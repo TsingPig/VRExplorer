@@ -5,7 +5,6 @@ using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 /// <summary>
 /// Machine Learning Agent：强化学习智能体
 /// </summary>
@@ -121,8 +120,12 @@ public class VRAgent : Agent
     public override void OnEpisodeBegin()
     {
         GrabbablerGrabbed = 0;                     //重置抓取的物体
-        rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
-        rigidbody.angularVelocity = Vector3.zero;
+        if(rigidbody != null)
+        {
+            rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
+            rigidbody.angularVelocity = Vector3.zero;
+
+        }
 
         //默认情况下，要面向花
         bool inFrontOfFlower = true;
@@ -139,7 +142,7 @@ public class VRAgent : Agent
         }
 
         //将智能体随机移动到一个新的点位
-        MoveToSafeRandomPosition(inFrontOfFlower);
+        //MoveToSafeRandomPosition(inFrontOfFlower);
 
 
     }
@@ -167,7 +170,7 @@ public class VRAgent : Agent
         //计算目标移动向量, targetDirection(dx,dy,dz)
         Vector3 targetMoveDirection = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
         //在这个小鸟移动方向上，施加一个力
-        rigidbody.AddForce(targetMoveDirection * moveForce);
+        rigidbody?.AddForce(targetMoveDirection * moveForce);
 
 
         //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
@@ -280,7 +283,7 @@ public class VRAgent : Agent
     {
         Debug.Assert(trainingMode == false, "训练模式不支持冻结智能体。");
         frozen = true;
-        rigidbody.Sleep();
+        rigidbody?.Sleep();
     }
 
     /// <summary>
@@ -290,7 +293,7 @@ public class VRAgent : Agent
     {
         Debug.Assert(trainingMode == false, "训练模式不支持解冻智能体。");
         frozen = false;
-        rigidbody.WakeUp();
+        rigidbody?.WakeUp();
     }
 
     /// <summary>
@@ -418,13 +421,7 @@ public class VRAgent : Agent
 
     private void Update()
     {
-        //画一条从鸟喙指向最近的花的线
-        if(nearestFlower != null)
-        {
-            //Debug.DrawLine(BeakTipCenterPosition, nearestFlower.FlowerCenterPosition, Color.green);
 
-
-        }
     }
     private void FixedUpdate()
     {
@@ -454,23 +451,23 @@ public class VRAgent : Agent
     // 手部碰撞时调用
     public void OnGrabberCollisionEnter(Collision collision)
     {
-        if(collision.collider.GetComponent<Grabbable>() != null && trainingMode)
+
+
+    }
+
+    // 子物体触发时调用
+    public void OnGrabberTriggerEnter(Collider collider)
+    {
+        if(collider.transform.GetComponent<Grabbable>() != null && trainingMode)
         {
             //AddReward(-0.5f);
             Debug.Log("碰撞Grabbable物体");
         }
-        if(collision.collider.GetComponent<Grabbable>() != null && !trainingMode)
+        if(collider.transform.GetComponent<Grabbable>() != null && !trainingMode)
         {
             //AddReward(-0.5f);
             Debug.Log("非trainingMode，碰撞Grabbable物体");
         }
 
-    }
-
-    // 子物体触发时调用
-    public void OnGrabberTriggerEnter(Collider other)
-    {
-        Debug.Log("检测到 Grabber 子物体的触发事件");
-        // 在此处处理触发逻辑
     }
 }
