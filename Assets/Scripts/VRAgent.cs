@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class VRAgent : Agent
 {
+    public SmoothLocomotion smoothLocomotion;
+    public BNGPlayerController player;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
@@ -61,24 +63,6 @@ public class VRAgent : Agent
     }
 
 
-    [Tooltip("当移动的时候施加在小鸟身上的力")]
-    public float moveForce = 0.1f;
-
-    [Tooltip("向上或者向下的俯冲旋转速度")]
-    public float pitchSpeed = 100f;
-    public float maxPitchAngle = 80f;       //最大俯冲角度
-
-    [Tooltip("Y轴偏航旋转（角）速度")]
-    public float yawSpeed = 100f;
-
-    //平滑改变俯冲和偏航角速度率（-1f~1f）
-    private float smoothPitchSpeedRate = 0f;
-    private float smoothYawSpeedRate = 0f;
-    private float smoothChangeRate = 2f;
-
-
-
-
 
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
     //使用new关键字显示的隐藏基类中的成员
@@ -101,6 +85,8 @@ public class VRAgent : Agent
         //这加起来相当于对虚方法进行功能的扩充。
         base.Initialize();
         rigidbody = GetComponent<Rigidbody>();
+        player = FindObjectOfType<BNGPlayerController>();
+        smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
 
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
@@ -341,7 +327,7 @@ public class VRAgent : Agent
     }
     private void FixedUpdate()
     {
-
+        //smoothLocomotion.MoveCharacter(Vector3.forward *  Time.deltaTime);
     }
 
     private void Start()
