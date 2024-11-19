@@ -1,7 +1,6 @@
 using BNG;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
@@ -20,9 +19,6 @@ public class VRAgent : Agent
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
 
-
-
-
     /// <summary>
     /// 已经完成的抓取次数
     /// </summary>
@@ -32,19 +28,13 @@ public class VRAgent : Agent
         private set;
     }
 
-
-
-
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
     //使用new关键字显示的隐藏基类中的成员
-    new private Rigidbody rigidbody;
-
-
+    private new Rigidbody rigidbody;
 
     private const float ModelsHandRadius = 0.008f; //手与Grabber的最大可碰撞距离
 
     private bool frozen = false;          //Agent是否处于非飞行状态
-
 
     /// <summary>
     /// 初始化智能体
@@ -54,25 +44,20 @@ public class VRAgent : Agent
         //override重写virtual方法，再base.Initialize()表示调用被重写的这个父类方法
         //这加起来相当于对虚方法进行功能的扩充。
         base.Initialize();
-        rigidbody = GetComponent<Rigidbody>();
         player = FindObjectOfType<BNGPlayerController>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
-
 
         // 获取场景中所有的可抓取物体列表
         GetAllGrabbaleObjects();
 
-
         // 保存场景中，可抓取物体的初始位置和旋转
         StoreAllGrabbableObjectsTransform();
-
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
         if(!trainingMode)
         {
             MaxStep = 0;         //非训练模式下，无最大步数限制（MaxStep=0）
         }
-
     }
 
     /// <summary>
@@ -88,25 +73,15 @@ public class VRAgent : Agent
         // 重置加载所有可抓取物体的位置和旋转
         LoadAllGrabbableObjectsTransform();
 
-
-        rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
-        rigidbody.angularVelocity = Vector3.zero;
         transform.position = new Vector3(0, 1, 0); // 设定初始位置
         transform.rotation = Quaternion.identity;  // 重置旋转
-
-
-
 
         //base.OnEpisodeBegin();
         if(trainingMode)
         {
             //当训练模式下、在每个花区域（flowerArea）只有一个智能体Agent的时候
             //这时候一只鸟捆绑到一个花的区域上。
-
         }
-
-
-
     }
 
     /// <summary>
@@ -133,7 +108,6 @@ public class VRAgent : Agent
         //Vector3 targetMoveDirection = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
         ////在这个小鸟移动方向上，施加一个力
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
-
 
         ////获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
         //Vector3 curRotation = transform.rotation.eulerAngles;
@@ -196,7 +170,6 @@ public class VRAgent : Agent
         sensor.AddObservation(InputBridge.Instance.RightGrip);
         sensor.AddObservation(InputBridge.Instance.LeftTrigger);
         sensor.AddObservation(InputBridge.Instance.RightTrigger);
-
     }
 
     /// <summary>
@@ -212,8 +185,6 @@ public class VRAgent : Agent
     /// <param name="actionsOut">存储智能体的行为输出</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-
-
     }
 
     /// <summary>
@@ -280,14 +251,12 @@ public class VRAgent : Agent
         }
     }
 
-
     private void Update()
     {
         //Debug.Log(InputBridge.Instance.RightTrigger);   // 扣动扳机
         //Debug.Log(InputBridge.Instance.RightGrip);      // 抓取
         //Debug.Log(InputBridge.Instance.RightThumbNear); // 大拇指按下
         //InputBridge.Instance.RightGrip = 1f;
-
     }
 
     private void FixedUpdate()
@@ -297,8 +266,6 @@ public class VRAgent : Agent
 
     private void Start()
     {
-
-
         // 获取当前物体及其所有子物体的 Collider
         Collider[] colliders = GetComponentsInChildren<Collider>();
 
@@ -316,8 +283,6 @@ public class VRAgent : Agent
     // 手部碰撞时调用
     public void OnGrabberCollisionEnter(Collision collision)
     {
-
-
     }
 
     // 子物体触发时调用
@@ -333,6 +298,5 @@ public class VRAgent : Agent
             //AddReward(-0.5f);
             Debug.Log("非trainingMode，碰撞Grabbable物体");
         }
-
     }
 }
