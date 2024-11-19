@@ -10,20 +10,18 @@ using UnityEngine;
 /// </summary>
 public class VRAgent : Agent
 {
+    private Grabbable[] _grabbables;
+    private Vector3[] _initialPositions;
+    private Quaternion[] _initialRotations;
+
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
 
-    [Tooltip("右手变换")]
-    public Transform modelsRight;
-    [Tooltip("左手变换")]
-    public Transform modelsLeft;
 
-        
-    [Tooltip("智能体摄像机")]
-    public Camera agentCamera;
+
 
     /// <summary>
     /// 已经完成的抓取次数
@@ -34,33 +32,6 @@ public class VRAgent : Agent
         private set;
     }
 
-    /// <summary>
-    /// 鸟的物理中心位置
-    /// </summary>
-    public Vector3 BirdCenterPosition
-    {
-        get { return transform.position; }
-        private set { transform.position = value; }
-    }
-    //等价于：public Vector3 BirdCenterPosition=>transform.position;
-
-    /// <summary>
-    /// 右手位置
-    /// </summary>
-    public Vector3 ModelsRightCenterPosition
-    {
-        get { return modelsRight.position; }
-        private set { modelsRight.position = value; }
-    }
-
-    /// <summary>
-    /// 右手位置
-    /// </summary>
-    public Vector3 ModelsLeftCenterPosition
-    {
-        get { return modelsLeft.position; }
-        private set { modelsLeft.position = value; }
-    }
 
 
 
@@ -75,7 +46,6 @@ public class VRAgent : Agent
     private bool frozen = false;          //Agent是否处于非飞行状态
 
 
-
     /// <summary>
     /// 初始化智能体
     /// </summary>
@@ -87,6 +57,20 @@ public class VRAgent : Agent
         rigidbody = GetComponent<Rigidbody>();
         player = FindObjectOfType<BNGPlayerController>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
+        
+        
+        GetAllGrabbaleObjects();
+
+
+        // 保存场景中，可抓取物体的初始位置和旋转
+        _initialPositions = new Vector3[_grabbables.Length];
+        _initialRotations = new Quaternion[_grabbables.Length];
+
+        for(int i = 0; i < _grabbables.Length; i++)
+        {
+            _initialPositions[i] = _grabbables[i].transform.position;
+            _initialRotations[i] = _grabbables[i].transform.rotation;
+        }
 
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
@@ -94,6 +78,7 @@ public class VRAgent : Agent
         {
             MaxStep = 0;         //非训练模式下，无最大步数限制（MaxStep=0）
         }
+
     }
 
     /// <summary>
@@ -104,10 +89,22 @@ public class VRAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-
         GrabbablerGrabbed = 0;                     //重置抓取的物体
 
-
+        // 重置所有可抓取物体的位置和旋转
+        for(int i = 0; i < _grabbables.Length; i++)
+        {
+            _grabbables[i].transform.position = _initialPositions[i];
+            _grabbables[i].transform.rotation = _initialRotations[i];
+                
+            // 如果有 Rigidbody，则清除速度
+            Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
+            if(rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
 
         if(rigidbody != null)
         {
@@ -272,48 +269,16 @@ public class VRAgent : Agent
        
     }
 
+    /// <summary>
+    /// 获取场景中所有的可抓取物体列表
+    /// </summary>
+    private void GetAllGrabbaleObjects()
+    {
+        _grabbables = Object.FindObjectsOfType<Grabbable>();
+        Debug.Log($"场景中的可交互物体有{_grabbables.Length}个");
+    }
 
-    ///// <summary>
-    ///// 触发器触发停留事件:当智能体的碰撞体触碰到刚体的时候，
-    ///// 我们需要确定该物体拥有Grabbable组件
-    ///// </summary>
-    ///// <param name="collider">花蜜碰撞体</param>
-    //private void OnTriggerStay(Collider collider)
-    //{
-    //    if(collider.GetComponent<Grabbable>())
-    //    {
-    //        Vector3 closePointToBeakTip = collider.ClosestPoint(BeakTipCenterPosition);
 
-    //        //表示鸟喙能够吃到花蜜
-    //        if(Vector3.Distance(closePointToBeakTip, BeakTipCenterPosition) < ModelsHandRadius)
-    //        {
-    //            //找到花蜜碰撞体对应的Flower花
-    //            Flower flower = flowerArea.GetFlowerFromNectar(collider);
-    //            //尝试去吃掉0.01f的花蜜。
-    //            //？//注意：这个事件是每0.02秒发生一次、一秒发生50次。
-    //            GrabbablerGrabbed += 1;
-    //            if(trainingMode)
-    //            {
-    //                ////用向量点乘，A dot B > 0表示朝向相同，表示面朝花。 <0相反。为0则垂直
-    //                ////添加：判断是否鸟喙朝向花开口(正，则表示鸟喙朝向花开口）(1)
-    //                //float beakTipAlignment = Vector3.Dot(beakTip.forward.normalized,
-    //                //-nearestFlower.FlowerUpVector.normalized);
-    //                float forwardAlignment = Vector3.Dot(transform.forward.normalized,
-    //                    -nearestFlower.FlowerUpVector.normalized);
-    //                //基础奖励0.01f，如果是正对着花进行采食，额外加最多0.02f分。
-    //                float bonus = .02f * Mathf.Clamp01(forwardAlignment);
-    //                float baseIncrement = .01f;
-    //                float increment = baseIncrement + bonus;
-    //                AddReward(increment);
-    //            }
-    //        }
-    //        //记得更新flower
-    //        if(!nearestFlower.HasNectar)
-    //        {
-    //            UpdateNearestFlower();
-    //        }
-    //    }
-    //}
 
 
 
@@ -332,6 +297,8 @@ public class VRAgent : Agent
 
     private void Start()
     {
+        
+
         // 获取当前物体及其所有子物体的 Collider
         Collider[] colliders = GetComponentsInChildren<Collider>();
 
