@@ -57,20 +57,14 @@ public class VRAgent : Agent
         rigidbody = GetComponent<Rigidbody>();
         player = FindObjectOfType<BNGPlayerController>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
-        
-        
+
+
+        // 获取场景中所有的可抓取物体列表
         GetAllGrabbaleObjects();
 
 
         // 保存场景中，可抓取物体的初始位置和旋转
-        _initialPositions = new Vector3[_grabbables.Length];
-        _initialRotations = new Quaternion[_grabbables.Length];
-
-        for(int i = 0; i < _grabbables.Length; i++)
-        {
-            _initialPositions[i] = _grabbables[i].transform.position;
-            _initialRotations[i] = _grabbables[i].transform.rotation;
-        }
+        StoreAllGrabbableObjectsTransform();
 
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
@@ -91,30 +85,17 @@ public class VRAgent : Agent
     {
         GrabbablerGrabbed = 0;                     //重置抓取的物体
 
-        // 重置所有可抓取物体的位置和旋转
-        for(int i = 0; i < _grabbables.Length; i++)
-        {
-            _grabbables[i].transform.position = _initialPositions[i];
-            _grabbables[i].transform.rotation = _initialRotations[i];
-                
-            // 如果有 Rigidbody，则清除速度
-            Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
-            if(rb != null)
-            {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
-        }
+        // 重置加载所有可抓取物体的位置和旋转
+        LoadAllGrabbableObjectsTransform();
 
-        if(rigidbody != null)
-        {
-            rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
-            rigidbody.angularVelocity = Vector3.zero;
 
-        }
+        rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
+        rigidbody.angularVelocity = Vector3.zero;
+        transform.position = new Vector3(0, 1, 0); // 设定初始位置
+        transform.rotation = Quaternion.identity;  // 重置旋转
 
-        //默认情况下，要面向花
-        bool inFrontOfFlower = true;
+
+
 
         //base.OnEpisodeBegin();
         if(trainingMode)
@@ -122,12 +103,8 @@ public class VRAgent : Agent
             //当训练模式下、在每个花区域（flowerArea）只有一个智能体Agent的时候
             //这时候一只鸟捆绑到一个花的区域上。
 
-            //有50%的情况，让小鸟面朝花
-            inFrontOfFlower = Random.value > .5f;
         }
 
-        //将智能体随机移动到一个新的点位
-        //MoveToSafeRandomPosition(inFrontOfFlower);
 
 
     }
@@ -260,16 +237,6 @@ public class VRAgent : Agent
     }
 
     /// <summary>
-    /// 将智能体重新移动到一个安全（比如不在碰撞体内）的位置处。
-    /// 如果是在花前面，同时需要将喙伸入到花中
-    /// </summary>
-    /// <param name="inFrontOfFlower">是否要选择一个花前面的点。</param>
-    private void MoveToSafeRandomPosition(bool inFrontOfFlower)
-    {
-       
-    }
-
-    /// <summary>
     /// 获取场景中所有的可抓取物体列表
     /// </summary>
     private void GetAllGrabbaleObjects()
@@ -278,8 +245,40 @@ public class VRAgent : Agent
         Debug.Log($"场景中的可交互物体有{_grabbables.Length}个");
     }
 
+    /// <summary>
+    /// 存储所有场景中可抓取物体的变换信息
+    /// </summary>
+    private void StoreAllGrabbableObjectsTransform()
+    {
+        _initialPositions = new Vector3[_grabbables.Length];
+        _initialRotations = new Quaternion[_grabbables.Length];
 
+        for(int i = 0; i < _grabbables.Length; i++)
+        {
+            _initialPositions[i] = _grabbables[i].transform.position;
+            _initialRotations[i] = _grabbables[i].transform.rotation;
+        }
+    }
 
+    /// <summary>
+    /// 重置加载所有可抓取物体的位置和旋转
+    /// </summary>
+    private void LoadAllGrabbableObjectsTransform()
+    {
+        for(int i = 0; i < _grabbables.Length; i++)
+        {
+            _grabbables[i].transform.position = _initialPositions[i];
+            _grabbables[i].transform.rotation = _initialRotations[i];
+
+            // 如果有 Rigidbody，则清除速度
+            Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
+            if(rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+    }
 
 
     private void Update()
@@ -290,6 +289,7 @@ public class VRAgent : Agent
         //InputBridge.Instance.RightGrip = 1f;
 
     }
+
     private void FixedUpdate()
     {
         //smoothLocomotion.MoveCharacter(Vector3.forward *  Time.deltaTime);
@@ -297,7 +297,7 @@ public class VRAgent : Agent
 
     private void Start()
     {
-        
+
 
         // 获取当前物体及其所有子物体的 Collider
         Collider[] colliders = GetComponentsInChildren<Collider>();
