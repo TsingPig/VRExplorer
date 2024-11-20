@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/BNG Framework/Scenes/XR Demo.unity
     guid: a1360534006d3f845bc79b46b93cfec5
   m_configObjects:
-    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 83b307d31f67da347affefa6683ac30e,
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: b3ac24369c63cb246976bcaf96adab11,
       type: 2}
     Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 2ec24d39f7b5ac84aad7e5df7b4fd3ea,
       type: 2}

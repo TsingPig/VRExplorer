@@ -53,8 +53,9 @@ public class VRAgent : Agent
         base.Initialize();
         player = FindObjectOfType<BNGPlayerController>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
-        leftHandGrabber = GameObject.Find("LeftPhysicalHand").transform.GetChild(2);
-        rightHandGrabber = GameObject.Find("RightPhysicalHand").transform.GetChild(2);
+
+        leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
+        rightHandGrabber = GameObject.Find("RightController").transform.GetChild(2);
 
 
         _environmentGrabbables = GetEnvironmentGrabbables();

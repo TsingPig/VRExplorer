@@ -39,6 +39,7 @@ namespace BNG {
         void Start() {
             player = GetComponentInChildren<BNGPlayerController>();
             teleport = GetComponentInChildren<PlayerTeleport>();
+
             // Load Locomotion Preference
             if (LoadLocomotionFromPrefs) {
                 ChangeLocomotion(PlayerPrefs.GetInt("LocomotionSelection", 0) == 0 ? LocomotionType.Teleport : LocomotionType.SmoothLocomotion, false);
@@ -103,6 +104,7 @@ namespace BNG {
             if (save) {
                 PlayerPrefs.SetInt("LocomotionSelection", locomotionType == LocomotionType.Teleport ? 0 : 1);
             }
+
             UpdateTeleportStatus();
         }
 
