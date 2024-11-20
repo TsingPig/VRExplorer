@@ -131621,6 +131621,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
+      propertyPath: m_BehaviorName
+      value: VRAgent
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
       propertyPath: m_BehaviorType
       value: 1
       objectReference: {fileID: 0}
@@ -131632,7 +131637,7 @@ PrefabInstance:
     - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 12
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}

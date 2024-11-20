@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -11,29 +12,48 @@ using UnityEngine;
 public class VRAgent : Agent
 {
     private Grabbable[] _environmentGrabbables;      //场景中的可抓取物体
-
     private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private Vector3 _initialPosition;       // Agent的初始位置
     private Quaternion _initialRotation;    // Agent的初始旋转
+    
+    public bool isGrabbing;
+
 
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
     public Transform rightHandGrabber;      // 右手变换
-    public Transform leftHandGrabber;       // 左手变换
+    //public Transform leftHandGrabber;       // 左手变换
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
+    
+    public float grabbedReward = 0.5f;  // 抓取奖励
+    public float grabbingReward = 0.001f; // 持续抓取奖励
+    public float ungrabbedReward = 0.2f; // 松手奖励
 
-    [Tooltip("是否正在训练模式下（trainingMode）")]
-    public bool trainingMode;
-
-    public float AreaDiameter = 40f;    // 场景的半径大小估算
-
-    private float smoothPitchSpeedRate = 0f;
-    private float smoothYawSpeedRate = 0f;
-    private float smoothChangeRate = 2f;
-    public float pitchSpeed = 100f;
-    public float maxPitchAngle = 80f;       //最大俯冲角度
-    public float yawSpeed = 100f;
+    /// <summary>
+    /// 是否正在抓住物体
+    /// </summary>
+    public bool IsGrabbing
+    {
+        get { return isGrabbing; }
+        set
+        {
+            if(value)
+            {
+                GrabbablerGrabbed += 1;
+                AddReward(grabbedReward); // 抓取奖励
+                currentReward += grabbedReward;
+                Debug.Log($"抓住了物体，奖励增加{grabbedReward}");
+            }
+            else
+            {
+                AddReward(ungrabbedReward); // 放开奖励
+                currentReward += ungrabbedReward;
+                Debug.Log($"放开了物体，奖励增加{ungrabbedReward}");
+            }
+            isGrabbing = value;
+        }
+    }
 
     /// <summary>
     /// 已经完成的抓取次数
@@ -43,6 +63,23 @@ public class VRAgent : Agent
         get;
         private set;
     }
+
+
+    public float currentReward = 0f;
+
+    [Tooltip("是否正在训练模式下（trainingMode）")]
+    public bool trainingMode;
+
+    public float AreaDiameter = 40f;    // 场景的半径大小估算
+
+    private float smoothPitchSpeedRate = 0f;
+    private float smoothYawSpeedRate = 0f;
+    private float smoothChangeRate = 2f;
+    private float pitchSpeed = 100f;
+    private float maxPitchAngle = 80f;       //最大俯冲角度
+    private float yawSpeed = 100f;
+    private bool frozen = false;          //Agent是否处于非移动状态
+
 
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
     //使用new关键字显示的隐藏基类中的成员
@@ -59,7 +96,7 @@ public class VRAgent : Agent
         player = FindObjectOfType<BNGPlayerController>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
 
-        leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
+        //leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
         rightHandGrabber = GameObject.Find("RightController").transform.GetChild(2);
 
 
@@ -86,7 +123,7 @@ public class VRAgent : Agent
     public override void OnEpisodeBegin()
     {
         GrabbablerGrabbed = 0;                     //重置抓取的物体
-
+        currentReward = 0;
         // 重置加载所有可抓取物体的位置和旋转
         LoadAllGrabbableObjectsTransform();
 
@@ -94,12 +131,7 @@ public class VRAgent : Agent
         transform.position = _initialPosition; // 设定初始位置
         transform.rotation = _initialRotation;  // 重置旋转
 
-        //base.OnEpisodeBegin();
-        if(trainingMode)
-        {
-            //当训练模式下、在每个花区域（flowerArea）只有一个智能体Agent的时候
-            //这时候一只鸟捆绑到一个花的区域上。
-        }
+
     }
 
     /// <summary>
@@ -119,10 +151,11 @@ public class VRAgent : Agent
     /// 例如位移、旋转、攻击等。</param>
     public override void OnActionReceived(ActionBuffers actions)
     {
+        if(frozen) return;
         //获取输入行为的数据
         var vectorAction = actions.ContinuousActions;
         //计算目标移动向量, targetDirection(dx,dy,dz)
-        Vector3 targetMoveDirection = new Vector3(vectorAction[0],0, vectorAction[2]);
+        Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[2]);
         // 控制目标移动
         smoothLocomotion.MoveCharacter(targetMoveDirection.normalized);
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
@@ -183,13 +216,11 @@ public class VRAgent : Agent
         sensor.AddObservation(rightHandToNeareastGrabbable.normalized);
         sensor.AddObservation(relativeDistance);
 
-        // 添加：左右手的按键状态(4)
-        sensor.AddObservation(InputBridge.Instance.LeftGrip);
+        // 添加：右手的按键状态(2)
         sensor.AddObservation(InputBridge.Instance.RightGrip);
-        sensor.AddObservation(InputBridge.Instance.LeftTrigger);
         sensor.AddObservation(InputBridge.Instance.RightTrigger);
 
-        //总共12个观察
+        //总共10个观察
 
     }
 
@@ -246,7 +277,8 @@ public class VRAgent : Agent
     public void FreezeAgent()
     {
         Debug.Assert(trainingMode == false, "训练模式不支持冻结智能体。");
-        rigidbody?.Sleep();
+        frozen = true;
+
     }
 
     /// <summary>
@@ -255,7 +287,7 @@ public class VRAgent : Agent
     public void UnfreezeAgent()
     {
         Debug.Assert(trainingMode == false, "训练模式不支持解冻智能体。");
-        rigidbody?.WakeUp();
+        frozen = false;
     }
 
     /// <summary>
@@ -309,7 +341,7 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable GetNearestGrabbable()
     {
-        var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
+        var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(rightHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
         if(res == null)
         {
             _environmentGrabbables = GetEnvironmentGrabbables();
@@ -337,37 +369,68 @@ public class VRAgent : Agent
 
     private void Start()
     {
-        // 获取当前物体及其所有子物体的 Collider
-        Collider[] colliders = GetComponentsInChildren<Collider>();
-
-        foreach(Collider col in colliders)
-        {
-            // 对手部Grabber绑定碰撞事件
-            if(col.gameObject.name == "Grabber")
-            {
-                var collisionHandler = col.gameObject.AddComponent<GrabberCollisionHandler>();
-                collisionHandler.vrAgent = this;
-            }
-        }
+        var handler = rightHandGrabber.gameObject.AddComponent<GrabberCollisionHandler>();
+        handler.vrAgent = this;
     }
 
-    // 手部碰撞时调用
-    public void OnGrabberCollisionEnter(Collision collision)
-    {
-    }
 
-    // 子物体触发时调用
+    /// <summary>
+    /// Grabber接触到可抓取物体时调用
+    /// </summary>
+    /// <param name="collider"></param>
     public void OnGrabberTriggerEnter(Collider collider)
     {
-        if(collider.transform.GetComponent<Grabbable>() != null && trainingMode)
+        Grabbable grabbable = collider.transform.GetComponent<Grabbable>();
+        if(_environmentGrabbables.Contains(grabbable) && trainingMode)
         {
-            //AddReward(-0.5f);
-            Debug.Log("碰撞Grabbable物体");
         }
-        if(collider.transform.GetComponent<Grabbable>() != null && !trainingMode)
+
+    }
+
+    /// <summary>
+    /// Grabber离开可抓取物体时调用
+    /// </summary>
+    /// <param name="collider"></param>
+    public void OnGrabberTriggerExit(Collider collider)
+    {
+        Grabbable grabbable = collider.transform.GetComponent<Grabbable>();
+        if(_environmentGrabbables.Contains(grabbable) && trainingMode)
         {
-            //AddReward(-0.5f);
-            Debug.Log("非trainingMode，碰撞Grabbable物体");
         }
     }
+
+    /// <summary>
+    /// Grabber持续接触可抓取物体时调用
+    /// </summary>
+    /// <param name="collider"></param>
+    public void OnGrabberTriggerStay(Collider collider)
+    {
+        Grabbable grabbable = collider.transform.GetComponent<Grabbable>();
+        if(_environmentGrabbables.Contains(grabbable) && trainingMode)
+        {
+            // 如果处于抓取状态，给予抓取奖励
+            if(InputBridge.Instance.RightGrip == 1f)
+            {
+                if(!IsGrabbing)
+                {
+                    IsGrabbing = true; // 更新抓取状态
+                }
+                else
+                {
+                    // 处于持续抓取状态
+                    AddReward(grabbingReward); // 抓取奖励
+                    currentReward += grabbingReward;
+                    Debug.Log($"持续抓取，奖励增加{grabbingReward}");
+                }
+            }
+            // 如果从抓取状态切换到非抓取状态，给予放开奖励
+            else if(IsGrabbing && InputBridge.Instance.RightGrip < 1f)
+            {
+                IsGrabbing = false; // 更新抓取状态
+            }
+
+        }
+    }
+
+
 }
