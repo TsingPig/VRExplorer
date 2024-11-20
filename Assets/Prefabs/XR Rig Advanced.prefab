@@ -57565,12 +57565,18 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
+  isGrabbing: 0
   smoothLocomotion: {fileID: 0}
   player: {fileID: 0}
   rightHandGrabber: {fileID: 0}
-  leftHandGrabber: {fileID: 0}
   neareastGrabbable: {fileID: 0}
+  grabbedReward: 0.5
+  grabbingReward: 0.0005
+  ungrabbedReward: 0.2
+  idlePunishment: -0.00001
+  currentReward: 0
   trainingMode: 1
+  AreaDiameter: 40
 --- !u!1 &6603154297308095803
 GameObject:
   m_ObjectHideFlags: 0

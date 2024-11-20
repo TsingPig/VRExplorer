@@ -76,9 +76,10 @@ public class VRAgent : Agent
     private float smoothPitchSpeedRate = 0f;
     private float smoothYawSpeedRate = 0f;
     private float smoothChangeRate = 2f;
-    private float pitchSpeed = 100f;
-    private float maxPitchAngle = 80f;       //最大俯冲角度
-    private float yawSpeed = 100f;
+    private float pitchSpeed = 200f;
+    private float maxPitchAngle = 20f;       //最大俯冲角度
+    private float yawSpeed = 200f;
+    private float moveSpeed = 4f;
     private bool frozen = false;          //Agent是否处于非移动状态
 
 
@@ -158,13 +159,13 @@ public class VRAgent : Agent
         Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[2]);
         // 控制目标移动
 
-        Debug.Log(targetMoveDirection);
+        targetMoveDirection = smoothLocomotion.transform.TransformDirection(targetMoveDirection);
 
-        smoothLocomotion.MoveCharacter(targetMoveDirection.normalized);
+        smoothLocomotion.MoveCharacter(targetMoveDirection.normalized * Time.deltaTime * moveSpeed);
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
 
         //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
-        Vector3 curRotation = transform.rotation.eulerAngles;
+        Vector3 curRotation = smoothLocomotion.transform.rotation.eulerAngles;
 
         //从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
         float targetPitchSpeedRate = vectorAction[3];
@@ -181,7 +182,7 @@ public class VRAgent : Agent
         pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
 
         //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
-        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+        smoothLocomotion.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
         // 获取离散动作
         var discreteActions = actions.DiscreteActions;
@@ -252,7 +253,7 @@ public class VRAgent : Agent
         if(Input.GetKey(KeyCode.D)) moveDirection += Vector3.right;
 
         // 鼠标控制旋转
-        float pitch = Input.GetAxis("Mouse Y"); // 垂直旋转（上下视角）
+        float pitch = -Input.GetAxis("Mouse Y"); // 垂直旋转（上下视角）
         float yaw = Input.GetAxis("Mouse X");   // 水平旋转（左右视角）
 
         // Z/X 键控制抓取动作
