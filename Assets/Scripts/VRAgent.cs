@@ -10,9 +10,12 @@ using UnityEngine;
 /// </summary>
 public class VRAgent : Agent
 {
-    private Grabbable[] _grabbables;
-    private Vector3[] _initialPositions;
-    private Quaternion[] _initialRotations;
+    private Grabbable[] _environmentGrabbables;      //场景中的可抓取物体
+
+    private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
+    private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
+    private Vector3 _initialPosition;       // Agent的初始位置
+    private Quaternion _initialRotation;    // Agent的初始旋转
 
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
@@ -48,14 +51,18 @@ public class VRAgent : Agent
         //override重写virtual方法，再base.Initialize()表示调用被重写的这个父类方法
         //这加起来相当于对虚方法进行功能的扩充。
         base.Initialize();
-        //player = FindObjectOfType<BNGPlayerController>();
-        //smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
-        //leftHandGrabber = GameObject.Find("LeftPhysicalHand").transform.GetChild(2);
-        //rightHandGrabber = GameObject.Find("RightPhysicalHand").transform.GetChild(2);
-        _grabbables = GetAllGrabbaleObjects();// 获取场景中所有的可抓取物体列表
+        player = FindObjectOfType<BNGPlayerController>();
+        smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
+        leftHandGrabber = GameObject.Find("LeftPhysicalHand").transform.GetChild(2);
+        rightHandGrabber = GameObject.Find("RightPhysicalHand").transform.GetChild(2);
+
+
+        _environmentGrabbables = GetEnvironmentGrabbables();
         neareastGrabbable = GetNearestGrabbable();
 
         StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
+        _initialPosition = transform.position;
+        _initialRotation = transform.rotation;
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
         if(!trainingMode)
@@ -77,8 +84,9 @@ public class VRAgent : Agent
         // 重置加载所有可抓取物体的位置和旋转
         LoadAllGrabbableObjectsTransform();
 
-        transform.position = new Vector3(0, 1, 0); // 设定初始位置
-        transform.rotation = Quaternion.identity;  // 重置旋转
+
+        transform.position = _initialPosition; // 设定初始位置
+        transform.rotation = _initialRotation;  // 重置旋转
 
         //base.OnEpisodeBegin();
         if(trainingMode)
@@ -214,11 +222,12 @@ public class VRAgent : Agent
     /// <summary>
     /// 获取场景中所有的可抓取物体列表
     /// </summary>
-    private Grabbable[] GetAllGrabbaleObjects()
+    private Grabbable[] GetEnvironmentGrabbables()
     {
-        var result = Object.FindObjectsOfType<Grabbable>();
-        Debug.Log($"场景中的可交互物体有{result.Length}个");
-        return result;
+        var allGrabbables = Object.FindObjectsOfType<Grabbable>();
+        var environmentGrabbables = allGrabbables.Except(transform.GetComponentsInChildren<Grabbable>()).ToArray();
+        Debug.Log($"场景中的可交互物体有{environmentGrabbables.Length}个");
+        return environmentGrabbables;
     }
 
     /// <summary>
@@ -226,13 +235,13 @@ public class VRAgent : Agent
     /// </summary>
     private void StoreAllGrabbableObjectsTransform()
     {
-        _initialPositions = new Vector3[_grabbables.Length];
-        _initialRotations = new Quaternion[_grabbables.Length];
+        _initialGrabbablePositions = new Vector3[_environmentGrabbables.Length];
+        _initialGrabbableRotations = new Quaternion[_environmentGrabbables.Length];
 
-        for(int i = 0; i < _grabbables.Length; i++)
+        for(int i = 0; i < _environmentGrabbables.Length; i++)
         {
-            _initialPositions[i] = _grabbables[i].transform.position;
-            _initialRotations[i] = _grabbables[i].transform.rotation;
+            _initialGrabbablePositions[i] = _environmentGrabbables[i].transform.position;
+            _initialGrabbableRotations[i] = _environmentGrabbables[i].transform.rotation;
         }
     }
 
@@ -241,13 +250,13 @@ public class VRAgent : Agent
     /// </summary>
     private void LoadAllGrabbableObjectsTransform()
     {
-        for(int i = 0; i < _grabbables.Length; i++)
+        for(int i = 0; i < _environmentGrabbables.Length; i++)
         {
-            _grabbables[i].transform.position = _initialPositions[i];
-            _grabbables[i].transform.rotation = _initialRotations[i];
+            _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
+            _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
 
             // 如果有 Rigidbody，则清除速度
-            Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
+            Rigidbody rb = _environmentGrabbables[i].GetComponent<Rigidbody>();
             if(rb != null)
             {
                 rb.velocity = Vector3.zero;
@@ -261,7 +270,7 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable GetNearestGrabbable()
     {
-        return _grabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
+        return _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
     }
 
     private void Update()

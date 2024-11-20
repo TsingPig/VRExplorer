@@ -75175,6 +75175,7 @@ GameObject:
   - component: {fileID: 5835717232903016108}
   - component: {fileID: 823061669245931258}
   - component: {fileID: 3800879838264149155}
+  - component: {fileID: 411521919}
   m_Layer: 0
   m_Name: XR Rig Advanced
   m_TagString: Untagged
@@ -75335,19 +75336,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
+    VectorObservationSize: 4
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
+      BranchSizes: 
+    VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
-  m_InferenceDevice: 0
+  m_InferenceDevice: 1
   m_BehaviorType: 0
-  m_BehaviorName: My Behavior
+  m_BehaviorName: VRAgent
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -75367,15 +75368,27 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
-  trainingMode: 0
-  modelsRight: {fileID: 0}
-  modelsLeft: {fileID: 0}
-  agentCamera: {fileID: 0}
-  moveForce: 2
-  pitchSpeed: 100
-  maxPitchAngle: 80
-  yawSpeed: 100
+  MaxStep: 50000
+  smoothLocomotion: {fileID: 0}
+  player: {fileID: 0}
+  rightHandGrabber: {fileID: 0}
+  leftHandGrabber: {fileID: 0}
+  neareastGrabbable: {fileID: 0}
+  trainingMode: 1
+--- !u!114 &411521919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8484783546018109669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
 --- !u!1 &8484783546044524851
 GameObject:
   m_ObjectHideFlags: 0
