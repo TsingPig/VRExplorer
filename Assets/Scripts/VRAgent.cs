@@ -26,10 +26,11 @@ public class VRAgent : Agent
     //public Transform leftHandGrabber;       // 左手变换
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
     
-    public float grabbedReward = 0.5f;  // 抓取奖励
-    public float grabbingReward = 0.0005f; // 持续抓取奖励
-    public float ungrabbedReward = 0.2f; // 松手奖励
-    public float idlePunishment = -0.00001f;
+    public float grabbedReward = 5f;  // 抓取奖励
+    public float grabbingReward = 0.005f; // 持续抓取奖励
+    public float ungrabbedReward = 2f; // 松手奖励
+    public float idlePunishment = -0.0001f;
+    public float distancePunisnment = -0.02f;
 
     /// <summary>
     /// 是否正在抓住物体
@@ -154,9 +155,9 @@ public class VRAgent : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         //获取输入行为的数据
-        var vectorAction = actions.ContinuousActions;
+        var continuousActions = actions.ContinuousActions;
         //计算目标移动向量, targetDirection(dx,dy,dz)
-        Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[2]);
+        Vector3 targetMoveDirection = new Vector3(continuousActions[0], 0, continuousActions[2]);
         // 控制目标移动
 
         targetMoveDirection = smoothLocomotion.transform.TransformDirection(targetMoveDirection);
@@ -168,8 +169,8 @@ public class VRAgent : Agent
         Vector3 curRotation = smoothLocomotion.transform.rotation.eulerAngles;
 
         //从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
-        float targetPitchSpeedRate = vectorAction[3];
-        float targetYawSpeedRate = vectorAction[4];
+        float targetPitchSpeedRate = continuousActions[3];
+        float targetYawSpeedRate = continuousActions[4];
 
         //平滑计算，将smooth平滑计算过渡到targetDelta上。
         //smooth的中间过程代表当前已经计算到的、应该附加的变化量。
@@ -184,13 +185,9 @@ public class VRAgent : Agent
         //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
         smoothLocomotion.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
-        // 获取离散动作
-        var discreteActions = actions.DiscreteActions;
-        int triggerGrab = discreteActions[0]; // 是否抓取（触发键）
-        int gripGrab = discreteActions[1];    // 是否抓取（手柄键）
 
-        InputBridge.Instance.RightTrigger = triggerGrab;
-        InputBridge.Instance.RightGrip = gripGrab;
+        InputBridge.Instance.RightTrigger = continuousActions[5];
+        InputBridge.Instance.RightGrip = continuousActions[6];
 
     }
 
@@ -269,10 +266,11 @@ public class VRAgent : Agent
         continuousActions[2] = moveDirection.z; // Z 方向移动
         continuousActions[3] = pitch;           // 垂直视角旋转
         continuousActions[4] = yaw;             // 水平视角旋转
-
+        continuousActions[5] = rightTrigger;
+        continuousActions[6] = rightGrip;
         // 将输入映射到 DiscreteActions (抓取动作)
-        discreteActions[0] = rightTrigger > 0 ? 1 : 0; // 扳机抓取
-        discreteActions[1] = rightGrip > 0 ? 1 : 0;    // 手柄抓取
+        //discreteActions[0] = rightTrigger > 0 ? 1 : 0; // 扳机抓取
+        //discreteActions[1] = rightGrip > 0 ? 1 : 0;    // 手柄抓取
     }
 
 
@@ -346,13 +344,8 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable GetNearestGrabbable()
     {
+        _environmentGrabbables = GetEnvironmentGrabbables();
         var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(rightHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
-        if(res == null)
-        {
-            _environmentGrabbables = GetEnvironmentGrabbables();
-            Debug.LogWarning("出现可抓取物体引用丢失");
-            return GetNearestGrabbable();
-        }
         return res;
     }
 
@@ -369,6 +362,11 @@ public class VRAgent : Agent
         {
             AddReward(idlePunishment);
             currentReward += idlePunishment;
+            if(Vector3.Distance(neareastGrabbable.transform.position, smoothLocomotion.transform.position) > 0.4f * AreaDiameter)
+            {
+                AddReward(distancePunisnment);
+                currentReward += distancePunisnment;
+            }
         }
 
     }
