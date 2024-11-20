@@ -127282,6 +127282,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 339972614535194941, guid: d7193dd2fc8d09f429b1d9a05550085a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 823061669245931258, guid: d7193dd2fc8d09f429b1d9a05550085a,
         type: 3}
       propertyPath: m_BehaviorName
@@ -127311,6 +127316,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2391777483235912719, guid: d7193dd2fc8d09f429b1d9a05550085a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2865811696094787868, guid: d7193dd2fc8d09f429b1d9a05550085a,
         type: 3}

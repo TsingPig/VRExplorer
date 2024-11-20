@@ -1,4 +1,5 @@
 using BNG;
+using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -15,6 +16,9 @@ public class VRAgent : Agent
 
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
+    public Transform rightHandGrabber;
+    public Transform leftHandGrabber;
+    public Grabbable neareastGrabbable;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
@@ -44,14 +48,14 @@ public class VRAgent : Agent
         //override重写virtual方法，再base.Initialize()表示调用被重写的这个父类方法
         //这加起来相当于对虚方法进行功能的扩充。
         base.Initialize();
-        player = FindObjectOfType<BNGPlayerController>();
-        smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
+        //player = FindObjectOfType<BNGPlayerController>();
+        //smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
+        //leftHandGrabber = GameObject.Find("LeftPhysicalHand").transform.GetChild(2);
+        //rightHandGrabber = GameObject.Find("RightPhysicalHand").transform.GetChild(2);
+        _grabbables = GetAllGrabbaleObjects();// 获取场景中所有的可抓取物体列表
+        neareastGrabbable = GetNearestGrabbable();
 
-        // 获取场景中所有的可抓取物体列表
-        GetAllGrabbaleObjects();
-
-        // 保存场景中，可抓取物体的初始位置和旋转
-        StoreAllGrabbableObjectsTransform();
+        StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
         if(!trainingMode)
@@ -210,10 +214,11 @@ public class VRAgent : Agent
     /// <summary>
     /// 获取场景中所有的可抓取物体列表
     /// </summary>
-    private void GetAllGrabbaleObjects()
+    private Grabbable[] GetAllGrabbaleObjects()
     {
-        _grabbables = Object.FindObjectsOfType<Grabbable>();
-        Debug.Log($"场景中的可交互物体有{_grabbables.Length}个");
+        var result = Object.FindObjectsOfType<Grabbable>();
+        Debug.Log($"场景中的可交互物体有{result.Length}个");
+        return result;
     }
 
     /// <summary>
@@ -251,6 +256,14 @@ public class VRAgent : Agent
         }
     }
 
+    /// <summary>
+    /// 获取最近的可抓取物体
+    /// </summary>
+    private Grabbable GetNearestGrabbable()
+    {
+        return _grabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
+    }
+
     private void Update()
     {
         //Debug.Log(InputBridge.Instance.RightTrigger);   // 扣动扳机
@@ -262,6 +275,7 @@ public class VRAgent : Agent
     private void FixedUpdate()
     {
         //smoothLocomotion.MoveCharacter(Vector3.forward *  Time.deltaTime);
+        neareastGrabbable = GetNearestGrabbable();
     }
 
     private void Start()
