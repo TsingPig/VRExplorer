@@ -131657,7 +131657,7 @@ PrefabInstance:
     - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: m_BehaviorType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
@@ -131732,12 +131732,22 @@ PrefabInstance:
     - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: idlePunishment
-      value: -0.0001
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: ungrabbedReward
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: distancePunisnment
+      value: -0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: outOfBoundPunishment
+      value: -0.02
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}

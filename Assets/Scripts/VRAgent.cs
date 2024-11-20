@@ -16,7 +16,7 @@ public class VRAgent : Agent
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private Vector3 _initialPosition;       // Agent的初始位置
     private Quaternion _initialRotation;    // Agent的初始旋转
-    
+
     public bool isGrabbing;
 
 
@@ -25,12 +25,13 @@ public class VRAgent : Agent
     public Transform rightHandGrabber;      // 右手变换
     //public Transform leftHandGrabber;       // 左手变换
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
-    
+
     public float grabbedReward = 5f;  // 抓取奖励
     public float grabbingReward = 0.005f; // 持续抓取奖励
     public float ungrabbedReward = 2f; // 松手奖励
     public float idlePunishment = -0.0001f;
     public float distancePunisnment = -0.02f;
+    public float outOfBoundPunishment = -0.02f;
 
     /// <summary>
     /// 是否正在抓住物体
@@ -40,7 +41,7 @@ public class VRAgent : Agent
         get { return isGrabbing; }
         set
         {
-            if (value)
+            if(value)
             {
                 GrabbablerGrabbed += 1;
                 AddReward(grabbedReward); // 抓取奖励
@@ -107,8 +108,8 @@ public class VRAgent : Agent
         neareastGrabbable = GetNearestGrabbable();
 
         StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
-        _initialPosition = transform.position;
-        _initialRotation = transform.rotation;
+        _initialPosition = smoothLocomotion.transform.position;
+        _initialRotation = smoothLocomotion.transform.rotation;
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
         if(!trainingMode)
@@ -131,8 +132,8 @@ public class VRAgent : Agent
         LoadAllGrabbableObjectsTransform();
 
 
-        transform.position = _initialPosition; // 设定初始位置
-        transform.rotation = _initialRotation;  // 重置旋转
+        smoothLocomotion.transform.position = _initialPosition; // 设定初始位置
+        smoothLocomotion.transform.rotation = _initialRotation;  // 重置旋转
 
 
     }
@@ -186,8 +187,10 @@ public class VRAgent : Agent
         smoothLocomotion.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
 
-        InputBridge.Instance.RightTrigger = continuousActions[5];
-        InputBridge.Instance.RightGrip = continuousActions[6];
+        InputBridge.Instance.RightTrigger = continuousActions[5] > 0 ? 1f : 0;
+        InputBridge.Instance.RightGrip = continuousActions[6] > 0 ? 1f : 0;
+        Debug.Log(continuousActions[5]);
+        Debug.Log(continuousActions[6]);
 
     }
 
@@ -238,9 +241,7 @@ public class VRAgent : Agent
     /// <param name="actionsOut">存储智能体的行为输出</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        Debug.Log("Heuristic");
         var continuousActions = actionsOut.ContinuousActions;
-        var discreteActions = actionsOut.DiscreteActions;
 
         // WASD 移动控制
         Vector3 moveDirection = Vector3.zero;
@@ -248,7 +249,6 @@ public class VRAgent : Agent
         if(Input.GetKey(KeyCode.S)) moveDirection += Vector3.back;
         if(Input.GetKey(KeyCode.A)) moveDirection += Vector3.left;
         if(Input.GetKey(KeyCode.D)) moveDirection += Vector3.right;
-
         // 鼠标控制旋转
         float pitch = -Input.GetAxis("Mouse Y"); // 垂直旋转（上下视角）
         float yaw = Input.GetAxis("Mouse X");   // 水平旋转（左右视角）
@@ -367,6 +367,13 @@ public class VRAgent : Agent
                 AddReward(distancePunisnment);
                 currentReward += distancePunisnment;
             }
+
+            if(smoothLocomotion.transform.position.y < -5f)
+            {
+                AddReward(outOfBoundPunishment);
+                currentReward += outOfBoundPunishment;
+
+            }
         }
 
     }
@@ -406,6 +413,10 @@ public class VRAgent : Agent
         Grabbable grabbable = collider.transform.GetComponent<Grabbable>();
         if(_environmentGrabbables.Contains(grabbable) && trainingMode)
         {
+            //if(IsGrabbing && InputBridge.Instance.RightGrip < 1f)
+            //{
+            //    IsGrabbing = false; // 更新抓取状态
+            //}
         }
     }
 
