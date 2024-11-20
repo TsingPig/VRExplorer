@@ -28,6 +28,13 @@ public class VRAgent : Agent
 
     public float AreaDiameter = 40f;    // 场景的半径大小估算
 
+    private float smoothPitchSpeedRate = 0f;
+    private float smoothYawSpeedRate = 0f;
+    private float smoothChangeRate = 2f;
+    public float pitchSpeed = 100f;
+    public float maxPitchAngle = 80f;       //最大俯冲角度
+    public float yawSpeed = 100f;
+
     /// <summary>
     /// 已经完成的抓取次数
     /// </summary>
@@ -112,33 +119,42 @@ public class VRAgent : Agent
     /// 例如位移、旋转、攻击等。</param>
     public override void OnActionReceived(ActionBuffers actions)
     {
-        //if(frozen) return;
-        ////获取输入行为的数据
-        //var vectorAction = actions.ContinuousActions;
-        ////计算目标移动向量, targetDirection(dx,dy,dz)
-        //Vector3 targetMoveDirection = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
-        ////在这个小鸟移动方向上，施加一个力
+        //获取输入行为的数据
+        var vectorAction = actions.ContinuousActions;
+        //计算目标移动向量, targetDirection(dx,dy,dz)
+        Vector3 targetMoveDirection = new Vector3(vectorAction[0],0, vectorAction[2]);
+        // 控制目标移动
+        smoothLocomotion.MoveCharacter(targetMoveDirection.normalized);
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
 
-        ////获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
-        //Vector3 curRotation = transform.rotation.eulerAngles;
+        //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
+        Vector3 curRotation = transform.rotation.eulerAngles;
 
-        ////从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
-        //float targetPitchSpeedRate = vectorAction[3];
-        //float targetYawSpeedRate = vectorAction[4];
+        //从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
+        float targetPitchSpeedRate = vectorAction[3];
+        float targetYawSpeedRate = vectorAction[4];
 
-        ////平滑计算，将smooth平滑计算过渡到targetDelta上。
-        ////smooth的中间过程代表当前已经计算到的、应该附加的变化量。
-        //smoothPitchSpeedRate = Mathf.MoveTowards(smoothPitchSpeedRate, targetPitchSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        //smoothYawSpeedRate = Mathf.MoveTowards(smoothYawSpeedRate, targetYawSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        ////p+=Rdp*dp*dt,y=Rdy*dy*dt
-        //float pitch = curRotation.x + smoothPitchSpeedRate * Time.fixedDeltaTime * pitchSpeed;
-        //float yaw = curRotation.y + smoothYawSpeedRate * Time.fixedDeltaTime * yawSpeed;
-        //if(pitch > 180f) pitch -= 360f;
-        //pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
+        //平滑计算，将smooth平滑计算过渡到targetDelta上。
+        //smooth的中间过程代表当前已经计算到的、应该附加的变化量。
+        smoothPitchSpeedRate = Mathf.MoveTowards(smoothPitchSpeedRate, targetPitchSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
+        smoothYawSpeedRate = Mathf.MoveTowards(smoothYawSpeedRate, targetYawSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
+        //p+=Rdp*dp*dt,y=Rdy*dy*dt
+        float pitch = curRotation.x + smoothPitchSpeedRate * Time.fixedDeltaTime * pitchSpeed;
+        float yaw = curRotation.y + smoothYawSpeedRate * Time.fixedDeltaTime * yawSpeed;
+        if(pitch > 180f) pitch -= 360f;
+        pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
 
-        ////计算完后，将新得到的旋转角度覆盖到当前旋转状态。
-        //transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+        //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
+        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+
+        // 获取离散动作
+        var discreteActions = actions.DiscreteActions;
+        int triggerGrab = discreteActions[0]; // 是否抓取（触发键）
+        int gripGrab = discreteActions[1];    // 是否抓取（手柄键）
+
+        InputBridge.Instance.RightTrigger = triggerGrab;
+        InputBridge.Instance.RightGrip = gripGrab;
+
     }
 
     /// <summary>
@@ -190,7 +206,39 @@ public class VRAgent : Agent
     /// <param name="actionsOut">存储智能体的行为输出</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
+        var continuousActions = actionsOut.ContinuousActions;
+        var discreteActions = actionsOut.DiscreteActions;
+
+        // WASD 移动控制
+        Vector3 moveDirection = Vector3.zero;
+        if(Input.GetKey(KeyCode.W)) moveDirection += Vector3.forward;
+        if(Input.GetKey(KeyCode.S)) moveDirection += Vector3.back;
+        if(Input.GetKey(KeyCode.A)) moveDirection += Vector3.left;
+        if(Input.GetKey(KeyCode.D)) moveDirection += Vector3.right;
+
+        // 鼠标控制旋转
+        float pitch = Input.GetAxis("Mouse Y"); // 垂直旋转（上下视角）
+        float yaw = Input.GetAxis("Mouse X");   // 水平旋转（左右视角）
+
+        // Z/X 键控制抓取动作
+        float rightTrigger = Input.GetKey(KeyCode.Z) ? 1f : 0f;
+        float rightGrip = Input.GetKey(KeyCode.X) ? 1f : 0f;
+
+        // 归一化移动方向
+        moveDirection = moveDirection.normalized;
+
+        // 将输入映射到 ContinuousActions
+        continuousActions[0] = moveDirection.x; // X 方向移动
+        continuousActions[1] = moveDirection.y; // Y 方向移动
+        continuousActions[2] = moveDirection.z; // Z 方向移动
+        continuousActions[3] = pitch;           // 垂直视角旋转
+        continuousActions[4] = yaw;             // 水平视角旋转
+
+        // 将输入映射到 DiscreteActions (抓取动作)
+        discreteActions[0] = rightTrigger > 0 ? 1 : 0; // 扳机抓取
+        discreteActions[1] = rightGrip > 0 ? 1 : 0;    // 手柄抓取
     }
+
 
     /// <summary>
     /// 在玩家控制模式下，控制冻结智能体

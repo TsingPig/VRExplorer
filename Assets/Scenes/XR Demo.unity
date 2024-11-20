@@ -131619,6 +131619,56 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Rig Advanced
       objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BehaviorType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_InferenceDevice
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.m_NumContinuousActions
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: trainingMode
