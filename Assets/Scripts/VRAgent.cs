@@ -152,12 +152,14 @@ public class VRAgent : Agent
     /// 例如位移、旋转、攻击等。</param>
     public override void OnActionReceived(ActionBuffers actions)
     {
-        if(frozen) return;
         //获取输入行为的数据
         var vectorAction = actions.ContinuousActions;
         //计算目标移动向量, targetDirection(dx,dy,dz)
         Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[2]);
         // 控制目标移动
+
+        Debug.Log(targetMoveDirection);
+
         smoothLocomotion.MoveCharacter(targetMoveDirection.normalized);
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
 
@@ -238,6 +240,7 @@ public class VRAgent : Agent
     /// <param name="actionsOut">存储智能体的行为输出</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
+        Debug.Log("Heuristic");
         var continuousActions = actionsOut.ContinuousActions;
         var discreteActions = actionsOut.DiscreteActions;
 
@@ -278,7 +281,7 @@ public class VRAgent : Agent
     public void FreezeAgent()
     {
         Debug.Assert(trainingMode == false, "训练模式不支持冻结智能体。");
-        frozen = true;
+        //frozen = true;
 
     }
 

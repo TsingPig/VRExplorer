@@ -128351,6 +128351,12 @@ Transform:
   m_Father: {fileID: 2590009416432338695}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &122421565962481314 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6603154296693343323, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+    type: 3}
+  m_PrefabInstance: {fileID: 6490232545555917561}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &122421566001855722 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6603154296666658323, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
@@ -131552,6 +131558,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6339257227193634346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122421565962481314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
 --- !u!1001 &6490232545555917561
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -131676,8 +131696,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
+      propertyPath: MaxStep
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
       propertyPath: trainingMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: grabbedReward
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: grabbingReward
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: idlePunishment
+      value: -0.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: ungrabbedReward
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}
