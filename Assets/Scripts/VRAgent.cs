@@ -19,12 +19,14 @@ public class VRAgent : Agent
 
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
-    public Transform rightHandGrabber;
-    public Transform leftHandGrabber;
-    public Grabbable neareastGrabbable;
+    public Transform rightHandGrabber;      // 右手变换
+    public Transform leftHandGrabber;       // 左手变换
+    public Grabbable neareastGrabbable;     // 最近的可抓取物体
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
+
+    public float AreaDiameter = 40f;    // 场景的半径大小估算
 
     /// <summary>
     /// 已经完成的抓取次数
@@ -38,10 +40,6 @@ public class VRAgent : Agent
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
     //使用new关键字显示的隐藏基类中的成员
     private new Rigidbody rigidbody;
-
-    private const float ModelsHandRadius = 0.008f; //手与Grabber的最大可碰撞距离
-
-    private bool frozen = false;          //Agent是否处于非飞行状态
 
     /// <summary>
     /// 初始化智能体
@@ -152,37 +150,31 @@ public class VRAgent : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         ////sensor.AddObservation(观测数据)用于将观测数据添加到智能体感知器，用于训练智能体
-        ////当最近的花还没有设置出来的时候，要传递进去一个空的10维float数组
-        //if(nearestFlower == null)
-        //{
-        //    sensor.AddObservation(new float[10]);
-        //    return;
-        //}
-        ////添加：相对于父物体的局部旋转，即相对于小岛的旋转（4）
-        ////单位四元数是长度为1的四元数，用于表示旋转方向
-        //Quaternion relativeRotation = transform.localRotation.normalized;
-        ////添加：指向花的向量(3)
-        //Vector3 toFlower = nearestFlower.FlowerCenterPosition - BeakTipCenterPosition;
-        ////toFlower.Normalize();
-        ////添加：判断身体是否朝向花开口(+1代表直接在花面前，-1代表在花后面）(1)
-        ////用向量点乘，A dot B > 0表示朝向相同，表示面朝花。 <0相反。为0则垂直
-        //float positionAlignment = Vector3.Dot(toFlower.normalized,
-        //    -nearestFlower.FlowerUpVector.normalized);
-        ////添加：判断是否鸟喙朝向花开口(正，则表示鸟喙朝向花开口）(1)
-        ////float beakTipAlignment = Vector3.Dot(beakTip.forward.normalized, -nearestFlower.FlowerUpVector.normalized);
-        ////添加：鸟喙到花的相对（相对小岛）距离（1）
-        //float relativeDistance = toFlower.magnitude / FlowerArea.areaDiameter;
-        //sensor.AddObservation(relativeRotation);
-        //sensor.AddObservation(toFlower.normalized);
-        //sensor.AddObservation(positionAlignment);
-        //sensor.AddObservation(beakTipAlignment);
-        //sensor.AddObservation(relativeDistance);
-        //总共10个观察
 
+        //添加：相对于父物体的局部旋转，即相对于小岛的旋转（4）
+        //单位四元数是长度为1的四元数，用于表示旋转方向
+        Quaternion relativeRotation = transform.localRotation.normalized;
+
+        ////添加：从右手，指向最近可抓取的物体的向量(3)
+        Vector3 rightHandToNeareastGrabbable = neareastGrabbable.transform.position - rightHandGrabber.transform.position;
+
+
+        //添加：手到最近可抓取物体的相对（相对场景）距离(1）
+        float relativeDistance = rightHandToNeareastGrabbable.magnitude / AreaDiameter;
+
+
+        sensor.AddObservation(relativeRotation);
+        sensor.AddObservation(rightHandToNeareastGrabbable.normalized);
+        sensor.AddObservation(relativeDistance);
+
+        // 添加：左右手的按键状态(4)
         sensor.AddObservation(InputBridge.Instance.LeftGrip);
         sensor.AddObservation(InputBridge.Instance.RightGrip);
         sensor.AddObservation(InputBridge.Instance.LeftTrigger);
         sensor.AddObservation(InputBridge.Instance.RightTrigger);
+
+        //总共12个观察
+
     }
 
     /// <summary>
@@ -206,7 +198,6 @@ public class VRAgent : Agent
     public void FreezeAgent()
     {
         Debug.Assert(trainingMode == false, "训练模式不支持冻结智能体。");
-        frozen = true;
         rigidbody?.Sleep();
     }
 
@@ -216,7 +207,6 @@ public class VRAgent : Agent
     public void UnfreezeAgent()
     {
         Debug.Assert(trainingMode == false, "训练模式不支持解冻智能体。");
-        frozen = false;
         rigidbody?.WakeUp();
     }
 
@@ -271,7 +261,14 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable GetNearestGrabbable()
     {
-        return _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
+        var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(leftHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
+        if(res == null)
+        {
+            _environmentGrabbables = GetEnvironmentGrabbables();
+            Debug.LogWarning("出现可抓取物体引用丢失");
+            return GetNearestGrabbable();
+        }
+        return res;
     }
 
     private void Update()
@@ -280,12 +277,14 @@ public class VRAgent : Agent
         //Debug.Log(InputBridge.Instance.RightGrip);      // 抓取
         //Debug.Log(InputBridge.Instance.RightThumbNear); // 大拇指按下
         //InputBridge.Instance.RightGrip = 1f;
+
+        neareastGrabbable = GetNearestGrabbable();
     }
 
     private void FixedUpdate()
     {
         //smoothLocomotion.MoveCharacter(Vector3.forward *  Time.deltaTime);
-        neareastGrabbable = GetNearestGrabbable();
+
     }
 
     private void Start()

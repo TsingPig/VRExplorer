@@ -131619,6 +131619,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Rig Advanced
       objectReference: {fileID: 0}
+    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+        type: 3}
+      propertyPath: trainingMode
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}
 --- !u!114 &6691768086823825396 stripped
