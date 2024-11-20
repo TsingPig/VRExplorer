@@ -27,8 +27,9 @@ public class VRAgent : Agent
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
     
     public float grabbedReward = 0.5f;  // 抓取奖励
-    public float grabbingReward = 0.001f; // 持续抓取奖励
+    public float grabbingReward = 0.0005f; // 持续抓取奖励
     public float ungrabbedReward = 0.2f; // 松手奖励
+    public float idlePunishment = -0.00001f;
 
     /// <summary>
     /// 是否正在抓住物体
@@ -38,7 +39,7 @@ public class VRAgent : Agent
         get { return isGrabbing; }
         set
         {
-            if(value)
+            if (value)
             {
                 GrabbablerGrabbed += 1;
                 AddReward(grabbedReward); // 抓取奖励
@@ -359,6 +360,13 @@ public class VRAgent : Agent
         //InputBridge.Instance.RightGrip = 1f;
 
         neareastGrabbable = GetNearestGrabbable();
+
+        if(trainingMode)
+        {
+            AddReward(idlePunishment);
+            currentReward += idlePunishment;
+        }
+
     }
 
     private void FixedUpdate()
