@@ -108,8 +108,8 @@ public class VRAgent : Agent
         neareastGrabbable = GetNearestGrabbable();
 
         StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
-        _initialPosition = smoothLocomotion.transform.position;
-        _initialRotation = smoothLocomotion.transform.rotation;
+        _initialPosition = transform.position;
+        _initialRotation = transform.rotation;
 
         //MaxStep用于限制在训练模式下，在某个环境中能够执行的最大步数
         if(!trainingMode)
@@ -132,10 +132,7 @@ public class VRAgent : Agent
         LoadAllGrabbableObjectsTransform();
 
 
-        smoothLocomotion.transform.position = _initialPosition; // 设定初始位置
-        smoothLocomotion.transform.rotation = _initialRotation;  // 重置旋转
-
-
+        transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
     }
 
     /// <summary>
@@ -161,13 +158,13 @@ public class VRAgent : Agent
         Vector3 targetMoveDirection = new Vector3(continuousActions[0], 0, continuousActions[2]);
         // 控制目标移动
 
-        targetMoveDirection = smoothLocomotion.transform.TransformDirection(targetMoveDirection);
+        targetMoveDirection = transform.TransformDirection(targetMoveDirection);
 
         smoothLocomotion.MoveCharacter(targetMoveDirection.normalized * Time.deltaTime * moveSpeed);
         //rigidbody?.AddForce(targetMoveDirection * moveForce);
 
         //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
-        Vector3 curRotation = smoothLocomotion.transform.rotation.eulerAngles;
+        Vector3 curRotation = transform.rotation.eulerAngles;
 
         //从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
         float targetPitchSpeedRate = continuousActions[3];
@@ -184,14 +181,19 @@ public class VRAgent : Agent
         pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
 
         //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
-        smoothLocomotion.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
 
         InputBridge.Instance.RightTrigger = continuousActions[5] > 0 ? 1f : 0;
         InputBridge.Instance.RightGrip = continuousActions[6] > 0 ? 1f : 0;
-        Debug.Log(continuousActions[5]);
-        Debug.Log(continuousActions[6]);
 
+        if(trainingMode && transform.localEulerAngles.y < -5f)
+        {
+            AddReward(outOfBoundPunishment);
+            currentReward += outOfBoundPunishment;
+            Debug.Log($"OutofBound:{_initialPosition}");
+            transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
+        }
     }
 
     /// <summary>
@@ -299,8 +301,8 @@ public class VRAgent : Agent
     private Grabbable[] GetEnvironmentGrabbables()
     {
         var allGrabbables = Object.FindObjectsOfType<Grabbable>();
-        var environmentGrabbables = allGrabbables.Except(transform.GetComponentsInChildren<Grabbable>()).ToArray();
-        Debug.Log($"场景中的可交互物体有{environmentGrabbables.Length}个");
+        var environmentGrabbables = allGrabbables.Except(transform.parent.GetComponentsInChildren<Grabbable>()).ToArray();
+        //Debug.Log($"场景中的可交互物体有{environmentGrabbables.Length}个");
         return environmentGrabbables;
     }
 
@@ -366,13 +368,6 @@ public class VRAgent : Agent
             {
                 AddReward(distancePunisnment);
                 currentReward += distancePunisnment;
-            }
-
-            if(smoothLocomotion.transform.position.y < -5f)
-            {
-                AddReward(outOfBoundPunishment);
-                currentReward += outOfBoundPunishment;
-
             }
         }
 

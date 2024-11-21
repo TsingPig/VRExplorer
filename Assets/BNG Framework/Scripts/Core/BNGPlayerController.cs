@@ -88,13 +88,13 @@ namespace BNG {
         /// Can also use this to detect if player somehow fell through a floor. Or if the "floor is lava".
         /// </summary>
         [Tooltip("Minimum Y position our player is allowed to go. Useful for floating point precision and making sure player didn't fall through the map.")]
-        public float MinElevation = -6000f;
+        public float MinElevation = -6f;
 
         /// <summary>
         /// If player goes above this elevation they will be reset to their initial starting position.
         /// If the player goes too far away from the center they may start to jitter due to floating point precisions.
         /// </summary>
-        public float MaxElevation = 6000f;
+        public float MaxElevation = 60f;
 
         [HideInInspector]
         public float LastPlayerMoveTime;
@@ -155,8 +155,10 @@ namespace BNG {
                     RotateTrackingSpaceToCamera();
                 }
             }
+
+            CheckPlayerElevationRespawn();
         }
-       
+
         void FixedUpdate() {
 
             UpdateDistanceFromGround();

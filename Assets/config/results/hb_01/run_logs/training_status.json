@@ -2,22 +2,22 @@
     "VRAgent": {
         "checkpoints": [
             {
-                "steps": 9472,
-                "file_path": "results\\hb_01\\VRAgent\\VRAgent-9472.onnx",
+                "steps": 5376,
+                "file_path": "results\\hb_01\\VRAgent\\VRAgent-5376.onnx",
                 "reward": null,
-                "creation_time": 1732109282.2118077,
+                "creation_time": 1732152260.0666327,
                 "auxillary_file_paths": [
-                    "results\\hb_01\\VRAgent\\VRAgent-9472.pt"
+                    "results\\hb_01\\VRAgent\\VRAgent-5376.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 9472,
+            "steps": 5376,
             "file_path": "results\\hb_01\\VRAgent.onnx",
             "reward": null,
-            "creation_time": 1732109282.2118077,
+            "creation_time": 1732152260.0666327,
             "auxillary_file_paths": [
-                "results\\hb_01\\VRAgent\\VRAgent-9472.pt"
+                "results\\hb_01\\VRAgent\\VRAgent-5376.pt"
             ]
         }
     },
