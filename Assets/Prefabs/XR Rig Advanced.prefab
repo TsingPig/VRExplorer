@@ -33795,7 +33795,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1400
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1939895775185256724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57370,8 +57370,6 @@ GameObject:
   - component: {fileID: 1002157301101913309}
   - component: {fileID: 1002157301101913296}
   - component: {fileID: 9124219799590801938}
-  - component: {fileID: 7881222817400879457}
-  - component: {fileID: 8864359253032663393}
   m_Layer: 0
   m_Name: XR Rig Advanced
   m_TagString: Untagged
@@ -57519,64 +57517,6 @@ MonoBehaviour:
   HMDIsActive: 0
   LeftControllerPosition: {x: -0.2, y: -0.2, z: 0.5}
   RightControllerPosition: {x: 0.2, y: -0.2, z: 0.5}
---- !u!114 &7881222817400879457
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6603154296693343323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_BrainParameters:
-    VectorObservationSize: 1
-    NumStackedVectorObservations: 1
-    m_ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
-    VectorActionDescriptions: []
-    VectorActionSpaceType: 0
-    hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
-  m_InferenceDevice: 0
-  m_BehaviorType: 0
-  m_BehaviorName: My Behavior
-  TeamId: 0
-  m_UseChildSensors: 1
-  m_UseChildActuators: 1
-  m_ObservableAttributeHandling: 0
---- !u!114 &8864359253032663393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6603154296693343323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ce364324c8ca644eb015fe2a5e41c42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
-  isGrabbing: 0
-  smoothLocomotion: {fileID: 0}
-  player: {fileID: 0}
-  rightHandGrabber: {fileID: 0}
-  neareastGrabbable: {fileID: 0}
-  grabbedReward: 0.5
-  grabbingReward: 0.0005
-  ungrabbedReward: 0.2
-  idlePunishment: -0.00001
-  currentReward: 0
-  trainingMode: 1
-  AreaDiameter: 40
 --- !u!1 &6603154297308095803
 GameObject:
   m_ObjectHideFlags: 0
@@ -62732,6 +62672,9 @@ GameObject:
   - component: {fileID: 9124219800142959501}
   - component: {fileID: 9124219799072186131}
   - component: {fileID: 5124358483106301837}
+  - component: {fileID: 8519486038960409293}
+  - component: {fileID: 8519486038960409294}
+  - component: {fileID: 8519486038960409295}
   m_Layer: 9
   m_Name: PlayerController
   m_TagString: Player
@@ -63109,6 +63052,80 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8519486038960409293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7175128582428581144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
+--- !u!114 &8519486038960409294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7175128582428581144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce364324c8ca644eb015fe2a5e41c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  isGrabbing: 0
+  smoothLocomotion: {fileID: 0}
+  player: {fileID: 0}
+  rightHandGrabber: {fileID: 0}
+  neareastGrabbable: {fileID: 0}
+  grabbedReward: 5
+  grabbingReward: 0.005
+  ungrabbedReward: 2
+  idlePunishment: -0.0001
+  distancePunisnment: -0.02
+  outOfBoundPunishment: -5
+  currentReward: 0
+  trainingMode: 1
+  AreaDiameter: 40
+--- !u!114 &8519486038960409295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7175128582428581144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 10
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 7
+      BranchSizes: 
+    VectorActionSize: 07000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 1
+  m_BehaviorType: 0
+  m_BehaviorName: VRAgent
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
 --- !u!1 &7176143295493687194
 GameObject:
   m_ObjectHideFlags: 0
@@ -74321,7 +74338,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1400
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &3272392595319386266
 MonoBehaviour:
   m_ObjectHideFlags: 0

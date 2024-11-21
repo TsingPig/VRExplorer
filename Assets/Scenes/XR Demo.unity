@@ -114822,7 +114822,7 @@ Transform:
   m_GameObject: {fileID: 1971433218}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.5, y: -6, z: 0}
-  m_LocalScale: {x: 10000, y: 10, z: 10000}
+  m_LocalScale: {x: 100, y: 10, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -131245,12 +131245,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d1403a4ac31b4464e9582f7faaf31deb, type: 3}
---- !u!1 &4144118093911848929 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7175128582428581144, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-    type: 3}
-  m_PrefabInstance: {fileID: 6490232545555917561}
-  m_PrefabAsset: {fileID: 0}
 --- !u!205 &4261493336155157779
 LODGroup:
   m_ObjectHideFlags: 0
@@ -131572,26 +131566,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3086319509469296003, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3138045633653491520, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_PresetInfoIsWorld
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4391347022643184493, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_PresetInfoIsWorld
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5548470059171766065, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6603154296693343321, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: m_RootOrder
@@ -131652,109 +131626,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Rig Advanced
       objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BehaviorName
-      value: VRAgent
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
+    - target: {fileID: 8519486038960409295, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
         type: 3}
       propertyPath: m_BehaviorType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_InferenceDevice
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.VectorActionSpaceType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.VectorObservationSize
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.m_NumContinuousActions
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: MaxStep
-      value: 50000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: trainingMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: grabbedReward
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: grabbingReward
-      value: 0.005
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: idlePunishment
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: ungrabbedReward
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: distancePunisnment
-      value: -0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21,
-        type: 3}
-      propertyPath: outOfBoundPunishment
-      value: -0.02
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8864359253032663393, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}
-    - {fileID: 7881222817400879457, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61a15e7bac0ed947b70c2f3ae89ef21, type: 3}
 --- !u!114 &6691768086823825396 stripped
 MonoBehaviour:
@@ -132252,80 +132129,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7597927797659456591}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &8519486038960409293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4144118093911848929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DecisionPeriod: 5
-  TakeActionsBetweenDecisions: 1
---- !u!114 &8519486038960409294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4144118093911848929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ce364324c8ca644eb015fe2a5e41c42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
-  isGrabbing: 0
-  smoothLocomotion: {fileID: 0}
-  player: {fileID: 0}
-  rightHandGrabber: {fileID: 0}
-  neareastGrabbable: {fileID: 0}
-  grabbedReward: 5
-  grabbingReward: 0.005
-  ungrabbedReward: 2
-  idlePunishment: -0.0001
-  distancePunisnment: -0.02
-  outOfBoundPunishment: -0.02
-  currentReward: 0
-  trainingMode: 1
-  AreaDiameter: 40
---- !u!114 &8519486038960409295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4144118093911848929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_BrainParameters:
-    VectorObservationSize: 10
-    NumStackedVectorObservations: 1
-    m_ActionSpec:
-      m_NumContinuousActions: 7
-      BranchSizes: 
-    VectorActionSize: 07000000
-    VectorActionDescriptions: []
-    VectorActionSpaceType: 1
-    hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
-  m_InferenceDevice: 1
-  m_BehaviorType: 1
-  m_BehaviorName: VRAgent
-  TeamId: 0
-  m_UseChildSensors: 1
-  m_UseChildActuators: 1
-  m_ObservableAttributeHandling: 0
 --- !u!1001 &8710617120108465711
 PrefabInstance:
   m_ObjectHideFlags: 0

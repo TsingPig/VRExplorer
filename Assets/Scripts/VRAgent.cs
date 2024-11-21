@@ -81,7 +81,7 @@ public class VRAgent : Agent
     private float pitchSpeed = 200f;
     private float maxPitchAngle = 20f;       //最大俯冲角度
     private float yawSpeed = 200f;
-    private float moveSpeed = 4f;
+    private float moveSpeed = 0.1f;
     private bool frozen = false;          //Agent是否处于非移动状态
 
 
@@ -97,7 +97,8 @@ public class VRAgent : Agent
         //override重写virtual方法，再base.Initialize()表示调用被重写的这个父类方法
         //这加起来相当于对虚方法进行功能的扩充。
         base.Initialize();
-        player = FindObjectOfType<BNGPlayerController>();
+        player = GetComponent<BNGPlayerController>();
+        rigidbody = GetComponent<Rigidbody>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
 
         //leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
@@ -158,10 +159,9 @@ public class VRAgent : Agent
         Vector3 targetMoveDirection = new Vector3(continuousActions[0], 0, continuousActions[2]);
         // 控制目标移动
 
-        targetMoveDirection = transform.TransformDirection(targetMoveDirection);
+        targetMoveDirection = Vector3.ClampMagnitude(transform.TransformDirection(targetMoveDirection).normalized * moveSpeed, moveSpeed);
 
-        smoothLocomotion.MoveCharacter(targetMoveDirection.normalized * Time.deltaTime * moveSpeed);
-        //rigidbody?.AddForce(targetMoveDirection * moveForce);
+        smoothLocomotion.MoveCharacter(targetMoveDirection.normalized * moveSpeed);
 
         //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
         Vector3 curRotation = transform.rotation.eulerAngles;
@@ -187,13 +187,7 @@ public class VRAgent : Agent
         InputBridge.Instance.RightTrigger = continuousActions[5] > 0 ? 1f : 0;
         InputBridge.Instance.RightGrip = continuousActions[6] > 0 ? 1f : 0;
 
-        if(trainingMode && transform.localEulerAngles.y < -5f)
-        {
-            AddReward(outOfBoundPunishment);
-            currentReward += outOfBoundPunishment;
-            Debug.Log($"OutofBound:{_initialPosition}");
-            transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
-        }
+
     }
 
     /// <summary>
@@ -368,6 +362,13 @@ public class VRAgent : Agent
             {
                 AddReward(distancePunisnment);
                 currentReward += distancePunisnment;
+            }
+            if(trainingMode && transform.position.y < -5f || Vector3.Distance(neareastGrabbable.transform.position, smoothLocomotion.transform.position) >  AreaDiameter)
+            {
+                AddReward(outOfBoundPunishment);
+                currentReward += outOfBoundPunishment;
+                Debug.Log($"OutofBound:{_initialPosition}");
+                EndEpisode();
             }
         }
 
