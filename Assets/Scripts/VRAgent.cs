@@ -19,7 +19,7 @@ public class VRAgent : Agent
 
     public bool isGrabbing;
 
-
+    public Transform itemRoot;
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
     public Transform rightHandGrabber;      // 右手变换
@@ -31,7 +31,6 @@ public class VRAgent : Agent
     public float ungrabbedReward = 2f; // 松手奖励
     public float idlePunishment = -0.0001f;
     public float distancePunisnment = -0.02f;
-    public float outOfBoundPunishment = -0.02f;
 
     /// <summary>
     /// 是否正在抓住物体
@@ -101,6 +100,7 @@ public class VRAgent : Agent
         rigidbody = GetComponent<Rigidbody>();
         smoothLocomotion = player.GetComponentInChildren<SmoothLocomotion>();
 
+        if(itemRoot == null) { itemRoot = GameObject.Find("Item").transform; }
         //leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
         rightHandGrabber = GameObject.Find("RightController").transform.GetChild(2);
 
@@ -294,9 +294,9 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable[] GetEnvironmentGrabbables()
     {
-        var allGrabbables = Object.FindObjectsOfType<Grabbable>();
+        var allGrabbables = itemRoot.GetComponentsInChildren<Grabbable>();
         var environmentGrabbables = allGrabbables.Except(transform.parent.GetComponentsInChildren<Grabbable>()).ToArray();
-        //Debug.Log($"场景中的可交互物体有{environmentGrabbables.Length}个");
+        Debug.Log($"场景中的可交互物体有{environmentGrabbables.Length}个");
         return environmentGrabbables;
     }
 
@@ -340,7 +340,6 @@ public class VRAgent : Agent
     /// </summary>
     private Grabbable GetNearestGrabbable()
     {
-        _environmentGrabbables = GetEnvironmentGrabbables();
         var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(rightHandGrabber.position, grabbable.transform.position)).FirstOrDefault();
         return res;
     }
@@ -363,13 +362,7 @@ public class VRAgent : Agent
                 AddReward(distancePunisnment);
                 currentReward += distancePunisnment;
             }
-            if(trainingMode && transform.position.y < -5f || Vector3.Distance(neareastGrabbable.transform.position, smoothLocomotion.transform.position) >  AreaDiameter)
-            {
-                AddReward(outOfBoundPunishment);
-                currentReward += outOfBoundPunishment;
-                Debug.Log($"OutofBound:{_initialPosition}");
-                EndEpisode();
-            }
+
         }
 
     }
