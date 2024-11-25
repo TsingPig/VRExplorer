@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6200265275973643042}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.203, z: 0.548}
+  m_LocalPosition: {x: 0, y: -0.32, z: 0.548}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -422,12 +422,11 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 5000
+  MaxStep: 50000
   itemRoot: {fileID: 0}
   neareastGrabbable: {fileID: 0}
-  collisionReward: 1
-  boundaryPunishment: -10
-  currentReward: 0
+  collisionReward: 2
+  boundaryPunishment: -1
   trainingMode: 1
   AreaDiameter: 20
 --- !u!114 &6200265277660493215

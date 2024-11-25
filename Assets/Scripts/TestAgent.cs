@@ -1,9 +1,10 @@
 using BNG;
+
+using System.Collections.Generic;
 using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -11,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public class TestAgent : Agent
 {
-    private Grabbable[] _environmentGrabbables;      //场景中的可抓取物体
+    private List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
     private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private Vector3 _initialPosition;       // Agent的初始位置
@@ -23,22 +24,11 @@ public class TestAgent : Agent
 
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
 
-    public float collisionReward = 1f;  // 抓取奖励
-    public float boundaryPunishment = -10f;
+    public float collisionReward = 2f;  // 抓取奖励
+    public float boundaryPunishment = -1f;
 
 
 
-    /// <summary>
-    /// 已经完成的抓取次数
-    /// </summary>
-    public int GrabbablerGrabbed
-    {
-        get;
-        private set;
-    }
-
-
-    public float currentReward = 0f;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
@@ -51,7 +41,7 @@ public class TestAgent : Agent
     private float pitchSpeed = 100f;
     private float maxPitchAngle = 80f;       //最大俯冲角度
     private float yawSpeed = 100f;
-    private float moveForce = 2f;
+    private float moveForce = 4f;
 
 
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
@@ -68,7 +58,7 @@ public class TestAgent : Agent
         base.Initialize();
         rigidbody = GetComponent<Rigidbody>();
 
-        _environmentGrabbables = GetEnvironmentGrabbables();
+        GetEnvironmentGrabbables(out _environmentGrabbables);
         neareastGrabbable = GetNearestGrabbable();
 
         StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
@@ -90,15 +80,11 @@ public class TestAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        GrabbablerGrabbed = 0;                     //重置抓取的物体
-        currentReward = 0;
         rigidbody.velocity = Vector3.zero;       //将速度和角速度归零
         rigidbody.angularVelocity = Vector3.zero;
 
         // 重置加载所有可抓取物体的位置和旋转
         LoadAllGrabbableObjectsTransform();
-
-
         transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
     }
 
@@ -187,28 +173,35 @@ public class TestAgent : Agent
     /// <param name="actionsOut">存储智能体的行为输出</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var continuousActions = actionsOut.ContinuousActions;
+        Vector3 left = Vector3.zero;     //x
+        Vector3 up = Vector3.zero;       //y
+        Vector3 forward = Vector3.zero; //z
+        float pitch = 0f;
+        float yaw = 0f;
+        //用户输入控制
+        //将用户输入表示的移动和旋转，映射到上面的向量和浮点数
+        if(Input.GetKey(KeyCode.W)) forward = transform.forward;
+        else if(Input.GetKey(KeyCode.S)) forward = (-1f) * transform.forward;
 
-        // WASD 移动控制
-        Vector3 moveDirection = Vector3.zero;
-        if(Input.GetKey(KeyCode.W)) moveDirection += Vector3.forward;
-        if(Input.GetKey(KeyCode.S)) moveDirection += Vector3.back;
-        if(Input.GetKey(KeyCode.A)) moveDirection += Vector3.left;
-        if(Input.GetKey(KeyCode.D)) moveDirection += Vector3.right;
-        // 鼠标控制旋转
-        float pitch = -Input.GetAxis("Mouse Y"); // 垂直旋转（上下视角）
-        float yaw = Input.GetAxis("Mouse X");   // 水平旋转（左右视角）
+        if(Input.GetKey(KeyCode.LeftArrow)) left = (-1f) * transform.right;
+        else if(Input.GetKey(KeyCode.RightArrow)) left = transform.right;
 
-        // 归一化移动方向
-        moveDirection = moveDirection.normalized;
+        if(Input.GetKey(KeyCode.Space)) left = transform.up;
+        else if(Input.GetKey(KeyCode.LeftControl)) left = (-1f) * transform.up;
 
-        // 将输入映射到 ContinuousActions
-        continuousActions[0] = moveDirection.x; // X 方向移动
-        continuousActions[1] = moveDirection.y; // Y 方向移动
-        continuousActions[2] = moveDirection.z; // Z 方向移动
-        continuousActions[3] = pitch;           // 垂直视角旋转
-        continuousActions[4] = yaw;             // 水平视角旋转
+        if(Input.GetKey(KeyCode.UpArrow)) pitch = -1f;
+        else if(Input.GetKey(KeyCode.DownArrow)) pitch = 1f;
 
+        if(Input.GetKey(KeyCode.A)) yaw = -1f;
+        else if(Input.GetKey(KeyCode.D)) yaw = 1f;
+
+        Vector3 combinedDirection = (forward + up + left).normalized;
+
+        actionsOut.ContinuousActions.Array[0] = combinedDirection.x;
+        actionsOut.ContinuousActions.Array[1] = combinedDirection.y;
+        actionsOut.ContinuousActions.Array[2] = combinedDirection.z;
+        actionsOut.ContinuousActions.Array[3] = pitch;
+        actionsOut.ContinuousActions.Array[4] = yaw;
 
     }
 
@@ -216,11 +209,10 @@ public class TestAgent : Agent
     /// <summary>
     /// 获取场景中所有的可抓取物体列表
     /// </summary>
-    private Grabbable[] GetEnvironmentGrabbables()
+    private void GetEnvironmentGrabbables(out List<Grabbable> grabbables)
     {
-        var allGrabbables = itemRoot.GetComponentsInChildren<Grabbable>();
-        Debug.Log($"场景中的可交互物体有{allGrabbables.Length}个");
-        return allGrabbables;
+        grabbables = itemRoot.GetComponentsInChildren<Grabbable>().ToList();
+        Debug.Log($"场景中的可交互物体有{grabbables.Count}个");
     }
 
     /// <summary>
@@ -228,10 +220,10 @@ public class TestAgent : Agent
     /// </summary>
     private void StoreAllGrabbableObjectsTransform()
     {
-        _initialGrabbablePositions = new Vector3[_environmentGrabbables.Length];
-        _initialGrabbableRotations = new Quaternion[_environmentGrabbables.Length];
+        _initialGrabbablePositions = new Vector3[_environmentGrabbables.Count];
+        _initialGrabbableRotations = new Quaternion[_environmentGrabbables.Count];
 
-        for(int i = 0; i < _environmentGrabbables.Length; i++)
+        for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
             _initialGrabbablePositions[i] = _environmentGrabbables[i].transform.position;
             _initialGrabbableRotations[i] = _environmentGrabbables[i].transform.rotation;
@@ -243,7 +235,7 @@ public class TestAgent : Agent
     /// </summary>
     private void LoadAllGrabbableObjectsTransform()
     {
-        for(int i = 0; i < _environmentGrabbables.Length; i++)
+        for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
             _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
             _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
@@ -288,6 +280,8 @@ public class TestAgent : Agent
             if(collision.gameObject.CompareTag("Grabbable"))
             {
                 AddReward(collisionReward);
+                _environmentGrabbables.Remove(collision.gameObject.GetComponent<Grabbable>());
+                Destroy(collision.gameObject);
                 Debug.Log("collisionReward");
             }
             else if(collision.gameObject.CompareTag("Boundary"))
