@@ -245,7 +245,18 @@ public class TestAgent : Agent
         for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
             _environmentGrabbables[i].gameObject.SetActive(true);
-            _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
+            //_environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
+            //_environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
+
+
+            // 生成随机的偏移量（在 -AreaDiameter 到 +AreaDiameter 范围内）
+            float randomX = Random.Range(-AreaDiameter, AreaDiameter);
+            float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
+            float randomY = 1f;  // 固定不变，如果需要动态改变y值，可以使用类似的随机方式：Random.Range(minY, maxY)
+
+            // 计算新的目标位置（根据 itemRoot.position 和随机偏移）
+            Vector3 newPosition = itemRoot.position + new Vector3(randomX, randomY, randomZ);
+            _environmentGrabbables[i].transform.position = newPosition;
             _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
 
             // 如果有 Rigidbody，则清除速度
