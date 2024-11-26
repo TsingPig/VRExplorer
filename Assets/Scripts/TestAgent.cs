@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public class TestAgent : Agent
 {
-    private List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
+    private List<GameObject> _environmentGrabbables;      //场景中的可抓取物体
     private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private Vector3 _initialPosition;       // Agent的初始位置
@@ -22,9 +22,9 @@ public class TestAgent : Agent
 
     public Transform itemRoot;
 
-    public Grabbable neareastGrabbable;     // 最近的可抓取物体
+    public GameObject neareastGrabbable;     // 最近的可抓取物体
 
-    public float collisionReward = 2f;  // 抓取奖励
+    public float collisionReward = 5f;  // 抓取奖励
     public float boundaryPunishment = -1f;
 
 
@@ -59,9 +59,9 @@ public class TestAgent : Agent
         rigidbody = GetComponent<Rigidbody>();
 
         GetEnvironmentGrabbables(out _environmentGrabbables);
-        neareastGrabbable = GetNearestGrabbable();
+        GetNearestGrabbable(out neareastGrabbable);
 
-        StoreAllGrabbableObjectsTransform();   // 保存场景中，可抓取物体的初始位置和旋转
+        StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
 
@@ -84,8 +84,8 @@ public class TestAgent : Agent
         rigidbody.angularVelocity = Vector3.zero;
 
         // 重置加载所有可抓取物体的位置和旋转
-        LoadAllGrabbableObjectsTransform();
-        transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
+        ResetAllGrabbableObjects();
+        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
     }
 
     /// <summary>
@@ -112,25 +112,25 @@ public class TestAgent : Agent
         rigidbody.AddForce(targetMoveDirection * moveForce);
 
 
-        //获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
-        Vector3 curRotation = transform.rotation.eulerAngles;
+        ////获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
+        //Vector3 curRotation = transform.rotation.eulerAngles;
 
-        //从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
-        float targetPitchSpeedRate = vectorAction[3];
-        float targetYawSpeedRate = vectorAction[4];
+        ////从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
+        //float targetPitchSpeedRate = vectorAction[3];
+        //float targetYawSpeedRate = vectorAction[4];
 
-        //平滑计算，将smooth平滑计算过渡到targetDelta上。
-        //smooth的中间过程代表当前已经计算到的、应该附加的变化量。
-        smoothPitchSpeedRate = Mathf.MoveTowards(smoothPitchSpeedRate, targetPitchSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        smoothYawSpeedRate = Mathf.MoveTowards(smoothYawSpeedRate, targetYawSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        //p+=Rdp*dp*dt,y=Rdy*dy*dt
-        float pitch = curRotation.x + smoothPitchSpeedRate * Time.fixedDeltaTime * pitchSpeed;
-        float yaw = curRotation.y + smoothYawSpeedRate * Time.fixedDeltaTime * yawSpeed;
-        if(pitch > 180f) pitch -= 360f;
-        pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
+        ////平滑计算，将smooth平滑计算过渡到targetDelta上。
+        ////smooth的中间过程代表当前已经计算到的、应该附加的变化量。
+        //smoothPitchSpeedRate = Mathf.MoveTowards(smoothPitchSpeedRate, targetPitchSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
+        //smoothYawSpeedRate = Mathf.MoveTowards(smoothYawSpeedRate, targetYawSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
+        ////p+=Rdp*dp*dt,y=Rdy*dy*dt
+        //float pitch = curRotation.x + smoothPitchSpeedRate * Time.fixedDeltaTime * pitchSpeed;
+        //float yaw = curRotation.y + smoothYawSpeedRate * Time.fixedDeltaTime * yawSpeed;
+        //if(pitch > 180f) pitch -= 360f;
+        //pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
 
-        //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
-        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+        ////计算完后，将新得到的旋转角度覆盖到当前旋转状态。
+        //transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
 
     }
@@ -149,6 +149,8 @@ public class TestAgent : Agent
         //单位四元数是长度为1的四元数，用于表示旋转方向
         Quaternion relativeRotation = transform.localRotation.normalized;
         ////添加：从位置指向最近可抓取的物体的向量(3)
+
+
         Vector3 ToNeareastGrabbable = neareastGrabbable.transform.position - transform.position;
         //添加：手到最近可抓取物体的相对（相对场景）距离(1）
         float relativeDistance = ToNeareastGrabbable.magnitude / AreaDiameter;
@@ -200,8 +202,8 @@ public class TestAgent : Agent
         actionsOut.ContinuousActions.Array[0] = combinedDirection.x;
         actionsOut.ContinuousActions.Array[1] = combinedDirection.y;
         actionsOut.ContinuousActions.Array[2] = combinedDirection.z;
-        actionsOut.ContinuousActions.Array[3] = pitch;
-        actionsOut.ContinuousActions.Array[4] = yaw;
+        //actionsOut.ContinuousActions.Array[3] = pitch;
+        //actionsOut.ContinuousActions.Array[4] = yaw;
 
     }
 
@@ -209,16 +211,21 @@ public class TestAgent : Agent
     /// <summary>
     /// 获取场景中所有的可抓取物体列表
     /// </summary>
-    private void GetEnvironmentGrabbables(out List<Grabbable> grabbables)
+    private void GetEnvironmentGrabbables(out List<GameObject> grabbables)
     {
-        grabbables = itemRoot.GetComponentsInChildren<Grabbable>().ToList();
-        Debug.Log($"场景中的可交互物体有{grabbables.Count}个");
+        grabbables = new List<GameObject>();
+        foreach(Transform child in itemRoot.transform)
+        {
+            grabbables.Add(child.gameObject);
+        }
+
+        //Debug.Log($"场景中的可交互物体有{grabbables.Count}个");
     }
 
     /// <summary>
     /// 存储所有场景中可抓取物体的变换信息
     /// </summary>
-    private void StoreAllGrabbableObjectsTransform()
+    private void StoreAllGrabbableObjects()
     {
         _initialGrabbablePositions = new Vector3[_environmentGrabbables.Count];
         _initialGrabbableRotations = new Quaternion[_environmentGrabbables.Count];
@@ -233,10 +240,11 @@ public class TestAgent : Agent
     /// <summary>
     /// 重置加载所有可抓取物体的位置和旋转
     /// </summary>
-    private void LoadAllGrabbableObjectsTransform()
+    private void ResetAllGrabbableObjects()
     {
         for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
+            _environmentGrabbables[i].gameObject.SetActive(true);
             _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
             _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
 
@@ -253,15 +261,18 @@ public class TestAgent : Agent
     /// <summary>
     /// 获取最近的可抓取物体
     /// </summary>
-    private Grabbable GetNearestGrabbable()
+    private void GetNearestGrabbable(out GameObject nearestGrabbable)
     {
-        var res = _environmentGrabbables.OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position)).FirstOrDefault();
-        return res;
+        nearestGrabbable = _environmentGrabbables
+            .Where(grabbable => grabbable.activeInHierarchy)  // 只选择激活状态的物体
+            .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))  // 按距离排序
+            .FirstOrDefault();  // 获取最近的物体（如果有）
     }
+
 
     private void Update()
     {
-        neareastGrabbable = GetNearestGrabbable();
+        GetNearestGrabbable(out neareastGrabbable);
     }
 
     private void FixedUpdate()
@@ -280,8 +291,11 @@ public class TestAgent : Agent
             if(collision.gameObject.CompareTag("Grabbable"))
             {
                 AddReward(collisionReward);
-                _environmentGrabbables.Remove(collision.gameObject.GetComponent<Grabbable>());
-                Destroy(collision.gameObject);
+                collision.gameObject.SetActive(false);
+                if(_environmentGrabbables.Count(grabbable => grabbable.activeInHierarchy) == 0)
+                {
+                    EndEpisode();
+                }
                 Debug.Log("collisionReward");
             }
             else if(collision.gameObject.CompareTag("Boundary"))

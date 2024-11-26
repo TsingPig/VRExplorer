@@ -393,9 +393,9 @@ MonoBehaviour:
     VectorObservationSize: 8
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 5
+      m_NumContinuousActions: 3
       BranchSizes: 
-    VectorActionSize: 05000000
+    VectorActionSize: 03000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
@@ -425,7 +425,7 @@ MonoBehaviour:
   MaxStep: 50000
   itemRoot: {fileID: 0}
   neareastGrabbable: {fileID: 0}
-  collisionReward: 2
+  collisionReward: 5
   boundaryPunishment: -1
   trainingMode: 1
   AreaDiameter: 20
