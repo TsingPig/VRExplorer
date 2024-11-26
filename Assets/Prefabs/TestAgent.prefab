@@ -428,7 +428,7 @@ MonoBehaviour:
   collisionReward: 5
   boundaryPunishment: -1
   trainingMode: 1
-  AreaDiameter: 20
+  AreaDiameter: 8.5
 --- !u!114 &6200265277660493215
 MonoBehaviour:
   m_ObjectHideFlags: 0

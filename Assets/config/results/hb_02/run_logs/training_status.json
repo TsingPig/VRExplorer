@@ -1,0 +1,65 @@
+{
+    "VRAgent": {
+        "checkpoints": [
+            {
+                "steps": 3499875,
+                "file_path": "results\\hb_02\\VRAgent\\VRAgent-3499875.onnx",
+                "reward": 44.77272727272727,
+                "creation_time": 1732604838.6247208,
+                "auxillary_file_paths": [
+                    "results\\hb_02\\VRAgent\\VRAgent-3499875.pt"
+                ]
+            },
+            {
+                "steps": 3999987,
+                "file_path": "results\\hb_02\\VRAgent\\VRAgent-3999987.onnx",
+                "reward": 44.53488372093023,
+                "creation_time": 1732605260.454063,
+                "auxillary_file_paths": [
+                    "results\\hb_02\\VRAgent\\VRAgent-3999987.pt"
+                ]
+            },
+            {
+                "steps": 4499885,
+                "file_path": "results\\hb_02\\VRAgent\\VRAgent-4499885.onnx",
+                "reward": 45.0,
+                "creation_time": 1732605685.1949437,
+                "auxillary_file_paths": [
+                    "results\\hb_02\\VRAgent\\VRAgent-4499885.pt"
+                ]
+            },
+            {
+                "steps": 4999919,
+                "file_path": "results\\hb_02\\VRAgent\\VRAgent-4999919.onnx",
+                "reward": 45.0,
+                "creation_time": 1732606105.529636,
+                "auxillary_file_paths": [
+                    "results\\hb_02\\VRAgent\\VRAgent-4999919.pt"
+                ]
+            },
+            {
+                "steps": 5000047,
+                "file_path": "results\\hb_02\\VRAgent\\VRAgent-5000047.onnx",
+                "reward": 45.0,
+                "creation_time": 1732606105.5697536,
+                "auxillary_file_paths": [
+                    "results\\hb_02\\VRAgent\\VRAgent-5000047.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 5000047,
+            "file_path": "results\\hb_02\\VRAgent.onnx",
+            "reward": 45.0,
+            "creation_time": 1732606105.5697536,
+            "auxillary_file_paths": [
+                "results\\hb_02\\VRAgent\\VRAgent-5000047.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "1.7.0+cpu"
+    }
+}
