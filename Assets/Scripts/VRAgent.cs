@@ -23,6 +23,7 @@ public class VRAgent : Agent
     public SmoothLocomotion smoothLocomotion;
     public BNGPlayerController player;
     public Transform rightHandGrabber;      // 右手变换
+
     //public Transform leftHandGrabber;       // 左手变换
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
 
@@ -66,7 +67,6 @@ public class VRAgent : Agent
         private set;
     }
 
-
     public float currentReward = 0f;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
@@ -81,7 +81,6 @@ public class VRAgent : Agent
     private float maxPitchAngle = 20f;       //最大俯冲角度
     private float yawSpeed = 200f;
     private float moveSpeed = 0.1f;
-
 
     //在派生类中定义了与基类中同名的成员，导致隐藏了基类的成员。
     //使用new关键字显示的隐藏基类中的成员
@@ -102,7 +101,6 @@ public class VRAgent : Agent
         if(itemRoot == null) { itemRoot = GameObject.Find("Item").transform; }
         //leftHandGrabber = GameObject.Find("LeftController").transform.GetChild(2);
         rightHandGrabber = GameObject.Find("RightController").transform.GetChild(2);
-
 
         _environmentGrabbables = GetEnvironmentGrabbables();
         neareastGrabbable = GetNearestGrabbable();
@@ -130,7 +128,6 @@ public class VRAgent : Agent
         currentReward = 0;
         // 重置加载所有可抓取物体的位置和旋转
         LoadAllGrabbableObjectsTransform();
-
 
         transform.SetLocalPositionAndRotation(_initialPosition, _initialRotation);
     }
@@ -182,11 +179,8 @@ public class VRAgent : Agent
         //计算完后，将新得到的旋转角度覆盖到当前旋转状态。
         transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
-
         InputBridge.Instance.RightTrigger = continuousActions[5] > 0 ? 1f : 0;
         InputBridge.Instance.RightGrip = continuousActions[6] > 0 ? 1f : 0;
-
-
     }
 
     /// <summary>
@@ -206,10 +200,8 @@ public class VRAgent : Agent
         ////添加：从右手，指向最近可抓取的物体的向量(3)
         Vector3 rightHandToNeareastGrabbable = neareastGrabbable.transform.position - rightHandGrabber.transform.position;
 
-
         //添加：手到最近可抓取物体的相对（相对场景）距离(1）
         float relativeDistance = rightHandToNeareastGrabbable.magnitude / AreaDiameter;
-
 
         sensor.AddObservation(relativeRotation);
         sensor.AddObservation(rightHandToNeareastGrabbable.normalized);
@@ -220,7 +212,6 @@ public class VRAgent : Agent
         sensor.AddObservation(InputBridge.Instance.RightTrigger);
 
         //总共10个观察
-
     }
 
     /// <summary>
@@ -267,7 +258,6 @@ public class VRAgent : Agent
         //discreteActions[0] = rightTrigger > 0 ? 1 : 0; // 扳机抓取
         //discreteActions[1] = rightGrip > 0 ? 1 : 0;    // 手柄抓取
     }
-
 
     /// <summary>
     /// 获取场景中所有的可抓取物体列表
@@ -342,15 +332,12 @@ public class VRAgent : Agent
                 AddReward(distancePunisnment);
                 currentReward += distancePunisnment;
             }
-
         }
-
     }
 
     private void FixedUpdate()
     {
         //smoothLocomotion.MoveCharacter(Vector3.forward *  Time.deltaTime);
-
     }
 
     private void Start()
@@ -358,7 +345,6 @@ public class VRAgent : Agent
         var handler = rightHandGrabber.gameObject.AddComponent<GrabberCollisionHandler>();
         handler.vrAgent = this;
     }
-
 
     /// <summary>
     /// Grabber接触到可抓取物体时调用
@@ -370,7 +356,6 @@ public class VRAgent : Agent
         if(_environmentGrabbables.Contains(grabbable) && trainingMode)
         {
         }
-
     }
 
     /// <summary>
@@ -418,9 +403,6 @@ public class VRAgent : Agent
             {
                 IsGrabbing = false; // 更新抓取状态
             }
-
         }
     }
-
-
 }
