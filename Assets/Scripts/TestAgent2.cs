@@ -107,30 +107,9 @@ public class TestAgent2: Agent
     {
         var vectorAction = actions.ContinuousActions;
         //计算目标移动向量, targetDirection(dx,dy,dz)
-        Vector3 targetMoveDirection = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
+        Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[1]);
         //在这个小鸟移动方向上，施加一个力
         rigidbody.AddForce(targetMoveDirection * moveForce);
-
-
-        ////获得当前旋转的状态(由于旋转的角度都是欧拉角，所以这里获得旋转的欧拉角
-        //Vector3 curRotation = transform.rotation.eulerAngles;
-
-        ////从输入行为中计算俯冲角速度率（-1~1）、偏航角速度率（-1~1）
-        //float targetPitchSpeedRate = vectorAction[3];
-        //float targetYawSpeedRate = vectorAction[4];
-
-        ////平滑计算，将smooth平滑计算过渡到targetDelta上。
-        ////smooth的中间过程代表当前已经计算到的、应该附加的变化量。
-        //smoothPitchSpeedRate = Mathf.MoveTowards(smoothPitchSpeedRate, targetPitchSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        //smoothYawSpeedRate = Mathf.MoveTowards(smoothYawSpeedRate, targetYawSpeedRate, smoothChangeRate * Time.fixedDeltaTime);
-        ////p+=Rdp*dp*dt,y=Rdy*dy*dt
-        //float pitch = curRotation.x + smoothPitchSpeedRate * Time.fixedDeltaTime * pitchSpeed;
-        //float yaw = curRotation.y + smoothYawSpeedRate * Time.fixedDeltaTime * yawSpeed;
-        //if(pitch > 180f) pitch -= 360f;
-        //pitch = Mathf.Clamp(pitch, -maxPitchAngle, maxPitchAngle);
-
-        ////计算完后，将新得到的旋转角度覆盖到当前旋转状态。
-        //transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
 
     }
@@ -178,32 +157,19 @@ public class TestAgent2: Agent
         Vector3 left = Vector3.zero;     //x
         Vector3 up = Vector3.zero;       //y
         Vector3 forward = Vector3.zero; //z
-        float pitch = 0f;
-        float yaw = 0f;
+
         //用户输入控制
         //将用户输入表示的移动和旋转，映射到上面的向量和浮点数
         if(Input.GetKey(KeyCode.W)) forward = transform.forward;
         else if(Input.GetKey(KeyCode.S)) forward = (-1f) * transform.forward;
 
-        if(Input.GetKey(KeyCode.LeftArrow)) left = (-1f) * transform.right;
-        else if(Input.GetKey(KeyCode.RightArrow)) left = transform.right;
-
-        if(Input.GetKey(KeyCode.Space)) left = transform.up;
-        else if(Input.GetKey(KeyCode.LeftControl)) left = (-1f) * transform.up;
-
-        if(Input.GetKey(KeyCode.UpArrow)) pitch = -1f;
-        else if(Input.GetKey(KeyCode.DownArrow)) pitch = 1f;
-
-        if(Input.GetKey(KeyCode.A)) yaw = -1f;
-        else if(Input.GetKey(KeyCode.D)) yaw = 1f;
+        if(Input.GetKey(KeyCode.A)) left = (-1f) * transform.right;
+        else if(Input.GetKey(KeyCode.D)) left = transform.right;
 
         Vector3 combinedDirection = (forward + up + left).normalized;
 
         actionsOut.ContinuousActions.Array[0] = combinedDirection.x;
-        actionsOut.ContinuousActions.Array[1] = combinedDirection.y;
-        actionsOut.ContinuousActions.Array[2] = combinedDirection.z;
-        //actionsOut.ContinuousActions.Array[3] = pitch;
-        //actionsOut.ContinuousActions.Array[4] = yaw;
+        actionsOut.ContinuousActions.Array[1] = combinedDirection.z;
 
     }
 

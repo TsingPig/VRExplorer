@@ -1,0 +1,65 @@
+{
+    "VRAgent": {
+        "checkpoints": [
+            {
+                "steps": 3499962,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-3499962.onnx",
+                "reward": 44.142857142857146,
+                "creation_time": 1732698706.2016666,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-3499962.pt"
+                ]
+            },
+            {
+                "steps": 3999881,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-3999881.onnx",
+                "reward": 45.0,
+                "creation_time": 1732699149.3180857,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-3999881.pt"
+                ]
+            },
+            {
+                "steps": 4499991,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-4499991.onnx",
+                "reward": 43.5,
+                "creation_time": 1732699586.639515,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-4499991.pt"
+                ]
+            },
+            {
+                "steps": 4999991,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-4999991.onnx",
+                "reward": 43.6,
+                "creation_time": 1732700024.6690912,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-4999991.pt"
+                ]
+            },
+            {
+                "steps": 5000119,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-5000119.onnx",
+                "reward": 43.6,
+                "creation_time": 1732700024.7087166,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-5000119.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 5000119,
+            "file_path": "results\\TestAgent2\\VRAgent.onnx",
+            "reward": 43.6,
+            "creation_time": 1732700024.7087166,
+            "auxillary_file_paths": [
+                "results\\TestAgent2\\VRAgent\\VRAgent-5000119.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "1.7.0+cpu"
+    }
+}

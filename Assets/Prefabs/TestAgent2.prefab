@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 2888603366726301175}
   - component: {fileID: 2888603366726301066}
   - component: {fileID: 2888603366726301064}
-  - component: {fileID: 2888603366726301067}
   - component: {fileID: 2888603366726301065}
+  - component: {fileID: 1594201618}
   m_Layer: 0
   m_Name: TestAgent2
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 2888603366726301169}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0.991, z: 0.12078}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2888603366890174011}
@@ -138,13 +138,13 @@ MonoBehaviour:
     VectorObservationSize: 8
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 3
+      m_NumContinuousActions: 2
       BranchSizes: 
-    VectorActionSize: 03000000
+    VectorActionSize: 02000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: cc8abbdfec747e94398c63270c60fb95, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: VRAgent
@@ -152,28 +152,6 @@ MonoBehaviour:
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
---- !u!114 &2888603366726301067
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2888603366726301169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7ffbb43bfb104b42b3a6044b3ae424e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 50000
-  itemRoot: {fileID: 0}
-  neareastGrabbable: {fileID: 0}
-  collisionReward: 5
-  boundaryPunishment: -1
-  trainingMode: 1
-  AreaDiameter: 8.5
 --- !u!114 &2888603366726301065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +166,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DecisionPeriod: 5
   TakeActionsBetweenDecisions: 1
+--- !u!114 &1594201618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2888603366726301169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1230121da2d68f41ad0920d5247a28f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 50000
+  itemRoot: {fileID: 0}
+  neareastGrabbable: {fileID: 0}
+  collisionReward: 5
+  boundaryPunishment: -1
+  trainingMode: 1
+  AreaDiameter: 8.5
 --- !u!1 &2888603366890174010
 GameObject:
   m_ObjectHideFlags: 0
