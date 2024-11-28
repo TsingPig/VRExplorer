@@ -68,6 +68,20 @@ public class TestAgent2 : Agent
         }
     }
 
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var continuousActions = actionsOut.ContinuousActions;
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Space");
+            continuousActions[0] = 1;
+        }
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            continuousActions[0] = 0;
+        }
+    }
+
     /// <summary>
     /// 在一个训练回合(Episode)开始的时候，重置这个智能体
     /// </summary>
@@ -87,8 +101,8 @@ public class TestAgent2 : Agent
     /// </summary>
     public override void OnActionReceived(ActionBuffers actions)
     {
-        var discreteActions = actions.DiscreteActions;
-        if(discreteActions[0] == 0)
+        var continuousActions = actions.ContinuousActions;
+        if(continuousActions[0] == 0)
         {
             // 0 是松开
             if(handController.grabber.HoldingItem)
@@ -100,15 +114,16 @@ public class TestAgent2 : Agent
         }
         else
         {
-
+            Debug.Log("discreteActions = 1");
             // 1 是抓取
-            if(!handController.grabber.HoldingItem)    // 不在抓取状态下
+            if(!handController.grabber.HoldingItem && Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 2f)    // 不在抓取状态下
             {
-                handController.grabber.TryGrab();
+
+                handController.grabber.GrabGrabbable(neareastGrabbable);
+
                 if(handController.grabber.HoldingItem)    // 成功抓取
                 {
                     Debug.Log("成功抓取");
-                    //handController.grabber.GrabGrabbable(neareastGrabbable);
                     _environmentGrabbablesState[neareastGrabbable] = true;
                     AddReward(grabReward);
                     curReward += grabReward;
@@ -117,35 +132,12 @@ public class TestAgent2 : Agent
             };
         }
 
-        if(discreteActions[1] == 0)
+        if(neareastGrabbable != null)
         {
-            // 0 是原地随机移动
-            // 设置随机抽搐的范围
-            float twitchRange = 4.0f; // 随机抽搐的半径范围
-            float randomOffsetX = Random.Range(-twitchRange, twitchRange); // X方向的随机偏移
-            float randomOffsetZ = Random.Range(-twitchRange, twitchRange); // Z方向的随机偏移
-
-            // 计算新位置（在当前位置的附近随机抽搐）
-            Vector3 randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
-
-            // 随机旋转（模拟抽搐时的随机转圈）
-            float randomRotationY = Random.Range(-30f, 30f); // 在 -30 到 30 度范围内旋转
-            transform.Rotate(0, randomRotationY, 0);
-
-            // 设置目标位置（如果使用 NavMeshAgent）
-            navMeshAgent.SetDestination(randomPosition);
-            navMeshAgent.speed = moveSpeed * 0.3f; // 抽搐时速度较慢
+            navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
-        else
-        {
-            // 1 是下一个目标
-            // 计算目标位置并更新 NavMeshAgent 的目标位置
-            if(neareastGrabbable != null)
-            {
-                navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
-            }
-            navMeshAgent.speed = moveSpeed;
-        }
+        navMeshAgent.speed = moveSpeed;
+
 
     }
 

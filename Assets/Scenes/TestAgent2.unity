@@ -136,6 +136,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -204,6 +209,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -274,6 +284,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -342,6 +357,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -506,6 +526,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -574,6 +599,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -644,6 +674,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -712,6 +747,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -782,6 +822,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -850,6 +895,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -920,6 +970,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -988,6 +1043,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
@@ -1058,6 +1118,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -1127,6 +1192,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrainRoom (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
       propertyPath: m_RootOrder
@@ -1195,6 +1265,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TrainRoom (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106540003092492546, guid: 9d1073355cb9c6f418c683d7e82e770b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9106540003092492547, guid: 9d1073355cb9c6f418c683d7e82e770b,
         type: 3}
