@@ -20,21 +20,17 @@ public class TestAgent2 : Agent
 
     public Transform itemRoot;
     public GameObject neareastGrabbable;     // 最近的可抓取物体
+    public HandController handController;
     public float collisionReward = 5f;  // 抓取奖励
     public float boundaryPunishment = -1f;
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
     public bool trainingMode;
 
-    public float AreaDiameter = 20f;    // 场景的半径大小估算
+    public float AreaDiameter = 7.5f;    // 场景的半径大小估算
 
-    private float smoothPitchSpeedRate = 0f;
-    private float smoothYawSpeedRate = 0f;
-    private float smoothChangeRate = 2f;
-    private float pitchSpeed = 100f;
-    private float maxPitchAngle = 80f;       //最大俯冲角度
-    private float yawSpeed = 100f;
-    private float moveForce = 4f;
+
+    public float moveSpeed = 4f;
 
     private new Rigidbody rigidbody;
     private NavMeshAgent navMeshAgent;  // 引入 NavMeshAgent
@@ -79,19 +75,14 @@ public class TestAgent2 : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var vectorAction = actions.ContinuousActions;
-        Vector3 targetMoveDirection = new Vector3(vectorAction[0], 0, vectorAction[1]);
 
         // 计算目标位置并更新 NavMeshAgent 的目标位置
         if(neareastGrabbable != null)
         {
             navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
+        navMeshAgent.speed = moveSpeed;
 
-        // 使用 NavMeshAgent 来移动
-        if(navMeshAgent.isOnNavMesh)
-        {
-            navMeshAgent.Move(targetMoveDirection * moveForce * Time.deltaTime);
-        }
     }
 
     /// <summary>
@@ -106,6 +97,16 @@ public class TestAgent2 : Agent
         sensor.AddObservation(relativeRotation);
         sensor.AddObservation(ToNeareastGrabbable.normalized);
         sensor.AddObservation(relativeDistance);
+    }
+
+    /// <summary>
+    /// 当智能体的行为参数类型被设置为"Heuristic Only"调用这个函数。
+    /// </summary>
+    /// <param name="actionsOut"></param>
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+
+
     }
 
     /// <summary>
@@ -173,6 +174,7 @@ public class TestAgent2 : Agent
     private void Update()
     {
         GetNearestGrabbable(out neareastGrabbable);
+
     }
 
     private void FixedUpdate()
@@ -185,7 +187,9 @@ public class TestAgent2 : Agent
         if(collision.gameObject.CompareTag("Grabbable"))
         {
             AddReward(collisionReward);
-            collision.gameObject.SetActive(false);
+            //collision.gameObject.SetActive(false);
+
+            handController.grabber.GrabGrabbable(neareastGrabbable.GetComponent<Grabbable>());
 
             if(_environmentGrabbables.Count(grabbable => grabbable.activeInHierarchy) == 0)
             {

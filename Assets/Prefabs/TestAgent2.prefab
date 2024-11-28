@@ -226,7 +226,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8080720548095950257}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.47, y: 1.59, z: 0.09}
   m_LocalScale: {x: 0.6200282, y: 0.6200282, z: 0.6200282}
   m_ConstrainProportionsScale: 0
@@ -267,7 +267,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9f61ad5ad5783464f973a47ae065801c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -381,10 +381,12 @@ MonoBehaviour:
   MaxStep: 50000
   itemRoot: {fileID: 0}
   neareastGrabbable: {fileID: 0}
+  handController: {fileID: 1026356573675553863}
   collisionReward: 5
   boundaryPunishment: -1
-  trainingMode: 1
-  AreaDiameter: 8.5
+  trainingMode: 0
+  AreaDiameter: 7.5
+  moveSpeed: 4
 --- !u!195 &496355604258214106
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -399,7 +401,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.75
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -549,8 +551,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: LeftControllerAnchor
       objectReference: {fileID: 0}
+    - target: {fileID: 8418564665109207314, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed17917da922a8443b04b34ba1264c22, type: 3}
+--- !u!114 &1026356573675553863 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4707598737328222911, guid: ed17917da922a8443b04b34ba1264c22,
+    type: 3}
+  m_PrefabInstance: {fileID: 5722555333844875000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e97e54343fcd4e4b81f6e22d317008a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6375906934550483355 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
