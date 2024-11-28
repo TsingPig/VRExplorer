@@ -112,8 +112,8 @@ public class TestAgent2 : Agent
         if(dragging) { return; }
 
         var continuousActions = actions.ContinuousActions;
-        Debug.Log(continuousActions[0]);
-        if(continuousActions[0] == 0)
+
+        if(continuousActions[0] > 0)
         {
             // 0 是松开
             if(handController.grabber.HoldingItem)
@@ -125,9 +125,9 @@ public class TestAgent2 : Agent
         }
         else
         {
-            Debug.Log("discreteActions = 1");
             // 1 是抓取
-            if(!handController.grabber.HoldingItem && Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 2f)    // 不在抓取状态下
+            if(!handController.grabber.HoldingItem &&
+                Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 2f)    // 不在抓取状态下
             {
 
                 handController.grabber.GrabGrabbable(neareastGrabbable);
@@ -177,12 +177,27 @@ public class TestAgent2 : Agent
         dragging = true;
         RandomTwitch();
         yield return new WaitForSeconds(dragTime);
+
+
         if(neareastGrabbable != null)
         {
             navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
         navMeshAgent.speed = moveSpeed;
         dragging = false;
+
+        if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
+        {
+            if(trainingMode)
+            {
+                EndEpisode();
+            }
+            else
+            {
+                ResetAllGrabbableObjects();
+            }
+        }
+
     }
 
     /// <summary>
@@ -197,6 +212,8 @@ public class TestAgent2 : Agent
         sensor.AddObservation(relativeRotation);
         sensor.AddObservation(ToNeareastGrabbable.normalized);
         sensor.AddObservation(relativeDistance);
+        sensor.AddObservation(dragging);
+        sensor.AddObservation(handController.grabber.HoldingItem);
     }
 
     /// <summary>
@@ -267,24 +284,16 @@ public class TestAgent2 : Agent
             .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
             .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
             .FirstOrDefault();
+        if(nearestGrabbable == null)
+        {
+            if(trainingMode) EndEpisode();
+        }
     }
 
     private void Update()
     {
         GetNearestGrabbable(out neareastGrabbable);
-        if(!_environmentGrabbablesState.Values.ToList().Contains(false)) // 所有都抓取过一遍
-        {
-            if(trainingMode)
-            {
-                EndEpisode();
 
-            }
-            else
-            {
-                ResetAllGrabbableObjects();
-
-            }
-        }
     }
 
     private void FixedUpdate()
