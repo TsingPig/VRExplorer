@@ -1,4 +1,5 @@
 using BNG;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.MLAgents;
@@ -33,6 +34,7 @@ public class TestAgent2 : Agent
 
 
 
+    private bool dragging = false;
 
 
     [Tooltip("是否正在训练模式下（trainingMode）")]
@@ -94,6 +96,11 @@ public class TestAgent2 : Agent
 
         ResetAllGrabbableObjects();
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+
+        if(neareastGrabbable != null)
+        {
+            navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
+        }
     }
 
     /// <summary>
@@ -101,7 +108,11 @@ public class TestAgent2 : Agent
     /// </summary>
     public override void OnActionReceived(ActionBuffers actions)
     {
+
+        if(dragging) { return; }
+
         var continuousActions = actions.ContinuousActions;
+        Debug.Log(continuousActions[0]);
         if(continuousActions[0] == 0)
         {
             // 0 是松开
@@ -127,18 +138,51 @@ public class TestAgent2 : Agent
                     _environmentGrabbablesState[neareastGrabbable] = true;
                     AddReward(grabReward);
                     curReward += grabReward;
-
+                    StartCoroutine(Drag(Random.Range(3f, 6f))); // 开始拖拽
                 }
             };
         }
+    }
 
+
+    /// <summary>
+    /// 随机抽搐
+    /// </summary>
+    private void RandomTwitch()
+    {
+        // 设置随机抽搐的范围
+        float twitchRange = 6f; // 随机抽搐的半径范围
+        float randomOffsetX = Random.Range(-twitchRange, twitchRange); // X方向的随机偏移
+        float randomOffsetZ = Random.Range(-twitchRange, twitchRange); // Z方向的随机偏移
+
+        // 计算新位置（在当前位置的附近随机抽搐）
+        Vector3 randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
+
+        // 随机旋转（模拟抽搐时的随机转圈）
+        float randomRotationY = Random.Range(-30f, 30f); // 在 -30 到 30 度范围内旋转
+        transform.Rotate(0, randomRotationY, 0);
+
+        // 设置目标位置（如果使用 NavMeshAgent）
+        navMeshAgent.SetDestination(randomPosition);
+        navMeshAgent.speed = moveSpeed * 0.6f; // 抽搐时速度较慢
+    }
+
+    /// <summary>
+    /// 拖拽
+    /// </summary>
+    /// <param name="dragTime"></param>
+    /// <returns></returns>
+    IEnumerator Drag(float dragTime = 3f)
+    {
+        dragging = true;
+        RandomTwitch();
+        yield return new WaitForSeconds(dragTime);
         if(neareastGrabbable != null)
         {
             navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
         navMeshAgent.speed = moveSpeed;
-
-
+        dragging = false;
     }
 
     /// <summary>

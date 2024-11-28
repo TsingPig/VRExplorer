@@ -553,6 +553,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: LeftControllerAnchor
       objectReference: {fileID: 0}
+    - target: {fileID: 5950505587806850609, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: ForceGrab
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5950505587806850609, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: ForceRelease
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8418564665109207314, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
       propertyPath: m_PresetInfoIsWorld
