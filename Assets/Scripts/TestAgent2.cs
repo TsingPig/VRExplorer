@@ -18,7 +18,8 @@ public class TestAgent2 : Agent
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private Vector3 _initialPosition;       // Agent的初始位置
     private Quaternion _initialRotation;    // Agent的初始旋转
-    private bool _isGrabbing = false;
+
+
 
     public float curReward = 0f;
 
@@ -73,7 +74,7 @@ public class TestAgent2 : Agent
     public override void OnEpisodeBegin()
     {
         curReward = 0f;
-        _isGrabbing = false;
+
         rigidbody.velocity = Vector3.zero;
         rigidbody.angularVelocity = Vector3.zero;
 
@@ -90,10 +91,9 @@ public class TestAgent2 : Agent
         if(discreteActions[0] == 0)
         {
             // 0 是松开
-            if(_isGrabbing)
+            if(handController.grabber.HoldingItem)
             {
                 handController.grabber.TryRelease();
-                _isGrabbing = false;
                 AddReward(releaseReward);
                 curReward += releaseReward;
             }
@@ -102,15 +102,17 @@ public class TestAgent2 : Agent
         {
 
             // 1 是抓取
-            if(!_isGrabbing)    // 不在抓取状态下
+            if(!handController.grabber.HoldingItem)    // 不在抓取状态下
             {
-                if(handController.grabber.TryGrab())    // 成功抓取
+                handController.grabber.TryGrab();
+                if(handController.grabber.HoldingItem)    // 成功抓取
                 {
-                    handController.grabber.GrabGrabbable(neareastGrabbable);
+                    Debug.Log("成功抓取");
+                    //handController.grabber.GrabGrabbable(neareastGrabbable);
                     _environmentGrabbablesState[neareastGrabbable] = true;
                     AddReward(grabReward);
                     curReward += grabReward;
-                    _isGrabbing = true;
+
                 }
             };
         }
@@ -119,7 +121,7 @@ public class TestAgent2 : Agent
         {
             // 0 是原地随机移动
             // 设置随机抽搐的范围
-            float twitchRange = 3.0f; // 随机抽搐的半径范围
+            float twitchRange = 4.0f; // 随机抽搐的半径范围
             float randomOffsetX = Random.Range(-twitchRange, twitchRange); // X方向的随机偏移
             float randomOffsetZ = Random.Range(-twitchRange, twitchRange); // Z方向的随机偏移
 
@@ -226,7 +228,7 @@ public class TestAgent2 : Agent
     private void GetNearestGrabbable(out Grabbable nearestGrabbable)
     {
         nearestGrabbable = _environmentGrabbables
-            .Where(grabbable => grabbable.gameObject.activeInHierarchy)
+            .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
             .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
             .FirstOrDefault();
     }
@@ -251,7 +253,7 @@ public class TestAgent2 : Agent
 
     private void FixedUpdate()
     {
-        if(_isGrabbing)
+        if(handController.grabber.HoldingItem)
         {
             AddReward(grabbingReward);
             curReward += grabbingReward;
