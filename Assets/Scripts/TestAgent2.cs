@@ -181,23 +181,30 @@ public class TestAgent2 : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(trainingMode)
+
+        if(collision.gameObject.CompareTag("Grabbable"))
         {
-            if(collision.gameObject.CompareTag("Grabbable"))
+            AddReward(collisionReward);
+            collision.gameObject.SetActive(false);
+
+            if(_environmentGrabbables.Count(grabbable => grabbable.activeInHierarchy) == 0)
             {
-                AddReward(collisionReward);
-                collision.gameObject.SetActive(false);
-                if(_environmentGrabbables.Count(grabbable => grabbable.activeInHierarchy) == 0)
+                if(trainingMode)
                 {
                     EndEpisode();
                 }
-                Debug.Log("collisionReward");
+                else
+                {
+                    ResetAllGrabbableObjects();
+                }
             }
-            else if(collision.gameObject.CompareTag("Boundary"))
-            {
-                AddReward(boundaryPunishment);
-                Debug.Log("boundaryPunishment");
-            }
+            Debug.Log("collisionReward");
+        }
+        else if(collision.gameObject.CompareTag("Boundary"))
+        {
+            AddReward(boundaryPunishment);
+            Debug.Log("boundaryPunishment");
         }
     }
+
 }
