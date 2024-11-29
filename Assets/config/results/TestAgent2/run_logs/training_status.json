@@ -1,0 +1,29 @@
+{
+    "VRAgent": {
+        "checkpoints": [
+            {
+                "steps": 51200,
+                "file_path": "results\\TestAgent2\\VRAgent\\VRAgent-51200.onnx",
+                "reward": null,
+                "creation_time": 1732812538.9238222,
+                "auxillary_file_paths": [
+                    "results\\TestAgent2\\VRAgent\\VRAgent-51200.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 51200,
+            "file_path": "results\\TestAgent2\\VRAgent.onnx",
+            "reward": null,
+            "creation_time": 1732812538.9238222,
+            "auxillary_file_paths": [
+                "results\\TestAgent2\\VRAgent\\VRAgent-51200.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "1.7.0+cpu"
+    }
+}

@@ -109,39 +109,24 @@ public class TestAgent2 : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
 
-        if(dragging) { return; }
 
-        var continuousActions = actions.ContinuousActions;
 
-        if(continuousActions[0] > 0)
+
+
+        if(!handController.grabber.HoldingItem &&
+            Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 1f)    // 不在抓取状态下
         {
-            // 0 是松开
-            if(handController.grabber.HoldingItem)
+
+            handController.grabber.GrabGrabbable(neareastGrabbable);
+
+            if(handController.grabber.HoldingItem)    // 成功抓取
             {
-                handController.grabber.TryRelease();
-                AddReward(releaseReward);
-                curReward += releaseReward;
+                _environmentGrabbablesState[neareastGrabbable] = true;
+                //AddReward(grabReward);
+                //curReward += grabReward;
+                StartCoroutine(Drag(Random.Range(3f, 6f))); // 开始拖拽
             }
-        }
-        else
-        {
-            // 1 是抓取
-            if(!handController.grabber.HoldingItem &&
-                Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 2f)    // 不在抓取状态下
-            {
-
-                handController.grabber.GrabGrabbable(neareastGrabbable);
-
-                if(handController.grabber.HoldingItem)    // 成功抓取
-                {
-                    Debug.Log("成功抓取");
-                    _environmentGrabbablesState[neareastGrabbable] = true;
-                    AddReward(grabReward);
-                    curReward += grabReward;
-                    StartCoroutine(Drag(Random.Range(3f, 6f))); // 开始拖拽
-                }
-            };
-        }
+        };
     }
 
 
@@ -178,6 +163,13 @@ public class TestAgent2 : Agent
         RandomTwitch();
         yield return new WaitForSeconds(dragTime);
 
+
+        if(handController.grabber.HoldingItem)
+        {
+            handController.grabber.TryRelease();
+            //AddReward(releaseReward);
+            //curReward += releaseReward;
+        }
 
         if(neareastGrabbable != null)
         {
@@ -284,11 +276,9 @@ public class TestAgent2 : Agent
             .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
             .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
             .FirstOrDefault();
-        if(nearestGrabbable == null)
-        {
-            if(trainingMode) EndEpisode();
-        }
+
     }
+
 
     private void Update()
     {
