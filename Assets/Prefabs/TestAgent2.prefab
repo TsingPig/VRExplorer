@@ -207,9 +207,6 @@ GameObject:
   - component: {fileID: 8080720548095950261}
   - component: {fileID: 8080720548095950260}
   - component: {fileID: 8080720548095950263}
-  - component: {fileID: 8080720548095950282}
-  - component: {fileID: 8080720548095950280}
-  - component: {fileID: 8080720548095950281}
   - component: {fileID: 6355174954153483858}
   - component: {fileID: 496355604258214106}
   m_Layer: 0
@@ -303,66 +300,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &8080720548095950282
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8080720548095950257}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 2
-  m_AngularDrag: 0.5
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 116
-  m_CollisionDetection: 0
---- !u!114 &8080720548095950280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8080720548095950257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_BrainParameters:
-    VectorObservationSize: 8
-    NumStackedVectorObservations: 1
-    m_ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 02000000
-    VectorActionSize: 02000000
-    VectorActionDescriptions: []
-    VectorActionSpaceType: 0
-    hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
-  m_InferenceDevice: 1
-  m_BehaviorType: 0
-  m_BehaviorName: VRAgent
-  TeamId: 0
-  m_UseChildSensors: 1
-  m_UseChildActuators: 1
-  m_ObservableAttributeHandling: 0
---- !u!114 &8080720548095950281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8080720548095950257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DecisionPeriod: 5
-  TakeActionsBetweenDecisions: 1
 --- !u!114 &6355174954153483858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,18 +312,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1230121da2d68f41ad0920d5247a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 50000
-  curReward: 0
   itemRoot: {fileID: 0}
   neareastGrabbable: {fileID: 0}
   handController: {fileID: 1026356573675553863}
-  grabReward: 5
-  grabbingReward: 0.01
-  releaseReward: 3
-  trainingMode: 1
   AreaDiameter: 7.5
   moveSpeed: 4
 --- !u!195 &496355604258214106
@@ -398,7 +326,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8080720548095950257}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -501,7 +429,7 @@ PrefabInstance:
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.25
+      value: 0.104
       objectReference: {fileID: 0}
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
@@ -511,7 +439,7 @@ PrefabInstance:
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.41
+      value: 0.688
       objectReference: {fileID: 0}
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}

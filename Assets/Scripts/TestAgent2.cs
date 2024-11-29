@@ -2,144 +2,55 @@ using BNG;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.MLAgents;
-using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Sensors;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Machine Learning Agent：强化学习智能体
-/// </summary>
-public class TestAgent2 : Agent
+public class TestAgent2 : MonoBehaviour
 {
     private List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
     private Dictionary<Grabbable, bool> _environmentGrabbablesState;
     private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
-    private Vector3 _initialPosition;       // Agent的初始位置
-    private Quaternion _initialRotation;    // Agent的初始旋转
-
-
-
-    public float curReward = 0f;
+    private NavMeshAgent navMeshAgent;  // 引入 NavMeshAgent
+    private bool dragging = false;
 
     public Transform itemRoot;
     public Grabbable neareastGrabbable;     // 最近的可抓取物体
     public HandController handController;
-
-    public float grabReward = 5f;  // 抓取奖励
-    public float grabbingReward = 0.01f;
-    public float releaseReward = 3f;
-
-
-
-    private bool dragging = false;
-
-
-    [Tooltip("是否正在训练模式下（trainingMode）")]
-    public bool trainingMode;
-
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
-
-
     public float moveSpeed = 4f;
 
-    private new Rigidbody rigidbody;
-    private NavMeshAgent navMeshAgent;  // 引入 NavMeshAgent
-
-    /// <summary>
-    /// 初始化智能体
-    /// </summary>
-    public override void Initialize()
+    private IEnumerator MoveToNearestGrabbable()
     {
-        base.Initialize();
-        rigidbody = GetComponent<Rigidbody>();
-        navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
-
-        GetEnvironmentGrabbables(out _environmentGrabbables, out _environmentGrabbablesState);
-        GetNearestGrabbable(out neareastGrabbable);
-
-        StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
-        _initialPosition = transform.position;
-        _initialRotation = transform.rotation;
-
-        if(!trainingMode)
-        {
-            MaxStep = 0;         //非训练模式下，无最大步数限制（MaxStep=0）
-        }
-    }
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        var continuousActions = actionsOut.ContinuousActions;
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Space");
-            continuousActions[0] = 1;
-        }
-        if(Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            continuousActions[0] = 0;
-        }
-    }
-
-    /// <summary>
-    /// 在一个训练回合(Episode)开始的时候，重置这个智能体
-    /// </summary>
-    public override void OnEpisodeBegin()
-    {
-        curReward = 0f;
-
-        rigidbody.velocity = Vector3.zero;
-        rigidbody.angularVelocity = Vector3.zero;
-
-        ResetAllGrabbableObjects();
-        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
-
         if(neareastGrabbable != null)
         {
             navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
-    }
+        navMeshAgent.speed = moveSpeed;
 
-    /// <summary>
-    /// 在每次Agent接收到新行为时调用
-    /// </summary>
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-
-
-
-
-
-        if(!handController.grabber.HoldingItem &&
-            Vector3.Distance(transform.position, neareastGrabbable.transform.position) < 1f)    // 不在抓取状态下
+        while(navMeshAgent.pathPending || navMeshAgent.remainingDistance > 0.5f)
         {
+            yield return null;
+        }
 
-            handController.grabber.GrabGrabbable(neareastGrabbable);
-
-            if(handController.grabber.HoldingItem)    // 成功抓取
-            {
-                _environmentGrabbablesState[neareastGrabbable] = true;
-                //AddReward(grabReward);
-                //curReward += grabReward;
-                StartCoroutine(Drag(Random.Range(3f, 6f))); // 开始拖拽
-            }
-        };
+        // 到了目标地点
+        Debug.Log("到达目标位置");
+        handController.grabber.GrabGrabbable(neareastGrabbable);
+        _environmentGrabbablesState[neareastGrabbable] = true;
+        StartCoroutine(Drag()); // 开始拖拽
     }
-
 
     /// <summary>
     /// 随机抽搐
     /// </summary>
-    private void RandomTwitch()
+    private IEnumerator RandomTwitch()
     {
         // 设置随机抽搐的范围
-        float twitchRange = 6f; // 随机抽搐的半径范围
-        float randomOffsetX = Random.Range(-twitchRange, twitchRange); // X方向的随机偏移
-        float randomOffsetZ = Random.Range(-twitchRange, twitchRange); // Z方向的随机偏移
-
+        float twitchRange = 8f; // 随机抽搐的半径范围
+        float randomOffsetX = Random.Range(twitchRange / 2, twitchRange); // X方向的随机偏移
+        float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange); // Z方向的随机偏移
+        randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
+        randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
         // 计算新位置（在当前位置的附近随机抽搐）
         Vector3 randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
 
@@ -150,6 +61,13 @@ public class TestAgent2 : Agent
         // 设置目标位置（如果使用 NavMeshAgent）
         navMeshAgent.SetDestination(randomPosition);
         navMeshAgent.speed = moveSpeed * 0.6f; // 抽搐时速度较慢
+        Debug.Log("开始RandomTwitch");
+
+        while(navMeshAgent.pathPending || navMeshAgent.remainingDistance > 0.6f)
+        {
+            yield return null;
+        }
+
     }
 
     /// <summary>
@@ -157,55 +75,27 @@ public class TestAgent2 : Agent
     /// </summary>
     /// <param name="dragTime"></param>
     /// <returns></returns>
-    IEnumerator Drag(float dragTime = 3f)
+    private IEnumerator Drag()
     {
         dragging = true;
-        RandomTwitch();
-        yield return new WaitForSeconds(dragTime);
+        Debug.Log("开始Drag");
 
+        yield return StartCoroutine(RandomTwitch());
 
         if(handController.grabber.HoldingItem)
         {
             handController.grabber.TryRelease();
-            //AddReward(releaseReward);
-            //curReward += releaseReward;
         }
-
-        if(neareastGrabbable != null)
-        {
-            navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
-        }
-        navMeshAgent.speed = moveSpeed;
         dragging = false;
+
+        Debug.Log("释放");
 
         if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
         {
-            if(trainingMode)
-            {
-                EndEpisode();
-            }
-            else
-            {
-                ResetAllGrabbableObjects();
-            }
+            ResetAllGrabbableObjects();
+            yield return null;
         }
-
-    }
-
-    /// <summary>
-    /// 定义智能体收集观测数据的行为
-    /// </summary>
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        Quaternion relativeRotation = transform.localRotation.normalized;
-        Vector3 ToNeareastGrabbable = neareastGrabbable.transform.position - transform.position;
-        float relativeDistance = ToNeareastGrabbable.magnitude / AreaDiameter;
-
-        sensor.AddObservation(relativeRotation);
-        sensor.AddObservation(ToNeareastGrabbable.normalized);
-        sensor.AddObservation(relativeDistance);
-        sensor.AddObservation(dragging);
-        sensor.AddObservation(handController.grabber.HoldingItem);
+        StartCoroutine(MoveToNearestGrabbable());
     }
 
     /// <summary>
@@ -248,7 +138,6 @@ public class TestAgent2 : Agent
     {
         for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
-            //_environmentGrabbables[i].gameObject.SetActive(true);
             _environmentGrabbablesState[_environmentGrabbables[i]] = false;
 
             float randomX = Random.Range(-AreaDiameter, AreaDiameter);
@@ -276,23 +165,22 @@ public class TestAgent2 : Agent
             .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
             .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
             .FirstOrDefault();
-
     }
 
+    private void Start()
+    {
+        navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
+
+        GetEnvironmentGrabbables(out _environmentGrabbables, out _environmentGrabbablesState);
+        GetNearestGrabbable(out neareastGrabbable);
+
+        StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
+
+        StartCoroutine(MoveToNearestGrabbable());
+    }
 
     private void Update()
     {
         GetNearestGrabbable(out neareastGrabbable);
-
     }
-
-    private void FixedUpdate()
-    {
-        if(handController.grabber.HoldingItem)
-        {
-            AddReward(grabbingReward);
-            curReward += grabbingReward;
-        }
-    }
-
 }
