@@ -12,19 +12,24 @@ public class TestAgent2 : MonoBehaviour
     private Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     private Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
     private NavMeshAgent navMeshAgent;  // 引入 NavMeshAgent
-    private bool dragging = false;
 
+
+
+    public bool drag = false;
     public Transform itemRoot;
-    public Grabbable neareastGrabbable;     // 最近的可抓取物体
+    public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
     public float moveSpeed = 4f;
+    public bool randomGrabble = false;
 
-    private IEnumerator MoveToNearestGrabbable()
+    private IEnumerator MoveToNextGrabbable()
     {
-        if(neareastGrabbable != null)
+        GetNextGrabbable(out nextGrabbable);
+
+        if(nextGrabbable != null)
         {
-            navMeshAgent.SetDestination(neareastGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
+            navMeshAgent.SetDestination(nextGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
         }
         navMeshAgent.speed = moveSpeed;
 
@@ -34,10 +39,23 @@ public class TestAgent2 : MonoBehaviour
         }
 
         // 到了目标地点
-        Debug.Log("到达目标位置");
-        handController.grabber.GrabGrabbable(neareastGrabbable);
-        _environmentGrabbablesState[neareastGrabbable] = true;
-        StartCoroutine(Drag()); // 开始拖拽
+        Debug.Log("TestAgent2到达目标位置");
+        _environmentGrabbablesState[nextGrabbable] = true;
+
+        if(drag)
+        {
+            handController.grabber.GrabGrabbable(nextGrabbable);
+            StartCoroutine(Drag()); // 开始拖拽
+        }
+        else
+        {
+            if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
+            {
+                ResetAllGrabbableObjects();
+                yield return null;
+            }
+            StartCoroutine(MoveToNextGrabbable());
+        }
     }
 
     /// <summary>
@@ -93,7 +111,7 @@ public class TestAgent2 : MonoBehaviour
             ResetAllGrabbableObjects();
             yield return null;
         }
-        StartCoroutine(MoveToNearestGrabbable());
+        StartCoroutine(MoveToNextGrabbable());
     }
 
     /// <summary>
@@ -138,13 +156,19 @@ public class TestAgent2 : MonoBehaviour
         {
             _environmentGrabbablesState[_environmentGrabbables[i]] = false;
 
-            float randomX = Random.Range(-AreaDiameter, AreaDiameter);
-            float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
-            float randomY = 2.5f;
-            Vector3 newPosition = itemRoot.position + new Vector3(randomX, randomY, randomZ);
-            _environmentGrabbables[i].transform.position = newPosition;
-            _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
+            if(randomGrabble)
+            {
+                float randomX = Random.Range(-AreaDiameter, AreaDiameter);
+                float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
+                float randomY = 2.5f;
+                Vector3 newPosition = itemRoot.position + new Vector3(randomX, randomY, randomZ);
+                _environmentGrabbables[i].transform.position = newPosition;
+            }
+            else
+            {
+                _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
 
+            }
             Rigidbody rb = _environmentGrabbables[i].GetComponent<Rigidbody>();
             if(rb != null)
             {
@@ -157,7 +181,7 @@ public class TestAgent2 : MonoBehaviour
     /// <summary>
     /// 获取最近的可抓取物体
     /// </summary>
-    private void GetNearestGrabbable(out Grabbable nearestGrabbable)
+    private void GetNextGrabbable(out Grabbable nearestGrabbable)
     {
         nearestGrabbable = _environmentGrabbables
             .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
@@ -170,15 +194,13 @@ public class TestAgent2 : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
 
         GetEnvironmentGrabbables(out _environmentGrabbables, out _environmentGrabbablesState);
-        GetNearestGrabbable(out neareastGrabbable);
+        GetNextGrabbable(out nextGrabbable);
 
         StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
+        ResetAllGrabbableObjects();
 
-        StartCoroutine(MoveToNearestGrabbable());
+        StartCoroutine(MoveToNextGrabbable());
     }
 
-    private void Update()
-    {
-        GetNearestGrabbable(out neareastGrabbable);
-    }
+
 }

@@ -18,6 +18,8 @@ public class TestAgent3 : MonoBehaviour
     public HandController handController;
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
     public float moveSpeed = 4f;
+    public bool drag = false;
+    public bool randomGrabble = false;
 
 
     private float[,] distanceMatrix; // 距离矩阵
@@ -131,11 +133,23 @@ public class TestAgent3 : MonoBehaviour
         }
 
         // 到了目标地点
-        Debug.Log("到达目标位置");
+        Debug.Log("TestAgent3到达目标位置");
 
-        handController.grabber.GrabGrabbable(nextGrabbable);
         _environmentGrabbablesState[nextGrabbable] = true;
-        StartCoroutine(Drag()); // 开始拖拽
+        if(drag)
+        {
+            handController.grabber.GrabGrabbable(nextGrabbable);
+            StartCoroutine(Drag()); // 开始拖拽
+        }
+        else
+        {
+            if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
+            {
+                ResetAllGrabbableObjects();
+                yield return null;
+            }
+            StartCoroutine(MoveToNextGrabbable());
+        }
     }
 
     /// <summary>
@@ -235,11 +249,20 @@ public class TestAgent3 : MonoBehaviour
         for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
             _environmentGrabbablesState[_environmentGrabbables[i]] = false;
-            float randomX = Random.Range(-AreaDiameter, AreaDiameter);
-            float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
-            float randomY = 2.5f;
-            Vector3 newPosition = itemRoot.position + new Vector3(randomX, randomY, randomZ);
-            _environmentGrabbables[i].transform.position = newPosition;
+            if(randomGrabble)
+            {
+                float randomX = Random.Range(-AreaDiameter, AreaDiameter);
+                float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
+                float randomY = 2.5f;
+                Vector3 newPosition = itemRoot.position + new Vector3(randomX, randomY, randomZ);
+                _environmentGrabbables[i].transform.position = newPosition;
+            }
+            else
+            {
+                _environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
+
+            }
+
             _environmentGrabbables[i].transform.rotation = _initialGrabbableRotations[i];
 
             Rigidbody rb = _environmentGrabbables[i].GetComponent<Rigidbody>();
@@ -276,7 +299,7 @@ public class TestAgent3 : MonoBehaviour
         StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
         ResetAllGrabbableObjects();
 
-        
+
 
         StartCoroutine(MoveToNextGrabbable());
     }
