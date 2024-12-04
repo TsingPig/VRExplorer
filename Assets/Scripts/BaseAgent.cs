@@ -8,7 +8,8 @@ using UnityEngine.AI;
 
 public abstract class BaseAgent : MonoBehaviour
 {
-    public int curFinishCount = 0;
+    private int curFinishCount = 0;
+    private float roundStartTIme = 0f;
 
     protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
     protected Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
@@ -23,7 +24,7 @@ public abstract class BaseAgent : MonoBehaviour
     public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
-    public float moveSpeed = 4f;
+    public float moveSpeed = 10f;
     public bool randomGrabble = false;
 
 
@@ -43,7 +44,7 @@ public abstract class BaseAgent : MonoBehaviour
         }
 
         // 到了目标地点
-        Debug.Log($"{GetType().Name}到达目标位置");
+        //Debug.Log($"{GetType().Name}到达目标位置");
         _environmentGrabbablesState[nextGrabbable] = true;
 
         if(drag)
@@ -55,8 +56,10 @@ public abstract class BaseAgent : MonoBehaviour
         {
             if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
             {
+                Debug.Log($"{GetType().Name}完成{curFinishCount}次, 花费{(roundStartTIme - Time.time):F2}秒");
                 ResetAllGrabbableObjects();
                 curFinishCount += 1;
+
                 yield return null;
             }
             StartCoroutine(MoveToNextGrabbable());
@@ -158,6 +161,7 @@ public abstract class BaseAgent : MonoBehaviour
     /// </summary>
     protected virtual void ResetAllGrabbableObjects()
     {
+        roundStartTIme = Time.time;
         for(int i = 0; i < _environmentGrabbables.Count; i++)
         {
             _environmentGrabbablesState[_environmentGrabbables[i]] = false;

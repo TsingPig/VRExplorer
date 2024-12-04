@@ -126,7 +126,7 @@ public class TestAgent3 : BaseAgent
         hamiltonianPath = SolveTSP();
 
         string pathString = string.Join(" -> ", hamiltonianPath.Select(i => i.ToString()).ToArray());
-        Debug.Log("Hamiltonian Path: " + pathString);
+        //Debug.Log("Hamiltonian Path: " + pathString);
 
         curGrabbableIndex = 0;
     }
