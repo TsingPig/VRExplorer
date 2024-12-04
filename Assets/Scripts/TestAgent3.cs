@@ -23,10 +23,21 @@ public class TestAgent3 : BaseAgent
         for(int i = 0; i < count; i++)
         {
             Vector3 grabbablePos = _environmentGrabbables[i].transform.position;
-            NavMeshPath agentToGrabbablePath = new NavMeshPath();
-            float dist = agentToGrabbablePath.corners.Zip(agentToGrabbablePath.corners.Skip(1), Vector3.Distance).Sum();
-            distanceMatrix[count, i] = dist;
-            distanceMatrix[i, count] = dist;
+            NavMeshPath path = new NavMeshPath();
+            NavMesh.CalculatePath(agentStartPos, grabbablePos, NavMesh.AllAreas, path);
+
+            if(path.status == NavMeshPathStatus.PathComplete)
+            {
+                float dist = path.corners.Zip(path.corners.Skip(1), Vector3.Distance).Sum();
+                distanceMatrix[count, i] = dist;
+                distanceMatrix[i, count] = dist;
+            }
+            else
+            {
+                distanceMatrix[count, i] = float.MaxValue; // Set to an unreachable value
+                distanceMatrix[i, count] = float.MaxValue;
+            }
+
         }
 
         for(int i = 0; i < count; i++)
@@ -98,9 +109,8 @@ public class TestAgent3 : BaseAgent
         }
 
         // 从初始节点（即代理的起始位置）开始，执行回溯
-        visited[0] = true;
-        path.Add(0);  // 初始路径包含起点（代理的位置）
-        Backtrack(0, 0, path);  // 从起点开始回溯
+        Backtrack(n, 0, path);  // 从起点开始回溯
+
 
         return bestPath;
     }
@@ -114,6 +124,10 @@ public class TestAgent3 : BaseAgent
         base.ResetAllGrabbableObjects();
         ComputeDistanceMatrix();
         hamiltonianPath = SolveTSP();
+
+        string pathString = string.Join(" -> ", hamiltonianPath.Select(i => i.ToString()).ToArray());
+        Debug.Log("Hamiltonian Path: " + pathString);
+
         curGrabbableIndex = 0;
     }
 
@@ -122,7 +136,7 @@ public class TestAgent3 : BaseAgent
     /// </summary>
     protected override void GetNextGrabbable(out Grabbable nextGrabbable)
     {
-        nextGrabbable = _environmentGrabbables[curGrabbableIndex];
+        nextGrabbable = _environmentGrabbables[hamiltonianPath[curGrabbableIndex]];
         curGrabbableIndex += 1;
     }
 

@@ -8,7 +8,8 @@ using UnityEngine.AI;
 
 public abstract class BaseAgent : MonoBehaviour
 {
-    protected List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
+    public int curFinishCount = 0;
+
     protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
     protected Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
     protected Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
@@ -16,6 +17,7 @@ public abstract class BaseAgent : MonoBehaviour
 
 
 
+    public List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
     public bool drag = false;
     public Transform itemRoot;
     public Grabbable nextGrabbable;     // 最近的可抓取物体
@@ -54,6 +56,7 @@ public abstract class BaseAgent : MonoBehaviour
             if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
             {
                 ResetAllGrabbableObjects();
+                curFinishCount += 1;
                 yield return null;
             }
             StartCoroutine(MoveToNextGrabbable());
@@ -111,6 +114,7 @@ public abstract class BaseAgent : MonoBehaviour
         if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
         {
             ResetAllGrabbableObjects();
+            curFinishCount += 1;
             yield return null;
         }
         StartCoroutine(MoveToNextGrabbable());
@@ -186,7 +190,6 @@ public abstract class BaseAgent : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
 
         GetEnvironmentGrabbables(out _environmentGrabbables, out _environmentGrabbablesState);
-        GetNextGrabbable(out nextGrabbable);
 
         StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
         ResetAllGrabbableObjects();
