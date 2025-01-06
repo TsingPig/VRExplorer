@@ -38,13 +38,22 @@ public abstract class BaseAgent : MonoBehaviour
         }
         navMeshAgent.speed = moveSpeed;
 
+        float maxTimeout = 10f; // 最大允许的时间（秒），如果超过这个时间还没到达目标，就认为成功
+        float startTime = Time.time;  // 记录开始时间
+
         while(navMeshAgent.pathPending || navMeshAgent.remainingDistance > 0.5f)
         {
+            // 检查是否超时
+            if(Time.time - startTime > maxTimeout)
+            {
+                Debug.LogWarning($"超时！{GetType().Name} 没有在指定时间内到达目标位置，强制视为成功.");
+                break;  // 超时，跳出循环，认为目标已到达
+            }
+
             yield return null;
         }
 
-        // 到了目标地点
-        //Debug.Log($"{GetType().Name}到达目标位置");
+        // 到了目标地点（或超时认为已到达）
         _environmentGrabbablesState[nextGrabbable] = true;
 
         if(drag)
@@ -65,6 +74,7 @@ public abstract class BaseAgent : MonoBehaviour
             StartCoroutine(MoveToNextGrabbable());
         }
     }
+
 
     /// <summary>
     /// 随机抽搐

@@ -2915,6 +2915,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4236298532006772439, guid: 3d27da16c7404d54d92b052491867081,
         type: 3}
+      propertyPath: drag
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4236298532006772439, guid: 3d27da16c7404d54d92b052491867081,
+        type: 3}
       propertyPath: itemRoot
       value: 
       objectReference: {fileID: 409639018}
@@ -3217,7 +3222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1600937883
 Transform:
   m_ObjectHideFlags: 0
