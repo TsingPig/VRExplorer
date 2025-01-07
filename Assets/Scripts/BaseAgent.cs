@@ -1,5 +1,4 @@
 using BNG;
-using OpenCover.Framework.Model;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using UnityEngine.AI;
 
 public abstract class BaseAgent : MonoBehaviour
 {
+    private SceneAnalyzer sceneAnalyzer;
     private int curFinishCount = 0;
     private float roundStartTIme = 0f;
 
@@ -20,6 +20,8 @@ public abstract class BaseAgent : MonoBehaviour
 
     public List<Grabbable> _environmentGrabbables;      //场景中的可抓取物体
     public bool drag = false;
+
+    
     public Transform itemRoot;
     public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
@@ -140,9 +142,11 @@ public abstract class BaseAgent : MonoBehaviour
     {
         grabbables = new List<Grabbable>();
         grabbableState = new Dictionary<Grabbable, bool>();
-        foreach(Transform child in itemRoot.transform)
+
+        
+        foreach(GameObject obj in sceneAnalyzer.grabObjects)
         {
-            var grabbable = child.GetComponent<Grabbable>();
+            var grabbable = obj.GetComponent<Grabbable>();
             if(grabbable)
             {
                 grabbables.Add(grabbable);
@@ -202,6 +206,7 @@ public abstract class BaseAgent : MonoBehaviour
     protected void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
+        sceneAnalyzer = GetComponent<SceneAnalyzer>();
 
         GetEnvironmentGrabbables(out _environmentGrabbables, out _environmentGrabbablesState);
 

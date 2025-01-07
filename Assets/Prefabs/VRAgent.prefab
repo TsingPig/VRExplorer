@@ -24,14 +24,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8080720546608194420}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.32, z: 0.548}
+  m_LocalRotation: {x: 0.123367384, y: -0, z: -0, w: 0.99236107}
+  m_LocalPosition: {x: 0, y: 0.71, z: 0.24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8080720548095950262}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 14.173, y: 0, z: 0}
 --- !u!20 &8080720546608194186
 Camera:
   m_ObjectHideFlags: 0
@@ -55,9 +55,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
+  near clip plane: 0.1
+  far clip plane: 5000
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -209,8 +209,9 @@ GameObject:
   - component: {fileID: 8080720548095950263}
   - component: {fileID: 6355174954153483858}
   - component: {fileID: 496355604258214106}
+  - component: {fileID: -8133979339642349054}
   m_Layer: 0
-  m_Name: TestAgent2
+  m_Name: VRAgent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -296,7 +297,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -312,11 +313,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1230121da2d68f41ad0920d5247a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _environmentGrabbables: []
+  drag: 1
   itemRoot: {fileID: 0}
-  neareastGrabbable: {fileID: 0}
+  nextGrabbable: {fileID: 0}
   handController: {fileID: 1026356573675553863}
   AreaDiameter: 7.5
   moveSpeed: 4
+  randomGrabble: 0
 --- !u!195 &496355604258214106
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -339,6 +343,20 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-8133979339642349054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8080720548095950257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f7ffced2aceec4eac4939e8ea785df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetGrabTypeFilter:
+  - Grabbable
 --- !u!1 &8080720548134321786
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,7 +447,7 @@ PrefabInstance:
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.104
+      value: 0.054
       objectReference: {fileID: 0}
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
@@ -439,7 +457,7 @@ PrefabInstance:
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.688
+      value: 1.106
       objectReference: {fileID: 0}
     - target: {fileID: 1662211248147916643, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
@@ -480,6 +498,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LeftControllerAnchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 4707598737328222908, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5127
+      objectReference: {fileID: 0}
+    - target: {fileID: 4707598737328222908, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5127
+      objectReference: {fileID: 0}
+    - target: {fileID: 4707598737328222908, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5127
       objectReference: {fileID: 0}
     - target: {fileID: 5950505587806850609, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}
