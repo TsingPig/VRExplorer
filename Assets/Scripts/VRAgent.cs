@@ -13,7 +13,7 @@ public class VRAgent : BaseAgent
     /// </summary>
     protected override void GetNextGrabbable(out Grabbable nextGrabbable)
     {
-        nextGrabbable = _environmentGrabbables
+        nextGrabbable = environmentGrabbables
             .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
             .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
             .FirstOrDefault();
