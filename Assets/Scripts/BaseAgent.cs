@@ -1,9 +1,12 @@
 using BNG;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
+
 
 public abstract class BaseAgent : MonoBehaviour
 {
@@ -28,6 +31,7 @@ public abstract class BaseAgent : MonoBehaviour
     public float twitchRange = 8f;
     public float moveSpeed = 6f;
     public bool randomGrabble = false;
+    public Action roundFinishEvent;
 
     protected IEnumerator MoveToNextGrabbable()
     {
@@ -47,6 +51,7 @@ public abstract class BaseAgent : MonoBehaviour
             // 检查是否超时
             if(Time.time - startTime > maxTimeout)
             {
+                roundFinishEvent?.Invoke();
                 Debug.LogWarning($"超时！{GetType().Name} 没有在指定时间内到达目标位置，强制视为成功.");
                 break;  // 超时，跳出循环，认为目标已到达
             }
@@ -60,20 +65,16 @@ public abstract class BaseAgent : MonoBehaviour
         if(drag)
         {
             handController.grabber.GrabGrabbable(nextGrabbable);
-            StartCoroutine(Drag()); // 开始拖拽
+            yield return StartCoroutine(Drag());
         }
-        else
-        {
-            if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
-            {
-                Debug.Log($"{GetType().Name}完成{_curFinishCount}次, 花费{(_roundStartTIme - Time.time):F2}秒");
-                ResetSceneGrabbableObjects();
-                _curFinishCount += 1;
 
-                yield return null;
-            }
-            StartCoroutine(MoveToNextGrabbable());
+        if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
+        {
+            roundFinishEvent.Invoke();
+            yield return null;
         }
+
+        StartCoroutine(MoveToNextGrabbable());
     }
 
     /// <summary>
@@ -110,7 +111,7 @@ public abstract class BaseAgent : MonoBehaviour
     /// <returns></returns>
     protected IEnumerator Drag()
     {
-        Debug.Log("开始Drag");
+        Debug.Log($"开始拖拽物体 {nextGrabbable.name}");
 
         yield return StartCoroutine(RandomTwitch());
 
@@ -119,15 +120,8 @@ public abstract class BaseAgent : MonoBehaviour
             handController.grabber.TryRelease();
         }
 
-        Debug.Log("释放");
+        Debug.Log($"释放物体 {nextGrabbable.name}");
 
-        if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
-        {
-            ResetSceneGrabbableObjects();
-            _curFinishCount += 1;
-            yield return null;
-        }
-        StartCoroutine(MoveToNextGrabbable());
     }
 
     /// <summary>
@@ -239,6 +233,9 @@ public abstract class BaseAgent : MonoBehaviour
 
         StoreSceneGrabbableObjects();
         ResetSceneGrabbableObjects();
+
+        roundFinishEvent += ResetSceneGrabbableObjects;
+        roundFinishEvent += () => { _curFinishCount += 1; };
 
         StartCoroutine(MoveToNextGrabbable());
     }
