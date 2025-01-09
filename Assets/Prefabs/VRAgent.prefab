@@ -86,8 +86,8 @@ GameObject:
   - component: {fileID: 8080720548095950262}
   - component: {fileID: 8080720548095950261}
   - component: {fileID: 8080720548095950260}
-  - component: {fileID: 8080720548095950263}
   - component: {fileID: 6355174954153483858}
+  - component: {fileID: 4267808211186112318}
   - component: {fileID: 496355604258214106}
   - component: {fileID: -8133979339642349054}
   - component: {fileID: 3805277377165494755}
@@ -107,7 +107,7 @@ Transform:
   m_GameObject: {fileID: 8080720548095950257}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.47, y: 1.59, z: 0.09}
-  m_LocalScale: {x: 0.6200282, y: 0.6200282, z: 0.6200282}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8080720546608194421}
@@ -165,20 +165,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8080720548095950263
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8080720548095950257}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.3
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6355174954153483858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,10 +181,24 @@ MonoBehaviour:
   drag: 1
   nextGrabbable: {fileID: 0}
   handController: {fileID: 1026356573675553863}
-  AreaDiameter: 7.5
-  moveSpeed: 4
+  areaDiameter: 7.5
   twitchRange: 8
+  moveSpeed: 4
   randomGrabble: 1
+--- !u!136 &4267808211186112318
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8080720548095950257}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!195 &496355604258214106
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -208,7 +208,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8080720548095950257}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.3
+  m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50

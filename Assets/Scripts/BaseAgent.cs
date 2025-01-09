@@ -137,18 +137,13 @@ public abstract class BaseAgent : MonoBehaviour
             randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
             randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
             randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
-            if(NavMesh.SamplePosition(randomPosition, out hit, 5f, NavMesh.AllAreas))
+            NavMeshPath path = new NavMeshPath();
+            if(NavMesh.CalculatePath(transform.position, randomPosition, NavMesh.AllAreas, path))
             {
-                NavMeshPath path = new NavMeshPath();
-                if(NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
+                if(path.status == NavMeshPathStatus.PathComplete)
                 {
-                    if(path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        randomPosition = hit.position;
-                        Debug.Log($"Successfully Finding the path from Agent to {nextGrabbable.name}");
-                        break;
-                    }
-
+                    Debug.Log($"Successfully Finding the path for randomly walking");
+                    break;
                 }
             }
             attempts++;
