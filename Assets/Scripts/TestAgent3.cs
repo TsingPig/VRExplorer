@@ -17,12 +17,12 @@ public class TestAgent3 : BaseAgent
     /// </summary>
     private void ComputeDistanceMatrix()
     {
-        int count = environmentGrabbables.Count;
+        int count = sceneGrabbables.Count;
         distanceMatrix = new float[count + 1, count + 1];
         Vector3 agentStartPos = transform.position;
         for(int i = 0; i < count; i++)
         {
-            Vector3 grabbablePos = environmentGrabbables[i].transform.position;
+            Vector3 grabbablePos = sceneGrabbables[i].transform.position;
             NavMeshPath path = new NavMeshPath();
             NavMesh.CalculatePath(agentStartPos, grabbablePos, NavMesh.AllAreas, path);
 
@@ -46,8 +46,8 @@ public class TestAgent3 : BaseAgent
             {
                 if(i == j) continue;
 
-                Vector3 start = environmentGrabbables[i].transform.position;
-                Vector3 end = environmentGrabbables[j].transform.position;
+                Vector3 start = sceneGrabbables[i].transform.position;
+                Vector3 end = sceneGrabbables[j].transform.position;
 
                 NavMeshPath path = new NavMeshPath();
                 if(NavMesh.CalculatePath(start, end, NavMesh.AllAreas, path))
@@ -68,7 +68,7 @@ public class TestAgent3 : BaseAgent
     /// <returns></returns>
     private List<int> SolveTSP()
     {
-        int n = environmentGrabbables.Count;
+        int n = sceneGrabbables.Count;
         List<int> path = new List<int>();
         List<int> bestPath = new List<int>(); // 用来存储最短路径
         float bestDistance = float.MaxValue;  // 用来存储最短路径的距离
@@ -119,9 +119,9 @@ public class TestAgent3 : BaseAgent
     /// <summary>
     /// 重置加载所有可抓取物体的位置和旋转
     /// </summary>
-    protected override void ResetAllGrabbableObjects()
+    protected override void ResetSceneGrabbableObjects()
     {
-        base.ResetAllGrabbableObjects();
+        base.ResetSceneGrabbableObjects();
         ComputeDistanceMatrix();
         hamiltonianPath = SolveTSP();
 
@@ -136,7 +136,7 @@ public class TestAgent3 : BaseAgent
     /// </summary>
     protected override void GetNextGrabbable(out Grabbable nextGrabbable)
     {
-        nextGrabbable = environmentGrabbables[hamiltonianPath[curGrabbableIndex]];
+        nextGrabbable = sceneGrabbables[hamiltonianPath[curGrabbableIndex]];
         curGrabbableIndex += 1;
     }
 

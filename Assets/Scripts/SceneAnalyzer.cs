@@ -10,7 +10,7 @@ public class SceneAnalyzer : MonoBehaviour
     /// </summary>
     public List<string> targetGrabTypeFilter = new List<string>();
 
-    public List<GameObject> grabObjects = new List<GameObject>();
+    public List<GameObject> grabbableObjects = new List<GameObject>();
 
     /// <summary>
     /// 场景中的所有物体
@@ -55,12 +55,12 @@ public class SceneAnalyzer : MonoBehaviour
         foreach(string scriptName in targetGrabTypeFilter)
         {
             List<GameObject> objects = FindObjectsWithScript(scriptName);
-            grabObjects.AddRange(objects);
+            grabbableObjects.AddRange(objects);
 
             Debug.Log($"脚本 {scriptName} 挂载的对象数量: {objects.Count}");
         }
 
-        foreach(GameObject obj in grabObjects)
+        foreach(GameObject obj in grabbableObjects)
         {
             obj.AddComponent<Grabbable>();
         }

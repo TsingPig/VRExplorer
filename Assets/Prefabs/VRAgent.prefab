@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 6355174954153483858}
   - component: {fileID: 496355604258214106}
   - component: {fileID: -8133979339642349054}
+  - component: {fileID: 3805277377165494755}
   m_Layer: 0
   m_Name: VRAgent
   m_TagString: Untagged
@@ -190,14 +191,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1230121da2d68f41ad0920d5247a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environmentGrabbables: []
+  sceneGrabbables: []
   drag: 1
   nextGrabbable: {fileID: 0}
   handController: {fileID: 1026356573675553863}
   AreaDiameter: 7.5
   moveSpeed: 4
   twitchRange: 8
-  randomGrabble: 0
+  randomGrabble: 1
 --- !u!195 &496355604258214106
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -233,7 +234,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetGrabTypeFilter: []
-  grabObjects: []
+  grabbableObjects: []
+--- !u!81 &3805277377165494755
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8080720548095950257}
+  m_Enabled: 1
 --- !u!1001 &5722555333844875000
 PrefabInstance:
   m_ObjectHideFlags: 0

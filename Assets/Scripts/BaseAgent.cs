@@ -9,7 +9,7 @@ public abstract class BaseAgent : MonoBehaviour
 {
     private int _curFinishCount = 0;
     private float _roundStartTIme = 0f;
-    private Transform _itemRoot;
+    private Vector3 _sceneCenter;
 
     protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
     protected Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
@@ -19,10 +19,10 @@ public abstract class BaseAgent : MonoBehaviour
 
 
 
-    public List<Grabbable> environmentGrabbables;      //场景中的可抓取物体
+    public List<Grabbable> sceneGrabbables;      //场景中的可抓取物体
     public bool drag = false;
 
-    
+
     public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
@@ -69,7 +69,7 @@ public abstract class BaseAgent : MonoBehaviour
             if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
             {
                 Debug.Log($"{GetType().Name}完成{_curFinishCount}次, 花费{(_roundStartTIme - Time.time):F2}秒");
-                ResetAllGrabbableObjects();
+                ResetSceneGrabbableObjects();
                 _curFinishCount += 1;
 
                 yield return null;
@@ -128,72 +128,100 @@ public abstract class BaseAgent : MonoBehaviour
 
         if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
         {
-            ResetAllGrabbableObjects();
+            ResetSceneGrabbableObjects();
             _curFinishCount += 1;
             yield return null;
         }
         StartCoroutine(MoveToNextGrabbable());
     }
 
+
     /// <summary>
-    /// 获取场景中所有的可抓取物体列表
+    /// 获取场景中所有的可抓取物体列表。
     /// </summary>
-    protected void GetEnvironmentGrabbables(out List<Grabbable> grabbables, out Dictionary<Grabbable, bool> grabbableState)
+    /// <param name="grabbables">可抓取物体列表</param>
+    /// <param name="grabbableState">可抓取物体状态</param>
+    protected void GetSceneGrabbables(out List<Grabbable> grabbables, out Dictionary<Grabbable, bool> grabbableState)
     {
         grabbables = new List<Grabbable>();
         grabbableState = new Dictionary<Grabbable, bool>();
 
-        
-        foreach(GameObject obj in _sceneAnalyzer.grabObjects)
+
+        foreach(GameObject grabbableObject in _sceneAnalyzer.grabbableObjects)
         {
-            var grabbable = obj.GetComponent<Grabbable>();
-            if(grabbable)
-            {
-                grabbables.Add(grabbable);
-                grabbableState.Add(grabbable, false);
-            }
+            var grabbable = grabbableObject.GetComponent<Grabbable>();
+            grabbables.Add(grabbable);
+            grabbableState.Add(grabbable, false);
         }
     }
 
     /// <summary>
     /// 存储所有场景中可抓取物体的变换信息
     /// </summary>
-    protected void StoreAllGrabbableObjects()
+    protected void StoreSceneGrabbableObjects()
     {
-        _initialGrabbablePositions = new Vector3[environmentGrabbables.Count];
-        _initialGrabbableRotations = new Quaternion[environmentGrabbables.Count];
+        _initialGrabbablePositions = new Vector3[sceneGrabbables.Count];
+        _initialGrabbableRotations = new Quaternion[sceneGrabbables.Count];
 
-        for(int i = 0; i < environmentGrabbables.Count; i++)
+        for(int i = 0; i < sceneGrabbables.Count; i++)
         {
-            _initialGrabbablePositions[i] = environmentGrabbables[i].transform.position;
-            _initialGrabbableRotations[i] = environmentGrabbables[i].transform.rotation;
+            _initialGrabbablePositions[i] = sceneGrabbables[i].transform.position;
+            _initialGrabbableRotations[i] = sceneGrabbables[i].transform.rotation;
         }
+    }
+
+    /// <summary>
+    /// 通过获取NavMesh的所有三角形网格顶点坐标，近似NavMesh的几何中心
+    /// </summary>
+    /// <returns>NavMesh的近似中心</returns>
+    private Vector3 GetNavMeshCenter()
+    {
+        NavMeshTriangulation triangulation = NavMesh.CalculateTriangulation();
+        Vector3 center = Vector3.zero;
+        int vertexCount = triangulation.vertices.Length;
+        foreach(Vector3 vertex in triangulation.vertices)
+        {
+            center += vertex;
+        }
+        if(vertexCount > 0)
+        {
+            center /= vertexCount;
+        }
+        return center;
     }
 
     /// <summary>
     /// 重置加载所有可抓取物体的位置和旋转
     /// </summary>
-    protected virtual void ResetAllGrabbableObjects()
+    protected virtual void ResetSceneGrabbableObjects()
     {
         _roundStartTIme = Time.time;
-        for(int i = 0; i < environmentGrabbables.Count; i++)
+        for(int i = 0; i < sceneGrabbables.Count; i++)
         {
-            _environmentGrabbablesState[environmentGrabbables[i]] = false;
+            _environmentGrabbablesState[sceneGrabbables[i]] = false;
 
             if(randomGrabble)
             {
                 float randomX = Random.Range(-AreaDiameter, AreaDiameter);
                 float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
                 float randomY = 2.5f;
-                Vector3 newPosition = _itemRoot.position + new Vector3(randomX, randomY, randomZ);
-                environmentGrabbables[i].transform.position = newPosition;
+                Vector3 randomPosition = _sceneCenter + new Vector3(randomX, randomY, randomZ);
+                NavMeshHit hit;
+                if(NavMesh.SamplePosition(randomPosition, out hit, 5.0f, NavMesh.AllAreas))
+                {
+                    sceneGrabbables[i].transform.position = hit.position;
+                }
+                else
+                {
+                    Debug.LogWarning("随机位置不在NavMesh上，未找到有效的可导航位置。");
+                }
             }
             else
             {
-                environmentGrabbables[i].transform.position = _initialGrabbablePositions[i];
-
+                sceneGrabbables[i].transform.position = _initialGrabbablePositions[i];
             }
-            Rigidbody rb = environmentGrabbables[i].GetComponent<Rigidbody>();
+
+            Rigidbody rb = sceneGrabbables[i].GetComponent<Rigidbody>();
             if(rb != null)
             {
                 rb.velocity = Vector3.zero;
@@ -203,15 +231,17 @@ public abstract class BaseAgent : MonoBehaviour
     }
 
 
+
     protected void Start()
     {
-        _navMeshAgent = GetComponent<NavMeshAgent>();  // 获取 NavMeshAgent 组件
+        _navMeshAgent = GetComponent<NavMeshAgent>();
         _sceneAnalyzer = GetComponent<SceneAnalyzer>();
+        _sceneCenter = GetNavMeshCenter();
 
-        GetEnvironmentGrabbables(out environmentGrabbables, out _environmentGrabbablesState);
+        GetSceneGrabbables(out sceneGrabbables, out _environmentGrabbablesState);
 
-        StoreAllGrabbableObjects();   // 保存场景中，可抓取物体的初始位置和旋转
-        ResetAllGrabbableObjects();
+        StoreSceneGrabbableObjects();
+        ResetSceneGrabbableObjects();
 
         StartCoroutine(MoveToNextGrabbable());
     }
