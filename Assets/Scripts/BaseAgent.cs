@@ -26,7 +26,8 @@ public abstract class BaseAgent : MonoBehaviour
     public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
     public float AreaDiameter = 7.5f;    // 场景的半径大小估算
-    public float moveSpeed = 10f;
+    public float moveSpeed = 6f;       // 移动速度
+    public float twitchRange = 8f; // 随机抽搐的半径范围
     public bool randomGrabble = false;
 
 
@@ -83,8 +84,7 @@ public abstract class BaseAgent : MonoBehaviour
     /// </summary>
     protected IEnumerator RandomTwitch()
     {
-        // 设置随机抽搐的范围
-        float twitchRange = 8f; // 随机抽搐的半径范围
+
         float randomOffsetX = Random.Range(twitchRange / 2, twitchRange); // X方向的随机偏移
         float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange); // Z方向的随机偏移
         randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;

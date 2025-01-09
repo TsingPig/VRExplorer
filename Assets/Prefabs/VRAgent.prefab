@@ -190,13 +190,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1230121da2d68f41ad0920d5247a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _environmentGrabbables: []
+  environmentGrabbables: []
   drag: 1
-  itemRoot: {fileID: 0}
   nextGrabbable: {fileID: 0}
   handController: {fileID: 1026356573675553863}
   AreaDiameter: 7.5
   moveSpeed: 4
+  twitchRange: 8
   randomGrabble: 0
 --- !u!195 &496355604258214106
 NavMeshAgent:
@@ -232,8 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f7ffced2aceec4eac4939e8ea785df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetGrabTypeFilter:
-  - Grabbable
+  targetGrabTypeFilter: []
   grabObjects: []
 --- !u!1001 &5722555333844875000
 PrefabInstance:

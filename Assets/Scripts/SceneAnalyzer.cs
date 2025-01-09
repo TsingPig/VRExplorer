@@ -55,11 +55,7 @@ public class SceneAnalyzer : MonoBehaviour
         foreach(string scriptName in targetGrabTypeFilter)
         {
             List<GameObject> objects = FindObjectsWithScript(scriptName);
-
-            foreach(GameObject obj in objects)
-            {
-                grabObjects.Add(obj);
-            }
+            grabObjects.AddRange(objects);
 
             Debug.Log($"脚本 {scriptName} 挂载的对象数量: {objects.Count}");
         }
