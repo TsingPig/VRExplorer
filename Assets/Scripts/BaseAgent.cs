@@ -78,51 +78,107 @@ public abstract class BaseAgent : MonoBehaviour
     }
 
     /// <summary>
-    /// 随机抽搐
+    /// 获取随机位置，确保该位置在NavMesh上可达且Agent能找到路径
     /// </summary>
-    protected IEnumerator RandomTwitch()
+    /// <returns></returns>
+    private Vector3 GetRandomPositionOnNavMesh()
     {
-        float randomOffsetX = Random.Range(twitchRange / 2, twitchRange); // X方向的随机偏移
-        float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange); // Z方向的随机偏移
-        randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
-        randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
-        // 计算新位置（在当前位置的附近随机抽搐）
-        Vector3 randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
+        Vector3 randomPosition = _sceneCenter;
+        NavMeshHit hit;
 
-        // 随机旋转（模拟抽搐时的随机转圈）
-        float randomRotationY = Random.Range(-30f, 30f); // 在 -30 到 30 度范围内旋转
+        // 尝试多次生成可达位置，避免无限循环
+        int maxAttempts = 10;
+        int attempts = 0;
+
+        while(attempts < maxAttempts)
+        {
+            // 生成随机位置
+            float randomOffsetX = Random.Range(twitchRange / 2, twitchRange);
+            float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange);
+            randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
+            randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
+            randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
+
+            if(NavMesh.SamplePosition(randomPosition, out hit, 5f, NavMesh.AllAreas))
+            {
+                NavMeshPath path = new NavMeshPath();
+                if(NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
+                {
+                    if(path.status == NavMeshPathStatus.PathComplete)
+                    {
+                        return hit.position;
+                    }
+                }
+            }
+            attempts++;
+        }
+        return randomPosition;
+    }
+
+    /// <summary>
+    /// 拖动
+    /// </summary>
+    /// <returns></returns>
+    protected IEnumerator Drag()
+    {
+        Debug.Log($"Start dragging Objects: {nextGrabbable.name}");
+
+        #region Randomly Walking
+
+        Vector3 randomPosition = _sceneCenter;
+        NavMeshHit hit;
+        int maxAttempts = 10;
+        int attempts = 0;
+
+        while(attempts < maxAttempts)
+        {
+            float randomOffsetX = Random.Range(twitchRange / 2, twitchRange);
+            float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange);
+            randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
+            randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
+            randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
+            if(NavMesh.SamplePosition(randomPosition, out hit, 5f, NavMesh.AllAreas))
+            {
+                NavMeshPath path = new NavMeshPath();
+                if(NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
+                {
+                    if(path.status == NavMeshPathStatus.PathComplete)
+                    {
+                        randomPosition = hit.position;
+                        Debug.Log($"Successfully Finding the path from Agent to {nextGrabbable.name}");
+                        break;
+                    }
+
+                }
+            }
+            attempts++;
+        }
+
+
+
+        float randomRotationY = Random.Range(-30f, 30f);
         transform.Rotate(0, randomRotationY, 0);
-
-        // 设置目标位置（如果使用 NavMeshAgent）
         _navMeshAgent.SetDestination(randomPosition);
-        _navMeshAgent.speed = moveSpeed * 0.6f; // 抽搐时速度较慢
-        Debug.Log("开始RandomTwitch");
+        _navMeshAgent.speed = moveSpeed * 0.6f;
+
+        Debug.Log($"Start Randomly Walking");
 
         while(_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > 0.6f)
         {
             yield return null;
         }
-    }
 
-    /// <summary>
-    /// 拖拽
-    /// </summary>
-    /// <param name="dragTime"></param>
-    /// <returns></returns>
-    protected IEnumerator Drag()
-    {
-        Debug.Log($"开始拖拽物体 {nextGrabbable.name}");
-
-        yield return StartCoroutine(RandomTwitch());
+        #endregion
 
         if(handController.grabber.HoldingItem)
         {
             handController.grabber.TryRelease();
         }
 
-        Debug.Log($"释放物体 {nextGrabbable.name}");
-
+        Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
     }
+
+
 
     /// <summary>
     /// 获取场景中所有的可抓取物体列表。
