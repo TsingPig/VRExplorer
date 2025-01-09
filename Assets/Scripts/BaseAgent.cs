@@ -12,24 +12,22 @@ public abstract class BaseAgent : MonoBehaviour
     private Vector3 _sceneCenter;
 
     protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
-    protected Vector3[] _initialGrabbablePositions;   //可抓取物体的初始位置
-    protected Quaternion[] _initialGrabbableRotations;//可抓取物体的初始旋转
-    protected NavMeshAgent _navMeshAgent;  // 引入 NavMeshAgent
-    protected SceneAnalyzer _sceneAnalyzer; // 场景分析器
-
-
+    protected Vector3[] _initialGrabbablePositions;
+    protected Quaternion[] _initialGrabbableRotations;
+    protected NavMeshAgent _navMeshAgent;
+    protected SceneAnalyzer _sceneAnalyzer;
+    protected NavMeshTriangulation _triangulation;
+    protected Vector3[] _meshCenters;
 
     public List<Grabbable> sceneGrabbables;      //场景中的可抓取物体
     public bool drag = false;
 
-
     public Grabbable nextGrabbable;     // 最近的可抓取物体
     public HandController handController;
-    public float AreaDiameter = 7.5f;    // 场景的半径大小估算
-    public float moveSpeed = 6f;       // 移动速度
-    public float twitchRange = 8f; // 随机抽搐的半径范围
+    public float areaDiameter = 7.5f;
+    public float twitchRange = 8f;
+    public float moveSpeed = 6f;
     public bool randomGrabble = false;
-
 
     protected IEnumerator MoveToNextGrabbable()
     {
@@ -78,13 +76,11 @@ public abstract class BaseAgent : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// 随机抽搐
     /// </summary>
     protected IEnumerator RandomTwitch()
     {
-
         float randomOffsetX = Random.Range(twitchRange / 2, twitchRange); // X方向的随机偏移
         float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange); // Z方向的随机偏移
         randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
@@ -105,7 +101,6 @@ public abstract class BaseAgent : MonoBehaviour
         {
             yield return null;
         }
-
     }
 
     /// <summary>
@@ -135,7 +130,6 @@ public abstract class BaseAgent : MonoBehaviour
         StartCoroutine(MoveToNextGrabbable());
     }
 
-
     /// <summary>
     /// 获取场景中所有的可抓取物体列表。
     /// </summary>
@@ -145,7 +139,6 @@ public abstract class BaseAgent : MonoBehaviour
     {
         grabbables = new List<Grabbable>();
         grabbableState = new Dictionary<Grabbable, bool>();
-
 
         foreach(GameObject grabbableObject in _sceneAnalyzer.grabbableObjects)
         {
@@ -171,26 +164,6 @@ public abstract class BaseAgent : MonoBehaviour
     }
 
     /// <summary>
-    /// 通过获取NavMesh的所有三角形网格顶点坐标，近似NavMesh的几何中心
-    /// </summary>
-    /// <returns>NavMesh的近似中心</returns>
-    private Vector3 GetNavMeshCenter()
-    {
-        NavMeshTriangulation triangulation = NavMesh.CalculateTriangulation();
-        Vector3 center = Vector3.zero;
-        int vertexCount = triangulation.vertices.Length;
-        foreach(Vector3 vertex in triangulation.vertices)
-        {
-            center += vertex;
-        }
-        if(vertexCount > 0)
-        {
-            center /= vertexCount;
-        }
-        return center;
-    }
-
-    /// <summary>
     /// 重置加载所有可抓取物体的位置和旋转
     /// </summary>
     protected virtual void ResetSceneGrabbableObjects()
@@ -202,19 +175,7 @@ public abstract class BaseAgent : MonoBehaviour
 
             if(randomGrabble)
             {
-                float randomX = Random.Range(-AreaDiameter, AreaDiameter);
-                float randomZ = Random.Range(-AreaDiameter, AreaDiameter);
-                float randomY = 2.5f;
-                Vector3 randomPosition = _sceneCenter + new Vector3(randomX, randomY, randomZ);
-                NavMeshHit hit;
-                if(NavMesh.SamplePosition(randomPosition, out hit, 5.0f, NavMesh.AllAreas))
-                {
-                    sceneGrabbables[i].transform.position = hit.position;
-                }
-                else
-                {
-                    Debug.LogWarning("随机位置不在NavMesh上，未找到有效的可导航位置。");
-                }
+                sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 2.5f, 0);
             }
             else
             {
@@ -231,13 +192,49 @@ public abstract class BaseAgent : MonoBehaviour
     }
 
 
+    protected abstract void GetNextGrabbable(out Grabbable nextGrabbbable);
 
-    protected void Start()
+    /// <summary>
+    /// 通过获取NavMesh的所有三角形网格顶点坐标，近似每个Mesh的几何中心、场景集合中心
+    /// </summary>
+    /// <returns>NavMesh的近似中心</returns>
+    private void ParseNavMesh(out Vector3 center, out float radius, out Vector3[] meshCenters)
+    {
+        int length = _triangulation.vertices.Length / 3;
+        center = Vector3.zero;
+        meshCenters = new Vector3[length];
+
+
+        Vector3 min = Vector3.positiveInfinity;
+        Vector3 max = Vector3.negativeInfinity;
+        Vector3 meshCenter = Vector3.zero;
+        int vecticesIndex = 0;
+
+        foreach(Vector3 vertex in _triangulation.vertices)
+        {
+            center += vertex;
+            meshCenter += vertex;
+            min = Vector3.Min(min, vertex);
+            max = Vector3.Max(max, vertex);
+            vecticesIndex += 1;
+            if(vecticesIndex % 3 == 0)
+            {
+                meshCenters[vecticesIndex / 3 - 1] = meshCenter / 3f;
+                meshCenter = Vector3.zero;
+            }
+        }
+        center /= length;
+        radius = Vector3.Distance(min, max) / 2;
+
+    }
+
+    private void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _sceneAnalyzer = GetComponent<SceneAnalyzer>();
-        _sceneCenter = GetNavMeshCenter();
+        _triangulation = NavMesh.CalculateTriangulation();
 
+        ParseNavMesh(out _sceneCenter, out areaDiameter, out _meshCenters);
         GetSceneGrabbables(out sceneGrabbables, out _environmentGrabbablesState);
 
         StoreSceneGrabbableObjects();
@@ -245,7 +242,5 @@ public abstract class BaseAgent : MonoBehaviour
 
         StartCoroutine(MoveToNextGrabbable());
     }
-
-    protected abstract void GetNextGrabbable(out Grabbable nextGrabbbable);
 
 }
