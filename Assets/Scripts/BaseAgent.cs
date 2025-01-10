@@ -43,7 +43,7 @@ public abstract class BaseAgent : MonoBehaviour
         }
         _navMeshAgent.speed = moveSpeed;
 
-        float maxTimeout = 10f; // 最大允许的时间（秒），如果超过这个时间还没到达目标，就认为成功
+        float maxTimeout = 30f; // 最大允许的时间（秒），如果超过这个时间还没到达目标，就认为成功
         float startTime = Time.time;  // 记录开始时间
 
         while(_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > 0.5f)
@@ -51,7 +51,6 @@ public abstract class BaseAgent : MonoBehaviour
             // 检查是否超时
             if(Time.time - startTime > maxTimeout)
             {
-                roundFinishEvent?.Invoke();
                 Debug.LogWarning($"超时！{GetType().Name} 没有在指定时间内到达目标位置，强制视为成功.");
                 break;  // 超时，跳出循环，认为目标已到达
             }
@@ -77,43 +76,6 @@ public abstract class BaseAgent : MonoBehaviour
         StartCoroutine(MoveToNextGrabbable());
     }
 
-    /// <summary>
-    /// 获取随机位置，确保该位置在NavMesh上可达且Agent能找到路径
-    /// </summary>
-    /// <returns></returns>
-    private Vector3 GetRandomPositionOnNavMesh()
-    {
-        Vector3 randomPosition = _sceneCenter;
-        NavMeshHit hit;
-
-        // 尝试多次生成可达位置，避免无限循环
-        int maxAttempts = 10;
-        int attempts = 0;
-
-        while(attempts < maxAttempts)
-        {
-            // 生成随机位置
-            float randomOffsetX = Random.Range(twitchRange / 2, twitchRange);
-            float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange);
-            randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
-            randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
-            randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
-
-            if(NavMesh.SamplePosition(randomPosition, out hit, 5f, NavMesh.AllAreas))
-            {
-                NavMeshPath path = new NavMeshPath();
-                if(NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
-                {
-                    if(path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        return hit.position;
-                    }
-                }
-            }
-            attempts++;
-        }
-        return randomPosition;
-    }
 
     /// <summary>
     /// 拖动
@@ -126,7 +88,6 @@ public abstract class BaseAgent : MonoBehaviour
         #region Randomly Walking
 
         Vector3 randomPosition = _sceneCenter;
-        NavMeshHit hit;
         int maxAttempts = 10;
         int attempts = 0;
 
@@ -286,7 +247,11 @@ public abstract class BaseAgent : MonoBehaviour
         ResetSceneGrabbableObjects();
 
         roundFinishEvent += ResetSceneGrabbableObjects;
-        roundFinishEvent += () => { _curFinishCount += 1; };
+        roundFinishEvent += () =>
+        {
+            _curFinishCount += 1;
+            Debug.Log($"Round {_curFinishCount} Finished ");
+        };
 
         StartCoroutine(MoveToNextGrabbable());
     }
