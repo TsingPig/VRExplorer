@@ -331,7 +331,7 @@ MonoBehaviour:
   BeingHeld: 0
   GrabButton: 2
   Grabtype: 2
-  GrabPhysics: 1
+  GrabPhysics: 0
   GrabMechanic: 1
   GrabSpeed: 10
   RemoteGrabbable: 0

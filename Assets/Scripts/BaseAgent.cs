@@ -64,6 +64,7 @@ public abstract class BaseAgent : MonoBehaviour
         if(drag)
         {
             handController.grabber.GrabGrabbable(nextGrabbable);
+            nextGrabbable.transform.localPosition = Vector3.zero;
             yield return StartCoroutine(Drag());
         }
 

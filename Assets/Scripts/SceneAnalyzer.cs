@@ -64,7 +64,14 @@ public class SceneAnalyzer : MonoBehaviour
         {
             if(!obj.GetComponent<Grabbable>())
             {
-                obj.AddComponent<Grabbable>();
+                var grabbable = obj.AddComponent<Grabbable>();
+                grabbable.GrabPhysics = GrabPhysics.PhysicsJoint;
+                grabbable.CollisionSpring = 10000f;
+                grabbable.CollisionSlerp = 1000f;
+
+                grabbable.SnapHandModel = false;
+                grabbable.ParentHandModel = false;
+                grabbable.ParentToHands = true;
             }
         }
 
