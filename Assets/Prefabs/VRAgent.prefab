@@ -183,7 +183,7 @@ MonoBehaviour:
   handController: {fileID: 1026356573675553863}
   areaDiameter: 7.5
   twitchRange: 8
-  moveSpeed: 4
+  moveSpeed: 7
   randomGrabble: 1
 --- !u!136 &4267808211186112318
 CapsuleCollider:
@@ -349,6 +349,16 @@ PrefabInstance:
         type: 3}
       propertyPath: ForceRelease
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5950505587806850609, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: DefaultHoldType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5950505587806850609, guid: ed17917da922a8443b04b34ba1264c22,
+        type: 3}
+      propertyPath: GrabCheckSeconds
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8418564665109207314, guid: ed17917da922a8443b04b34ba1264c22,
         type: 3}

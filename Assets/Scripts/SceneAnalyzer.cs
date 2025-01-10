@@ -62,7 +62,10 @@ public class SceneAnalyzer : MonoBehaviour
 
         foreach(GameObject obj in grabbableObjects)
         {
-            obj.AddComponent<Grabbable>();
+            if(!obj.GetComponent<Grabbable>())
+            {
+                obj.AddComponent<Grabbable>();
+            }
         }
 
     }

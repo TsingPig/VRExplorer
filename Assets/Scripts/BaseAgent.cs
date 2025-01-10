@@ -126,10 +126,7 @@ public abstract class BaseAgent : MonoBehaviour
 
         #endregion
 
-        if(handController.grabber.HoldingItem)
-        {
-            handController.grabber.TryRelease();
-        }
+        handController.grabber.TryRelease();
 
         Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
     }
@@ -181,7 +178,7 @@ public abstract class BaseAgent : MonoBehaviour
 
             if(randomGrabble)
             {
-                sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 2.5f, 0);
+                sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 5f, 0);
             }
             else
             {
@@ -255,5 +252,6 @@ public abstract class BaseAgent : MonoBehaviour
 
         StartCoroutine(MoveToNextGrabbable());
     }
+
 
 }

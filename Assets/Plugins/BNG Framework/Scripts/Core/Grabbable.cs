@@ -573,11 +573,11 @@ namespace BNG {
                     Grabber g = heldByGrabbers[x];
 
                     // Should we drop the item if it's too far away?
-                    if (!recentlyTeleported && BreakDistance > 0 && Vector3.Distance(grabPosition, g.transform.position) > BreakDistance) {
-                        Debug.LogWarning("Break Distance Exceeded. Dropping item.");
-                        //DropItem(g, true, true);
-                        break;
-                    }
+                    //if (!recentlyTeleported && BreakDistance > 0 && Vector3.Distance(grabPosition, g.transform.position) > BreakDistance) {
+                    //    Debug.LogWarning("Break Distance Exceeded. Dropping item.");
+                    //    DropItem(g, true, true);
+                    //    break;
+                    //}
 
                     // Should we drop the item if no longer holding the required Grabbable?
                     if (OtherGrabbableMustBeGrabbed != null && !OtherGrabbableMustBeGrabbed.BeingHeld) {

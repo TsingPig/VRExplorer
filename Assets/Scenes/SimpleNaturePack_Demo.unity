@@ -13952,10 +13952,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6355174954153483858, guid: 220046a189ec53d4e9d8c2c88e544bff,
+    - target: {fileID: -8133979339642349054, guid: 220046a189ec53d4e9d8c2c88e544bff,
         type: 3}
-      propertyPath: moveSpeed
-      value: 4
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2161420574921029833, guid: 220046a189ec53d4e9d8c2c88e544bff,
+        type: 3}
+      propertyPath: ForceGrab
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2161420574921029833, guid: 220046a189ec53d4e9d8c2c88e544bff,
+        type: 3}
+      propertyPath: ForceRelease
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8080720548095950257, guid: 220046a189ec53d4e9d8c2c88e544bff,
         type: 3}
