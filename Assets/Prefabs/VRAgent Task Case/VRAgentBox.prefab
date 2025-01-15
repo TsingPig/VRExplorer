@@ -331,7 +331,7 @@ MonoBehaviour:
   BeingHeld: 0
   GrabButton: 2
   Grabtype: 2
-  GrabPhysics: 0
+  GrabPhysics: 1
   GrabMechanic: 1
   GrabSpeed: 10
   RemoteGrabbable: 0
@@ -362,14 +362,14 @@ MonoBehaviour:
   SecondHandLookSpeed: 40
   SecondaryGrabbable: {fileID: 0}
   OtherGrabbableMustBeGrabbed: {fileID: 0}
-  CollisionSpring: 10000
-  CollisionSlerp: 1000
-  CollisionLinearMotionX: 2
-  CollisionLinearMotionY: 2
-  CollisionLinearMotionZ: 2
-  CollisionAngularMotionX: 2
-  CollisionAngularMotionY: 2
-  CollisionAngularMotionZ: 2
+  CollisionSpring: 3000
+  CollisionSlerp: 500
+  CollisionLinearMotionX: 0
+  CollisionLinearMotionY: 0
+  CollisionLinearMotionZ: 0
+  CollisionAngularMotionX: 0
+  CollisionAngularMotionY: 0
+  CollisionAngularMotionZ: 0
   ApplyCorrectiveForce: 1
   MoveVelocityForce: 3000
   MoveAngularVelocityForce: 90

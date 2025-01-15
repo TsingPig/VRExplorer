@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.XR.Interaction.Toolkit;
 using Random = UnityEngine.Random;
 
 namespace VRAgent
@@ -26,11 +27,15 @@ namespace VRAgent
         public bool drag = false;
 
         public Grabbable nextGrabbable;     // 最近的可抓取物体
-        public HandController handController;
+        
+        public HandController leftHandController;
+        public ActionBasedController rightHandController;
+
         public float areaDiameter = 7.5f;
         public float twitchRange = 8f;
         public float moveSpeed = 6f;
         public bool randomGrabble = false;
+
         public Action roundFinishEvent;
 
         protected IEnumerator MoveToNextGrabbable()
@@ -63,7 +68,7 @@ namespace VRAgent
 
             if(drag)
             {
-                handController.grabber.GrabGrabbable(nextGrabbable);
+                leftHandController.grabber.GrabGrabbable(nextGrabbable);
                 nextGrabbable.transform.localPosition = Vector3.zero;
                 yield return StartCoroutine(Drag());
             }
@@ -124,7 +129,7 @@ namespace VRAgent
 
             #endregion Randomly Walking
 
-            handController.grabber.TryRelease();
+            leftHandController.grabber.TryRelease();
 
             Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
         }
@@ -228,13 +233,11 @@ namespace VRAgent
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _sceneAnalyzer = GetComponent<SceneAnalyzer>();
             _triangulation = NavMesh.CalculateTriangulation();
-
             ParseNavMesh(out _sceneCenter, out areaDiameter, out _meshCenters);
             GetSceneGrabbables(out sceneGrabbables, out _environmentGrabbablesState);
 
             StoreSceneGrabbableObjects();
             ResetSceneGrabbableObjects();
-
             roundFinishEvent += ResetSceneGrabbableObjects;
             roundFinishEvent += () =>
             {

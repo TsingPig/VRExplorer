@@ -10,6 +10,8 @@ namespace VRAgent
     }
     public interface ButtonEntity
     {
+        void OnPress();
 
+        void OnRelease();
     }
 }

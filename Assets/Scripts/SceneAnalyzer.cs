@@ -1,10 +1,11 @@
 using BNG;
 using System.Collections.Generic;
 using UnityEngine;
+using TsingPigSDK;
 
 namespace VRAgent
 {
-    public class SceneAnalyzer : MonoBehaviour
+    public class SceneAnalyzer : Singleton<SceneAnalyzer>
     {
         /// <summary>
         /// 通过脚本挂载的类对可交互物体进行分类，此处记录可抓取物体的挂载脚本过滤器
