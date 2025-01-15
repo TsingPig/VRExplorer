@@ -1,18 +1,25 @@
 using BNG;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using TsingPigSDK;
+using Unity.VisualScripting;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace VRAgent
 {
-    public class SceneAnalyzer : Singleton<SceneAnalyzer>
+    public class SceneAnalyzer : TsingPigSDK.Singleton<SceneAnalyzer>
     {
         /// <summary>
         /// 通过脚本挂载的类对可交互物体进行分类，此处记录可抓取物体的挂载脚本过滤器
         /// </summary>
         public List<string> targetGrabTypeFilter = new List<string>();
 
-        public List<GameObject> grabbableObjects = new List<GameObject>();
+
+        public HashSet<GameObject> grabbableObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// 场景中的所有物体
@@ -28,10 +35,8 @@ namespace VRAgent
         {
             List<GameObject> result = new List<GameObject>();
 
-            // 遍历所有对象，检查其组件是否包含指定脚本
             foreach(GameObject obj in allGameObjects)
             {
-                // 获取该物体上的所有组件
                 Component[] components = obj.GetComponents<Component>();
 
                 foreach(Component component in components)
@@ -39,7 +44,7 @@ namespace VRAgent
                     if(component != null && component.GetType().Name == scriptName)
                     {
                         result.Add(obj);
-                        break; // 已找到目标脚本，跳过当前对象的其他组件检查
+                        break; 
                     }
                 }
             }
@@ -81,13 +86,101 @@ namespace VRAgent
         /// <summary>
         /// 测试入口
         /// </summary>
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             targetGrabTypeFilter.Add("XRGrabInteractable");
             targetGrabTypeFilter.Add("Grabbable");
-
-            // 分析场景
+            RegisterAllEntities();
             AnalyzeScene();
         }
+
+        #region 指标（Metrics）
+
+
+        /// <summary>
+        /// 存储每个实体的触发状态
+        /// </summary>
+        private Dictionary<BaseEntity, HashSet<Enum>> entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
+
+
+        /// <summary>
+        /// 使用反射，注册所有实体
+        /// </summary>
+        public void RegisterAllEntities()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var entityTypes = assembly.GetTypes().Where(t => typeof(BaseEntity).IsAssignableFrom(t) && !t.IsAbstract);
+            foreach(var type in entityTypes)
+            {
+                BaseEntity entity = (BaseEntity)Activator.CreateInstance(type);
+                RegisterEntity(entity);
+            }
+        }
+
+        /// <summary>
+        /// 注册实体并初始化状态
+        /// </summary>
+        /// <param name="entity"></param>
+        public void RegisterEntity(BaseEntity entity)
+        {
+            if(!entityStates.ContainsKey(entity))
+            {
+                entityStates[entity] = new HashSet<Enum>();
+            }
+        }
+
+
+        /// <summary>
+        /// 触发实体状态
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="state"></param>
+        public void TriggerState(BaseEntity entity, Enum state)
+        {
+            if(entityStates.ContainsKey(entity) && !entityStates[entity].Contains(state))
+            {
+                entityStates[entity].Add(state);
+                Debug.Log(new RichText()
+                    .Add($"Entity ", bold: true)
+                    .Add(entity.Name, bold: true, color: Color.yellow)
+                    .Add(" Event ", bold: true)
+                    .Add(new StackTrace().GetFrame(1).GetMethod().Name, bold: true, color: Color.blue)
+                    .GetText());
+            }
+        }
+
+        /// <summary>
+        /// 计算已触发的状态个数
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public int GetTriggeredStateCount(BaseEntity entity)
+        {
+            if(entityStates.ContainsKey(entity))
+            {
+                return entityStates[entity].Count;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// 获取总状态个数
+        /// </summary>
+        /// <param name="enumType"></param>
+        /// <returns></returns>
+        public int GetTotalStateCount()
+        {
+            int res = 0;
+            foreach(var v in entityStates.Values)
+            {
+                res += v.Count;
+            }
+            return res;
+        }
+
+        #endregion 指标（Metrics）
+
+
     }
 }

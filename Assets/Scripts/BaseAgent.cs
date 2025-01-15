@@ -19,7 +19,6 @@ namespace VRAgent
         protected Vector3[] _initialGrabbablePositions;
         protected Quaternion[] _initialGrabbableRotations;
         protected NavMeshAgent _navMeshAgent;
-        protected SceneAnalyzer _sceneAnalyzer;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
 
@@ -27,9 +26,9 @@ namespace VRAgent
         public bool drag = false;
 
         public Grabbable nextGrabbable;     // 最近的可抓取物体
-        
+
         public HandController leftHandController;
-        public ActionBasedController rightHandController;
+        public XRBaseInteractor rightHandController;
 
         public float areaDiameter = 7.5f;
         public float twitchRange = 8f;
@@ -69,7 +68,12 @@ namespace VRAgent
             if(drag)
             {
                 leftHandController.grabber.GrabGrabbable(nextGrabbable);
-                nextGrabbable.transform.localPosition = Vector3.zero;
+
+                //var a = new SelectEnterEventArgs();
+                //a.interactorObject = rightHandController;
+                //nextGrabbable.GetComponent<XRGrabInteractable>().selectEntered?.Invoke(a);
+
+
                 yield return StartCoroutine(Drag());
             }
 
@@ -131,6 +135,10 @@ namespace VRAgent
 
             leftHandController.grabber.TryRelease();
 
+            //var a = new SelectExitEventArgs();
+            //a.interactorObject = rightHandController;
+            //nextGrabbable.GetComponent<XRGrabInteractable>().selectExited?.Invoke(a);
+
             Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
         }
 
@@ -144,7 +152,7 @@ namespace VRAgent
             grabbables = new List<Grabbable>();
             grabbableState = new Dictionary<Grabbable, bool>();
 
-            foreach(GameObject grabbableObject in _sceneAnalyzer.grabbableObjects)
+            foreach(GameObject grabbableObject in SceneAnalyzer.Instance.grabbableObjects)
             {
                 var grabbable = grabbableObject.GetComponent<Grabbable>();
                 grabbables.Add(grabbable);
@@ -228,10 +236,14 @@ namespace VRAgent
             radius = Vector3.Distance(min, max) / 2;
         }
 
-        private void Start()
+        private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
-            _sceneAnalyzer = GetComponent<SceneAnalyzer>();
+            Debug.Log($"Init: {SceneAnalyzer.Instance}");
+        }
+
+        private void Start()
+        {
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out areaDiameter, out _meshCenters);
             GetSceneGrabbables(out sceneGrabbables, out _environmentGrabbablesState);

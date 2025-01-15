@@ -212,6 +212,7 @@ GameObject:
   - component: {fileID: 6005079764981903965}
   - component: {fileID: 6005079764981903938}
   - component: {fileID: 5441481335439147082}
+  - component: {fileID: 5668701402829770155}
   m_Layer: 10
   m_Name: VRAgentBox
   m_TagString: Untagged
@@ -446,3 +447,15 @@ LODGroup:
     renderers:
     - renderer: {fileID: 8448577737953563392}
   m_Enabled: 1
+--- !u!114 &5668701402829770155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6005079764981903956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 863ad73ce86b912429a5644514e806f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

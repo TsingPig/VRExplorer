@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -469,6 +470,9 @@ namespace BNG {
         }
         protected Grabber flyingTo;
 
+        public Action OnGrabbed;
+        public Action OnReleased;
+        
         protected List<GrabbableEvents> events;
 
         public bool DidParentHands {
@@ -1580,6 +1584,8 @@ namespace BNG {
             }
 
             journeyLength = Vector3.Distance(grabPosition, grabbedBy.transform.position);
+
+            OnGrabbed?.Invoke();
         }
 
         protected virtual void setupConfigJointGrab(Grabber grabbedBy, GrabType grabType) {
@@ -1843,6 +1849,8 @@ namespace BNG {
             }
 
             BeingHeld = heldByGrabbers != null && heldByGrabbers.Count > 0;
+
+            OnReleased?.Invoke();
         }
 
         void clearLookAtTransform() {
