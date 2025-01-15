@@ -3,16 +3,8 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRAgent;
 
-public class VRAgentBox : MonoBehaviour, BoxEntity
+public class VRAgentBox : MonoBehaviour, GrabbableEntity
 {
-
-    Grabbable grabbable;
-
-    void Start()
-    {
-        grabbable = GetComponent<Grabbable>();
-        grabbable.OnGrabbed += OnGrabbed;
-    }
 
     void OnGrabbed()
     {
@@ -23,9 +15,11 @@ public class VRAgentBox : MonoBehaviour, BoxEntity
     #region Entity Region
     public string Name => "VRAgentBox";
 
-    void BoxEntity.OnGrabbed()
+    void GrabbableEntity.OnGrabbed()
     {
-        SceneAnalyzer.Instance.TriggerState(this, BoxEntity.BoxState.Grabbed);
+        SceneAnalyzer.Instance.TriggerState(this, GrabbableEntity.BoxState.Grabbed);
+        OnGrabbed();
     }
+
     #endregion
 }

@@ -39,6 +39,8 @@ namespace VRAgent
 
         protected IEnumerator MoveToNextGrabbable()
         {
+            SceneAnalyzer.Instance.ShowMetrics();
+
             GetNextGrabbable(out nextGrabbable);
 
             if(nextGrabbable != null)
@@ -68,11 +70,9 @@ namespace VRAgent
             if(drag)
             {
                 leftHandController.grabber.GrabGrabbable(nextGrabbable);
-
-                //var a = new SelectEnterEventArgs();
-                //a.interactorObject = rightHandController;
-                //nextGrabbable.GetComponent<XRGrabInteractable>().selectEntered?.Invoke(a);
-
+                
+                // 基于实体任务建模
+                nextGrabbable.GetComponent<GrabbableEntity>().OnGrabbed();
 
                 yield return StartCoroutine(Drag());
             }
@@ -135,9 +135,6 @@ namespace VRAgent
 
             leftHandController.grabber.TryRelease();
 
-            //var a = new SelectExitEventArgs();
-            //a.interactorObject = rightHandController;
-            //nextGrabbable.GetComponent<XRGrabInteractable>().selectExited?.Invoke(a);
 
             Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
         }

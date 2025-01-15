@@ -44,7 +44,7 @@ namespace VRAgent
                     if(component != null && component.GetType().Name == scriptName)
                     {
                         result.Add(obj);
-                        break; 
+                        break;
                     }
                 }
             }
@@ -101,7 +101,7 @@ namespace VRAgent
         /// <summary>
         /// 存储每个实体的触发状态
         /// </summary>
-        private Dictionary<BaseEntity, HashSet<Enum>> entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
+        public Dictionary<BaseEntity, HashSet<Enum>> entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
 
 
         /// <summary>
@@ -109,12 +109,20 @@ namespace VRAgent
         /// </summary>
         public void RegisterAllEntities()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var entityTypes = assembly.GetTypes().Where(t => typeof(BaseEntity).IsAssignableFrom(t) && !t.IsAbstract);
-            foreach(var type in entityTypes)
+            GetTotalStateCount = 0;
+
+            var entityTypes = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => typeof(BaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+            foreach(var entityType in entityTypes)
             {
-                BaseEntity entity = (BaseEntity)Activator.CreateInstance(type);
-                RegisterEntity(entity);
+
+                var allEntities = FindObjectsOfType(entityType);
+                foreach(var entity in allEntities)
+                {
+                    RegisterEntity((BaseEntity)entity);
+                }
             }
         }
 
@@ -127,8 +135,24 @@ namespace VRAgent
             if(!entityStates.ContainsKey(entity))
             {
                 entityStates[entity] = new HashSet<Enum>();
+                var interfaces = entity.GetType().GetInterfaces();
+                foreach(var iface in interfaces)
+                {
+                    var nestedTypes = iface.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                    foreach(var nestedType in nestedTypes)
+                    {
+                        if(nestedType.IsEnum)
+                        {
+                            var enumValues = Enum.GetValues(nestedType);
+                            GetTotalStateCount += enumValues.Length;
+                        }
+                    }
+                }
             }
         }
+
+
+
 
 
         /// <summary>
@@ -145,23 +169,9 @@ namespace VRAgent
                     .Add($"Entity ", bold: true)
                     .Add(entity.Name, bold: true, color: Color.yellow)
                     .Add(" Event ", bold: true)
-                    .Add(new StackTrace().GetFrame(1).GetMethod().Name, bold: true, color: Color.blue)
+                    .Add(new StackTrace().GetFrame(1).GetMethod().Name, bold: true, color: Color.green)
                     .GetText());
             }
-        }
-
-        /// <summary>
-        /// 计算已触发的状态个数
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public int GetTriggeredStateCount(BaseEntity entity)
-        {
-            if(entityStates.ContainsKey(entity))
-            {
-                return entityStates[entity].Count;
-            }
-            return 0;
         }
 
         /// <summary>
@@ -169,14 +179,29 @@ namespace VRAgent
         /// </summary>
         /// <param name="enumType"></param>
         /// <returns></returns>
-        public int GetTotalStateCount()
+        public int GetTotalTriggeredStateCount
         {
-            int res = 0;
-            foreach(var v in entityStates.Values)
+            get
             {
-                res += v.Count;
+                int res = 0;
+                foreach(var v in entityStates.Values)
+                {
+                    res += v.Count;
+                }
+                return res;
             }
-            return res;
+        }
+
+        public int GetTotalStateCount { get; set; }
+
+
+        public void ShowMetrics()
+        {
+            Debug.Log(new RichText()
+                .Add("TriggeredStateCount: ", bold: true)
+                .Add(GetTotalTriggeredStateCount.ToString(), bold: true, color: Color.yellow)
+                .Add(", TotalStateCount: ", bold: true)
+                .Add(GetTotalStateCount.ToString(), bold: true, color: Color.yellow));
         }
 
         #endregion 指标（Metrics）

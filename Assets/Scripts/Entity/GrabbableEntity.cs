@@ -1,6 +1,6 @@
 namespace VRAgent
 {
-    public interface BoxEntity : BaseEntity
+    public interface GrabbableEntity : BaseEntity
     {
         public enum BoxState
         {
