@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 6005079764981903938}
   - component: {fileID: 5441481335439147082}
   m_Layer: 10
-  m_Name: BlockTeal
+  m_Name: VRAgentBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

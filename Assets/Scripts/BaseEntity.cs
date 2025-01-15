@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-
-public class Evaluator : MonoBehaviour
+namespace VRAgent
 {
-    public void RoundFinish()
+    public interface BaseEntity
+    {
+
+    }
+    public interface ButtonEntity
     {
 
     }
