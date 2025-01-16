@@ -15,15 +15,15 @@ namespace VRAgent
         private NavMeshAgent _agent;
         private Vector3 _sceneCenter;
         private float _moveSpeed;
-        private Func<Grabbable> _grabbableHandle;
+        private Func<GrabbableEntity> _grabbableEntityHandle;
 
-        private Grabbable _grabbable;
+        private GrabbableEntity _grabbableEntity;
 
-        public GrabAction(HandController handController, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed, Func<Grabbable> grabbableHandle)
+        public GrabAction(HandController handController, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed, Func<GrabbableEntity> grabbableEntityHandle)
         {
             actionName = "GrabAction";
             _handController = handController;
-            _grabbableHandle = grabbableHandle;
+            _grabbableEntityHandle = grabbableEntityHandle;
             _agent = agent;
             _sceneCenter = sceneCenter;
             _moveSpeed = moveSpeed;
@@ -31,7 +31,7 @@ namespace VRAgent
 
         public override async Task Execute()
         {
-            _grabbable = _grabbableHandle();
+            _grabbableEntity = _grabbableEntityHandle();
             Grab();
             await Drag();
             Release();
@@ -39,13 +39,13 @@ namespace VRAgent
 
         private void Grab()
         {
-            _handController.grabber.GrabGrabbable(_grabbable);
-            _grabbable.GetComponent<GrabbableEntity>().OnGrabbed();
+            _handController.grabber.GrabGrabbable(_grabbableEntity.Grabbable);
+            _grabbableEntity.OnGrabbed();
         }
 
         private async Task Drag()
         {
-            Debug.Log($"Start dragging Objects: {_grabbable.name}");
+            Debug.Log($"Start dragging Objects: {_grabbableEntity.Name}");
 
             Vector3 randomPosition = _sceneCenter;
             int attempts = 0;
@@ -55,10 +55,10 @@ namespace VRAgent
             {
                 float randomOffsetX = UnityEngine.Random.Range(-1f, 1f) * 8f;
                 float randomOffsetZ = UnityEngine.Random.Range(-1f, 1f) * 8f;
-                randomPosition = _grabbable.transform.position + new Vector3(randomOffsetX, 1f, randomOffsetZ);
+                randomPosition = _grabbableEntity.Grabbable.transform.position + new Vector3(randomOffsetX, 1f, randomOffsetZ);
                 NavMeshPath path = new NavMeshPath();
 
-                if(NavMesh.CalculatePath(_grabbable.transform.position, randomPosition, NavMesh.AllAreas, path))
+                if(NavMesh.CalculatePath(_grabbableEntity.Grabbable.transform.position, randomPosition, NavMesh.AllAreas, path))
                 {
                     if(path.status == NavMeshPathStatus.PathComplete)
                     {
@@ -75,7 +75,7 @@ namespace VRAgent
             {
                 await Task.Yield();
             }
-            Debug.Log($"Finish dragging Objects: {_grabbable.name}");
+            Debug.Log($"Finish dragging Objects: {_grabbableEntity.Name}");
         }
 
         private void Release()

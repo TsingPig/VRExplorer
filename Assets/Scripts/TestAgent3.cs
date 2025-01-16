@@ -17,12 +17,12 @@ namespace VRAgent
         /// </summary>
         private void ComputeDistanceMatrix()
         {
-            int count = sceneGrabbables.Count;
+            int count = _grabbables.Count;
             distanceMatrix = new float[count + 1, count + 1];
             Vector3 agentStartPos = transform.position;
             for(int i = 0; i < count; i++)
             {
-                Vector3 grabbablePos = sceneGrabbables[i].transform.position;
+                Vector3 grabbablePos = _grabbables[i].transform.position;
                 NavMeshPath path = new NavMeshPath();
                 NavMesh.CalculatePath(agentStartPos, grabbablePos, NavMesh.AllAreas, path);
 
@@ -45,8 +45,8 @@ namespace VRAgent
                 {
                     if(i == j) continue;
 
-                    Vector3 start = sceneGrabbables[i].transform.position;
-                    Vector3 end = sceneGrabbables[j].transform.position;
+                    Vector3 start = _grabbables[i].transform.position;
+                    Vector3 end = _grabbables[j].transform.position;
 
                     NavMeshPath path = new NavMeshPath();
                     if(NavMesh.CalculatePath(start, end, NavMesh.AllAreas, path))
@@ -67,7 +67,7 @@ namespace VRAgent
         /// <returns></returns>
         private List<int> SolveTSP()
         {
-            int n = sceneGrabbables.Count;
+            int n = _grabbables.Count;
             List<int> path = new List<int>();
             List<int> bestPath = new List<int>(); // 用来存储最短路径
             float bestDistance = float.MaxValue;  // 用来存储最短路径的距离
@@ -131,9 +131,9 @@ namespace VRAgent
         /// <summary>
         /// 获取最近的可抓取物体
         /// </summary>
-        protected override void GetNextGrabbable(out Grabbable nextGrabbable)
+        protected override void GetNextGrabbableEntity(out GrabbableEntity nextGrabbableEntity)
         {
-            nextGrabbable = sceneGrabbables[hamiltonianPath[curGrabbableIndex]];
+            nextGrabbableEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<GrabbableEntity>();
             curGrabbableIndex += 1;
         }
     }

@@ -18,70 +18,15 @@ namespace VRAgent
         /// </summary>
         public List<string> targetGrabTypeFilter = new List<string>();
 
-
-        public HashSet<GameObject> grabbableObjects = new HashSet<GameObject>();
+        /// <summary>
+        /// 所有可抓取实体
+        /// </summary>
+        public List<GrabbableEntity> grabbableEntities = new List<GrabbableEntity>();
 
         /// <summary>
-        /// 场景中的所有物体
+        /// 所有按钮实体
         /// </summary>
-        private GameObject[] allGameObjects;
-
-        /// <summary>
-        /// 查找场景中挂载了指定脚本的所有游戏对象
-        /// </summary>
-        /// <param name="scriptName">脚本名称</param>
-        /// <returns>所有挂载了指定脚本的游戏对象列表</returns>
-        private List<GameObject> FindObjectsWithScript(string scriptName)
-        {
-            List<GameObject> result = new List<GameObject>();
-
-            foreach(GameObject obj in allGameObjects)
-            {
-                Component[] components = obj.GetComponents<Component>();
-
-                foreach(Component component in components)
-                {
-                    if(component != null && component.GetType().Name == scriptName)
-                    {
-                        result.Add(obj);
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// 通过挂载脚本类型过滤器，分类并记录可抓取的物体
-        /// </summary>
-        public void AnalyzeScene()
-        {
-            allGameObjects = FindObjectsOfType<GameObject>();
-
-            foreach(string scriptName in targetGrabTypeFilter)
-            {
-                List<GameObject> objects = FindObjectsWithScript(scriptName);
-                grabbableObjects.AddRange(objects);
-
-                Debug.Log($"脚本 {scriptName} 挂载的对象数量: {objects.Count}");
-            }
-
-            foreach(GameObject obj in grabbableObjects)
-            {
-                if(!obj.GetComponent<Grabbable>())
-                {
-                    var grabbable = obj.AddComponent<Grabbable>();
-                    grabbable.GrabPhysics = GrabPhysics.PhysicsJoint;
-                    grabbable.CollisionSpring = 10000f;
-                    grabbable.CollisionSlerp = 1000f;
-
-                    grabbable.SnapHandModel = false;
-                    grabbable.ParentHandModel = false;
-                    grabbable.ParentToHands = true;
-                }
-            }
-        }
+        public List<ButtonEntity> buttonEntities = new List<ButtonEntity>();
 
         /// <summary>
         /// 测试入口
@@ -91,7 +36,6 @@ namespace VRAgent
             base.Awake();
             targetGrabTypeFilter.Add("XRGrabInteractable");
             targetGrabTypeFilter.Add("Grabbable");
-            AnalyzeScene();
         }
 
         #region 指标（Metrics）
@@ -104,13 +48,11 @@ namespace VRAgent
         /// </summary>
         public Dictionary<BaseEntity, HashSet<Enum>> entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
 
-
         /// <summary>
         /// 使用反射，注册所有实体
         /// </summary>
         public void RegisterAllEntities()
         {
-            GetTotalStateCount = 0;
 
             var entityTypes = Assembly.GetExecutingAssembly()
                 .GetTypes()
@@ -135,9 +77,15 @@ namespace VRAgent
             if(!entityStates.ContainsKey(entity))
             {
                 entityStates[entity] = new HashSet<Enum>();
+
                 var interfaces = entity.GetType().GetInterfaces();
                 foreach(var iface in interfaces)
                 {
+                    switch(iface)
+                    {
+                        case Type t when typeof(GrabbableEntity).IsAssignableFrom(t): grabbableEntities.Add((GrabbableEntity)entity); break;
+                        case Type t when typeof(ButtonEntity).IsAssignableFrom(t): buttonEntities.Add((ButtonEntity)entity); break;
+                    }
                     var nestedTypes = iface.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                     foreach(var nestedType in nestedTypes)
                     {
@@ -190,7 +138,6 @@ namespace VRAgent
 
         public int GetTotalStateCount { get; set; }
 
-
         public void ShowMetrics()
         {
             Debug.Log(new RichText()
@@ -203,7 +150,6 @@ namespace VRAgent
         public void RoundFinish()
         {
             ShowMetrics();
-            
             _curFinishCount++;
             Debug.Log(new RichText()
                 .Add("Round ")
@@ -211,15 +157,12 @@ namespace VRAgent
                 .Add(" finished"));
 
             entityStates.Clear();
-
+            GetTotalStateCount = 0;
             RegisterAllEntities();
 
             RoundFinishEvent?.Invoke();
-
         }
 
         #endregion 指标（Metrics）
-
-
     }
 }

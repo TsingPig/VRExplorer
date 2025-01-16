@@ -1,5 +1,16 @@
+using System;
+
 namespace VRAgent
 {
+    /// <summary>
+    /// BaseEntity
+    /// Definition: Entity is the terminal interface used for binding to the MonoBehaviour-Derived class,
+    /// such as XRJoystick, which can be classified as an entity like a button, having 2 states.
+    /// The state is presented in the form of enum HashSet.
+    /// The entity event is presented in the form of method that needs to be implemented in the MonBehaviour-Derived class.
+    /// So, it is easily for VRAgent to trigger the UnityEvent that practically exist in the class.
+    /// And it is also easily for SceneAnalyzer to get the entity relation coverage using the reflection.
+    /// </summary>
     public interface BaseEntity
     {
         string Name { get; }

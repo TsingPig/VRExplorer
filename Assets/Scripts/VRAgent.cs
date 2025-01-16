@@ -12,11 +12,11 @@ namespace VRAgent
         /// <summary>
         /// 获取最近的可抓取物体
         /// </summary>
-        protected override void GetNextGrabbable(out Grabbable nextGrabbable)
+        protected override void GetNextGrabbableEntity(out GrabbableEntity nextGrabbableEntity)
         {
-            nextGrabbable = sceneGrabbables
-                .Where(grabbable => _environmentGrabbablesState[grabbable] == false)
-                .OrderBy(grabbable => Vector3.Distance(transform.position, grabbable.transform.position))
+            nextGrabbableEntity = _grabbableEntities
+                .Where(grabbableEntity => _grabbablesStates[grabbableEntity] == false)
+                .OrderBy(grabbableEntity => Vector3.Distance(transform.position, grabbableEntity.Grabbable.transform.position))
                 .FirstOrDefault();
         }
 

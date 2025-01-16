@@ -1,9 +1,7 @@
 using BNG;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -15,22 +13,26 @@ namespace VRAgent
     {
         private Vector3 _sceneCenter;
 
-        protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
         protected Vector3[] _initialGrabbablePositions;
         protected Quaternion[] _initialGrabbableRotations;
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
 
-
-        protected MoveAction moveActionHandle;
-        protected GrabAction grabActionHandle;
-
+        protected MoveAction _moveActionHandle;
+        protected GrabAction _grabActionHandle;
 
         [Header("Show For Debug")]
-        [SerializeField] protected Grabbable nextGrabbable;
-        [SerializeField] protected float areaDiameter = 7.5f;
-        [SerializeField] protected List<Grabbable> sceneGrabbables;
+        [SerializeField] protected GrabbableEntity _nextGrabbableEntity;
+        [SerializeField] protected float _areaDiameter = 7.5f;
+        [SerializeField] protected BaseAction _curAction;
+        [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
+        public Grabbable NextGrabbable => _nextGrabbableEntity.Grabbable;
+
+
+        protected List<GrabbableEntity> _grabbableEntities = new List<GrabbableEntity>();
+        protected Dictionary<GrabbableEntity, bool> _grabbablesStates = new Dictionary<GrabbableEntity, bool>();
+
 
 
         [Header("Configuration")]
@@ -40,25 +42,22 @@ namespace VRAgent
         public bool randomGrabble = false;
         public bool drag = false;
 
-
-
         protected async Task MoveToNextGrabbable()
         {
-            SceneAnalyzer.Instance.ShowMetrics();
-            GetNextGrabbable(out nextGrabbable);
+            GetNextGrabbableEntity(out _nextGrabbableEntity);
 
-            if(nextGrabbable == null) return;
+            if(_nextGrabbableEntity == null) return;
 
-            await moveActionHandle.Execute(nextGrabbable.transform.position);
+            await _moveActionHandle.Execute(_nextGrabbableEntity.Grabbable.transform.position);
 
-            _environmentGrabbablesState[nextGrabbable] = true;
+            _grabbablesStates[_nextGrabbableEntity] = true;
 
-            if(drag && nextGrabbable)
+            if(drag && _nextGrabbableEntity.Grabbable)
             {
-                await grabActionHandle.Execute();
+                await _grabActionHandle.Execute();
             }
 
-            if(_environmentGrabbablesState.Values.All(value => value))
+            if(_grabbablesStates.Values.All(value => value))
             {
                 SceneAnalyzer.Instance.RoundFinish();
             }
@@ -68,39 +67,23 @@ namespace VRAgent
             }
         }
 
-        protected abstract void GetNextGrabbable(out Grabbable nextGrabbable);
+        protected abstract void GetNextGrabbableEntity(out GrabbableEntity nextGrabbableEntity);
 
+        #region 场景信息预处理（Scene Information Preprocessing)
 
-        /// <summary>
-        /// 获取场景中所有的可抓取物体列表。
-        /// </summary>
-        /// <param name="grabbables">可抓取物体列表</param>
-        /// <param name="grabbableState">可抓取物体状态</param>
-        protected void GetSceneGrabbables(out List<Grabbable> grabbables, out Dictionary<Grabbable, bool> grabbableState)
-        {
-            grabbables = new List<Grabbable>();
-            grabbableState = new Dictionary<Grabbable, bool>();
-
-            foreach(GameObject grabbableObject in SceneAnalyzer.Instance.grabbableObjects)
-            {
-                var grabbable = grabbableObject.GetComponent<Grabbable>();
-                grabbables.Add(grabbable);
-                grabbableState.Add(grabbable, false);
-            }
-        }
 
         /// <summary>
         /// 存储所有场景中可抓取物体的变换信息
         /// </summary>
         protected void StoreSceneGrabbableObjects()
         {
-            _initialGrabbablePositions = new Vector3[sceneGrabbables.Count];
-            _initialGrabbableRotations = new Quaternion[sceneGrabbables.Count];
+            _initialGrabbablePositions = new Vector3[_grabbables.Count];
+            _initialGrabbableRotations = new Quaternion[_grabbables.Count];
 
-            for(int i = 0; i < sceneGrabbables.Count; i++)
+            for(int i = 0; i < _grabbables.Count; i++)
             {
-                _initialGrabbablePositions[i] = sceneGrabbables[i].transform.position;
-                _initialGrabbableRotations[i] = sceneGrabbables[i].transform.rotation;
+                _initialGrabbablePositions[i] = _grabbables[i].transform.position;
+                _initialGrabbableRotations[i] = _grabbables[i].transform.rotation;
             }
         }
 
@@ -109,20 +92,20 @@ namespace VRAgent
         /// </summary>
         protected virtual void ResetSceneGrabbableObjects()
         {
-            for(int i = 0; i < sceneGrabbables.Count; i++)
+            for(int i = 0; i < _grabbableEntities.Count; i++)
             {
-                _environmentGrabbablesState[sceneGrabbables[i]] = false;
+                _grabbablesStates[_grabbableEntities[i]] = false;
 
                 if(randomGrabble)
                 {
-                    sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 10f, 0);
+                    _grabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 10f, 0);
                 }
                 else
                 {
-                    sceneGrabbables[i].transform.position = _initialGrabbablePositions[i];
+                    _grabbables[i].transform.position = _initialGrabbablePositions[i];
                 }
 
-                Rigidbody rb = sceneGrabbables[i].GetComponent<Rigidbody>();
+                Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
                 if(rb != null)
                 {
                     rb.velocity = Vector3.zero;
@@ -163,6 +146,8 @@ namespace VRAgent
             radius = Vector3.Distance(min, max) / 2;
         }
 
+        #endregion 场景信息预处理（Scene Information Preprocessing)
+
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -172,8 +157,14 @@ namespace VRAgent
         private void Start()
         {
             _triangulation = NavMesh.CalculateTriangulation();
-            ParseNavMesh(out _sceneCenter, out areaDiameter, out _meshCenters);
-            GetSceneGrabbables(out sceneGrabbables, out _environmentGrabbablesState);
+            ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
+
+            foreach(GrabbableEntity grabbableEntity in SceneAnalyzer.Instance.grabbableEntities)
+            {
+                _grabbables.Add(grabbableEntity.Grabbable);
+                _grabbableEntities.Add(grabbableEntity);
+                _grabbablesStates.Add(grabbableEntity, false);
+            }
 
             StoreSceneGrabbableObjects();
             ResetSceneGrabbableObjects();
@@ -184,11 +175,9 @@ namespace VRAgent
                 _ = MoveToNextGrabbable();
             };
 
-            moveActionHandle = new MoveAction(_navMeshAgent, moveSpeed);
-            grabActionHandle = new GrabAction(leftHandController, _navMeshAgent, _sceneCenter, moveSpeed, () => { return nextGrabbable; });
+            _moveActionHandle = new MoveAction(_navMeshAgent, moveSpeed);
+            _grabActionHandle = new GrabAction(leftHandController, _navMeshAgent, _sceneCenter, moveSpeed, () => { return _nextGrabbableEntity; });
             _ = MoveToNextGrabbable();
-
         }
-
     }
 }

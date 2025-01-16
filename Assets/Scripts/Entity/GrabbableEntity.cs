@@ -1,3 +1,5 @@
+using BNG;
+
 namespace VRAgent
 {
     public interface GrabbableEntity : BaseEntity
@@ -7,6 +9,9 @@ namespace VRAgent
             Grabbed
         }
 
+        Grabbable Grabbable { get; }
+
         void OnGrabbed();
+
     }
 }
