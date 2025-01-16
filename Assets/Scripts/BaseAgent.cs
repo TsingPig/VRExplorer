@@ -1,8 +1,8 @@
 using BNG;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -14,130 +14,58 @@ namespace VRAgent
     {
         private int _curFinishCount = 0;
         private Vector3 _sceneCenter;
-
         protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
         protected Vector3[] _initialGrabbablePositions;
         protected Quaternion[] _initialGrabbableRotations;
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
-
         public List<Grabbable> sceneGrabbables;      //场景中的可抓取物体
         public bool drag = false;
-
         public Grabbable nextGrabbable;     // 最近的可抓取物体
-
         public HandController leftHandController;
         public XRBaseInteractor rightHandController;
-
         public float areaDiameter = 7.5f;
         public float twitchRange = 8f;
         public float moveSpeed = 6f;
         public bool randomGrabble = false;
-
         public Action roundFinishEvent;
 
-        protected IEnumerator MoveToNextGrabbable()
+        protected async Task MoveToNextGrabbable()
         {
             SceneAnalyzer.Instance.ShowMetrics();
-
             GetNextGrabbable(out nextGrabbable);
 
-            if(nextGrabbable != null)
-            {
-                _navMeshAgent.SetDestination(nextGrabbable.transform.position);  // 设置目标位置为最近的可抓取物体
-            }
-            _navMeshAgent.speed = moveSpeed;
+            if(nextGrabbable == null) return;
 
-            float maxTimeout = 30f; // 最大允许的时间（秒），如果超过这个时间还没到达目标，就认为成功
-            float startTime = Time.time;  // 记录开始时间
+            MoveAction moveAction = new MoveAction(_navMeshAgent, nextGrabbable.transform.position, moveSpeed);
+            await moveAction.Execute();
 
-            while(_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > 0.5f)
-            {
-                // 检查是否超时
-                if(Time.time - startTime > maxTimeout)
-                {
-                    Debug.LogWarning($"超时！{GetType().Name} 没有在指定时间内到达目标位置，强制视为成功.");
-                    break;  // 超时，跳出循环，认为目标已到达
-                }
-
-                yield return null;
-            }
-
-            // 到了目标地点（或超时认为已到达）
             _environmentGrabbablesState[nextGrabbable] = true;
 
-            if(drag)
+            if(drag && nextGrabbable)
             {
-                leftHandController.grabber.GrabGrabbable(nextGrabbable);
-                
-                // 基于实体任务建模
-                nextGrabbable.GetComponent<GrabbableEntity>().OnGrabbed();
+                GrabAction grabAction = new GrabAction(leftHandController, nextGrabbable);
+                grabAction.Grab();
 
-                yield return StartCoroutine(Drag());
+                var dragAction = new DragAction(_navMeshAgent, nextGrabbable.transform, _sceneCenter, moveSpeed * 0.6f);
+                await dragAction.Execute();
+
+                grabAction.Release();
             }
 
-            if(_environmentGrabbablesState.Values.All(value => value)) // 如果所有值都为 true
+            if(_environmentGrabbablesState.Values.All(value => value))
             {
                 roundFinishEvent.Invoke();
-                yield return null;
             }
-
-            StartCoroutine(MoveToNextGrabbable());
+            else
+            {
+                await MoveToNextGrabbable();
+            }
         }
 
-        /// <summary>
-        /// 拖动
-        /// </summary>
-        /// <returns></returns>
-        protected IEnumerator Drag()
-        {
-            Debug.Log($"Start dragging Objects: {nextGrabbable.name}");
+        protected abstract void GetNextGrabbable(out Grabbable nextGrabbable);
 
-            #region Randomly Walking
-
-            Vector3 randomPosition = _sceneCenter;
-            int maxAttempts = 10;
-            int attempts = 0;
-
-            while(attempts < maxAttempts)
-            {
-                float randomOffsetX = Random.Range(twitchRange / 2, twitchRange);
-                float randomOffsetZ = Random.Range(twitchRange / 2, twitchRange);
-                randomOffsetX = Random.Range(-1, 1) >= 0 ? randomOffsetX : -randomOffsetX;
-                randomOffsetZ = Random.Range(-1, 1) >= 0 ? randomOffsetZ : -randomOffsetZ;
-                randomPosition = transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
-                NavMeshPath path = new NavMeshPath();
-                if(NavMesh.CalculatePath(transform.position, randomPosition, NavMesh.AllAreas, path))
-                {
-                    if(path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        Debug.Log($"Successfully Finding the path for randomly walking");
-                        break;
-                    }
-                }
-                attempts++;
-            }
-
-            float randomRotationY = Random.Range(-30f, 30f);
-            transform.Rotate(0, randomRotationY, 0);
-            _navMeshAgent.SetDestination(randomPosition);
-            _navMeshAgent.speed = moveSpeed * 0.6f;
-
-            Debug.Log($"Start Randomly Walking");
-
-            while(_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > 0.6f)
-            {
-                yield return null;
-            }
-
-            #endregion Randomly Walking
-
-            leftHandController.grabber.TryRelease();
-
-
-            Debug.Log($"Finish dragging Objects: {nextGrabbable.name}");
-        }
 
         /// <summary>
         /// 获取场景中所有的可抓取物体列表。
@@ -199,8 +127,6 @@ namespace VRAgent
             }
         }
 
-        protected abstract void GetNextGrabbable(out Grabbable nextGrabbbable);
-
         /// <summary>
         /// 通过获取NavMesh的所有三角形网格顶点坐标，近似每个Mesh的几何中心、场景集合中心
         /// </summary>
@@ -236,7 +162,7 @@ namespace VRAgent
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
-            Debug.Log($"Init: {SceneAnalyzer.Instance}");
+            SceneAnalyzer.Instance.RegisterAllEntities();
         }
 
         private void Start()
@@ -247,14 +173,18 @@ namespace VRAgent
 
             StoreSceneGrabbableObjects();
             ResetSceneGrabbableObjects();
-            roundFinishEvent += ResetSceneGrabbableObjects;
             roundFinishEvent += () =>
             {
+                SceneAnalyzer.Instance.ShowMetrics();
+
+                ResetSceneGrabbableObjects();
                 _curFinishCount += 1;
                 Debug.Log($"Round {_curFinishCount} Finished ");
+                SceneAnalyzer.Instance.RegisterAllEntities();
+                _ = MoveToNextGrabbable();
             };
-
-            StartCoroutine(MoveToNextGrabbable());
+            _ = MoveToNextGrabbable();
         }
+
     }
 }

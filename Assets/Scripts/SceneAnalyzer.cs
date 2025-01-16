@@ -91,7 +91,6 @@ namespace VRAgent
             base.Awake();
             targetGrabTypeFilter.Add("XRGrabInteractable");
             targetGrabTypeFilter.Add("Grabbable");
-            RegisterAllEntities();
             AnalyzeScene();
         }
 
@@ -110,6 +109,7 @@ namespace VRAgent
         public void RegisterAllEntities()
         {
             GetTotalStateCount = 0;
+            entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
 
             var entityTypes = Assembly.GetExecutingAssembly()
                 .GetTypes()
@@ -130,7 +130,7 @@ namespace VRAgent
         /// 注册实体并初始化状态
         /// </summary>
         /// <param name="entity"></param>
-        public void RegisterEntity(BaseEntity entity)
+        private void RegisterEntity(BaseEntity entity)
         {
             if(!entityStates.ContainsKey(entity))
             {
@@ -150,10 +150,6 @@ namespace VRAgent
                 }
             }
         }
-
-
-
-
 
         /// <summary>
         /// 触发实体状态
