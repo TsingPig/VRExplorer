@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace VRAgent
 {
+    [Obsolete("拖拽动作已经被集成到抓取动作中")]
     /// <summary>
     /// 拖拽动作
     /// </summary>
@@ -32,8 +34,8 @@ namespace VRAgent
 
             while(attempts < maxAttempts)
             {
-                float randomOffsetX = Random.Range(-1f, 1f) * 8f;
-                float randomOffsetZ = Random.Range(-1f, 1f) * 8f;
+                float randomOffsetX = UnityEngine.Random.Range(-1f, 1f) * 8f;
+                float randomOffsetZ = UnityEngine.Random.Range(-1f, 1f) * 8f;
                 randomPosition = _grabbable.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
                 NavMeshPath path = new NavMeshPath();
 

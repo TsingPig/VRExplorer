@@ -45,13 +45,8 @@ namespace VRAgent
 
             if(drag && nextGrabbable)
             {
-                GrabAction grabAction = new GrabAction(leftHandController, nextGrabbable);
-                grabAction.Grab();
-
-                var dragAction = new DragAction(_navMeshAgent, nextGrabbable.transform, _sceneCenter, moveSpeed * 0.6f);
-                await dragAction.Execute();
-
-                grabAction.Release();
+                GrabAction grabAction = new GrabAction(leftHandController, nextGrabbable, _navMeshAgent, _sceneCenter, moveSpeed);
+                await grabAction.Execute();
             }
 
             if(_environmentGrabbablesState.Values.All(value => value))
@@ -111,7 +106,7 @@ namespace VRAgent
 
                 if(randomGrabble)
                 {
-                    sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 5f, 0);
+                    sceneGrabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 10f, 0);
                 }
                 else
                 {
@@ -184,6 +179,7 @@ namespace VRAgent
                 _ = MoveToNextGrabbable();
             };
             _ = MoveToNextGrabbable();
+
         }
 
     }
