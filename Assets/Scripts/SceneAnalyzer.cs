@@ -96,6 +96,8 @@ namespace VRAgent
 
         #region 指标（Metrics）
 
+        private int _curFinishCount = 0;
+        public Action RoundFinishEvent;
 
         /// <summary>
         /// 存储每个实体的触发状态
@@ -109,7 +111,6 @@ namespace VRAgent
         public void RegisterAllEntities()
         {
             GetTotalStateCount = 0;
-            entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
 
             var entityTypes = Assembly.GetExecutingAssembly()
                 .GetTypes()
@@ -117,7 +118,6 @@ namespace VRAgent
 
             foreach(var entityType in entityTypes)
             {
-
                 var allEntities = FindObjectsOfType(entityType);
                 foreach(var entity in allEntities)
                 {
@@ -198,6 +198,24 @@ namespace VRAgent
                 .Add(GetTotalTriggeredStateCount.ToString(), bold: true, color: Color.yellow)
                 .Add(", TotalStateCount: ", bold: true)
                 .Add(GetTotalStateCount.ToString(), bold: true, color: Color.yellow));
+        }
+
+        public void RoundFinish()
+        {
+            ShowMetrics();
+            
+            _curFinishCount++;
+            Debug.Log(new RichText()
+                .Add("Round ")
+                .Add(_curFinishCount.ToString(), color: Color.yellow, bold: true)
+                .Add(" finished"));
+
+            entityStates.Clear();
+
+            RegisterAllEntities();
+
+            RoundFinishEvent?.Invoke();
+
         }
 
         #endregion 指标（Metrics）

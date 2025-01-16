@@ -6,9 +6,6 @@ using UnityEngine.AI;
 namespace VRAgent
 {
     [Obsolete("拖拽动作已经被集成到抓取动作中")]
-    /// <summary>
-    /// 拖拽动作
-    /// </summary>
     public class DragAction : BaseAction
     {
         private NavMeshAgent _agent;
@@ -24,7 +21,8 @@ namespace VRAgent
             _sceneCenter = sceneCenter;
             _moveSpeed = moveSpeed;
         }
-        public async override Task Execute()
+
+        public override async Task Execute()
         {
             Debug.Log($"Start dragging Objects: {_grabbable.name}");
 
@@ -59,5 +57,4 @@ namespace VRAgent
             Debug.Log($"Finish dragging Objects: {_grabbable.name}");
         }
     }
-
 }

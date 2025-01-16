@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -12,24 +13,34 @@ namespace VRAgent
 {
     public abstract class BaseAgent : MonoBehaviour
     {
-        private int _curFinishCount = 0;
         private Vector3 _sceneCenter;
+
         protected Dictionary<Grabbable, bool> _environmentGrabbablesState;
         protected Vector3[] _initialGrabbablePositions;
         protected Quaternion[] _initialGrabbableRotations;
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
-        public List<Grabbable> sceneGrabbables;      //场景中的可抓取物体
-        public bool drag = false;
-        public Grabbable nextGrabbable;     // 最近的可抓取物体
+
+
+        protected MoveAction moveActionHandle;
+        protected GrabAction grabActionHandle;
+
+
+        [Header("Show For Debug")]
+        [SerializeField] protected Grabbable nextGrabbable;
+        [SerializeField] protected float areaDiameter = 7.5f;
+        [SerializeField] protected List<Grabbable> sceneGrabbables;
+
+
+        [Header("Configuration")]
         public HandController leftHandController;
         public XRBaseInteractor rightHandController;
-        public float areaDiameter = 7.5f;
-        public float twitchRange = 8f;
         public float moveSpeed = 6f;
         public bool randomGrabble = false;
-        public Action roundFinishEvent;
+        public bool drag = false;
+
+
 
         protected async Task MoveToNextGrabbable()
         {
@@ -38,20 +49,18 @@ namespace VRAgent
 
             if(nextGrabbable == null) return;
 
-            MoveAction moveAction = new MoveAction(_navMeshAgent, nextGrabbable.transform.position, moveSpeed);
-            await moveAction.Execute();
+            await moveActionHandle.Execute(nextGrabbable.transform.position);
 
             _environmentGrabbablesState[nextGrabbable] = true;
 
             if(drag && nextGrabbable)
             {
-                GrabAction grabAction = new GrabAction(leftHandController, nextGrabbable, _navMeshAgent, _sceneCenter, moveSpeed);
-                await grabAction.Execute();
+                await grabActionHandle.Execute();
             }
 
             if(_environmentGrabbablesState.Values.All(value => value))
             {
-                roundFinishEvent.Invoke();
+                SceneAnalyzer.Instance.RoundFinish();
             }
             else
             {
@@ -168,16 +177,15 @@ namespace VRAgent
 
             StoreSceneGrabbableObjects();
             ResetSceneGrabbableObjects();
-            roundFinishEvent += () =>
-            {
-                SceneAnalyzer.Instance.ShowMetrics();
 
+            SceneAnalyzer.Instance.RoundFinishEvent = () =>
+            {
                 ResetSceneGrabbableObjects();
-                _curFinishCount += 1;
-                Debug.Log($"Round {_curFinishCount} Finished ");
-                SceneAnalyzer.Instance.RegisterAllEntities();
                 _ = MoveToNextGrabbable();
             };
+
+            moveActionHandle = new MoveAction(_navMeshAgent, moveSpeed);
+            grabActionHandle = new GrabAction(leftHandController, _navMeshAgent, _sceneCenter, moveSpeed, () => { return nextGrabbable; });
             _ = MoveToNextGrabbable();
 
         }

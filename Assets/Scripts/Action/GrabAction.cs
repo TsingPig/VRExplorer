@@ -1,8 +1,8 @@
 using BNG;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
 
 namespace VRAgent
 {
@@ -12,22 +12,26 @@ namespace VRAgent
     public class GrabAction : BaseAction
     {
         private HandController _handController;
-        private Grabbable _grabbable;
         private NavMeshAgent _agent;
         private Vector3 _sceneCenter;
         private float _moveSpeed;
+        private Func<Grabbable> _grabbableHandle;
 
-        public GrabAction(HandController handController, Grabbable grabbable, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed)
+        private Grabbable _grabbable;
+
+        public GrabAction(HandController handController, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed, Func<Grabbable> grabbableHandle)
         {
             actionName = "GrabAction";
             _handController = handController;
-            _grabbable = grabbable;
+            _grabbableHandle = grabbableHandle;
             _agent = agent;
             _sceneCenter = sceneCenter;
             _moveSpeed = moveSpeed;
         }
+
         public override async Task Execute()
         {
+            _grabbable = _grabbableHandle();
             Grab();
             await Drag();
             Release();
@@ -37,7 +41,6 @@ namespace VRAgent
         {
             _handController.grabber.GrabGrabbable(_grabbable);
             _grabbable.GetComponent<GrabbableEntity>().OnGrabbed();
-
         }
 
         private async Task Drag()
@@ -50,8 +53,8 @@ namespace VRAgent
 
             while(attempts < maxAttempts)
             {
-                float randomOffsetX = Random.Range(-1f, 1f) * 8f;
-                float randomOffsetZ = Random.Range(-1f, 1f) * 8f;
+                float randomOffsetX = UnityEngine.Random.Range(-1f, 1f) * 8f;
+                float randomOffsetZ = UnityEngine.Random.Range(-1f, 1f) * 8f;
                 randomPosition = _grabbable.transform.position + new Vector3(randomOffsetX, 1f, randomOffsetZ);
                 NavMeshPath path = new NavMeshPath();
 
@@ -80,5 +83,4 @@ namespace VRAgent
             _handController.grabber.TryRelease();
         }
     }
-
 }
