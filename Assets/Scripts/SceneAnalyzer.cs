@@ -21,12 +21,12 @@ namespace VRAgent
         /// <summary>
         /// 所有可抓取实体
         /// </summary>
-        public List<GrabbableEntity> grabbableEntities = new List<GrabbableEntity>();
+        public List<IGrabbableEntity> grabbableEntities = new List<IGrabbableEntity>();
 
         /// <summary>
         /// 所有按钮实体
         /// </summary>
-        public List<ButtonEntity> buttonEntities = new List<ButtonEntity>();
+        public List<ITriggerableEntity> triggerableEntities = new List<ITriggerableEntity>();
 
         /// <summary>
         /// 测试入口
@@ -46,7 +46,7 @@ namespace VRAgent
         /// <summary>
         /// 存储每个实体的触发状态
         /// </summary>
-        public Dictionary<BaseEntity, HashSet<Enum>> entityStates = new Dictionary<BaseEntity, HashSet<Enum>>();
+        public Dictionary<IBaseEntity, HashSet<Enum>> entityStates = new Dictionary<IBaseEntity, HashSet<Enum>>();
 
         /// <summary>
         /// 使用反射，注册所有实体
@@ -56,14 +56,14 @@ namespace VRAgent
 
             var entityTypes = Assembly.GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => typeof(BaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+                .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
             foreach(var entityType in entityTypes)
             {
                 var allEntities = FindObjectsOfType(entityType);
                 foreach(var entity in allEntities)
                 {
-                    RegisterEntity((BaseEntity)entity);
+                    RegisterEntity((IBaseEntity)entity);
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace VRAgent
         /// 注册实体并初始化状态
         /// </summary>
         /// <param name="entity"></param>
-        private void RegisterEntity(BaseEntity entity)
+        private void RegisterEntity(IBaseEntity entity)
         {
             if(!entityStates.ContainsKey(entity))
             {
@@ -83,8 +83,8 @@ namespace VRAgent
                 {
                     switch(iface)
                     {
-                        case Type t when typeof(GrabbableEntity).IsAssignableFrom(t): grabbableEntities.Add((GrabbableEntity)entity); break;
-                        case Type t when typeof(ButtonEntity).IsAssignableFrom(t): buttonEntities.Add((ButtonEntity)entity); break;
+                        case Type t when typeof(IGrabbableEntity).IsAssignableFrom(t): grabbableEntities.Add((IGrabbableEntity)entity); break;
+                        case Type t when typeof(ITriggerableEntity).IsAssignableFrom(t): triggerableEntities.Add((ITriggerableEntity)entity); break;
                     }
                     var nestedTypes = iface.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                     foreach(var nestedType in nestedTypes)
@@ -104,7 +104,7 @@ namespace VRAgent
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="state"></param>
-        public void TriggerState(BaseEntity entity, Enum state)
+        public void TriggerState(IBaseEntity entity, Enum state)
         {
             if(entityStates.ContainsKey(entity) && !entityStates[entity].Contains(state))
             {

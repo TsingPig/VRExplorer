@@ -21,19 +21,7 @@ namespace VRAgent
 
         protected MoveAction _moveActionHandle;
         protected GrabAction _grabActionHandle;
-
-        [Header("Show For Debug")]
-        [SerializeField] protected GrabbableEntity _nextGrabbableEntity;
-        [SerializeField] protected float _areaDiameter = 7.5f;
-        [SerializeField] protected BaseAction _curAction;
-        [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
-        public Grabbable NextGrabbable => _nextGrabbableEntity.Grabbable;
-
-
-        protected List<GrabbableEntity> _grabbableEntities = new List<GrabbableEntity>();
-        protected Dictionary<GrabbableEntity, bool> _grabbablesStates = new Dictionary<GrabbableEntity, bool>();
-
-
+        protected TriggerAction _triggerActionHandle;
 
         [Header("Configuration")]
         public HandController leftHandController;
@@ -41,6 +29,20 @@ namespace VRAgent
         public float moveSpeed = 6f;
         public bool randomGrabble = false;
         public bool drag = false;
+
+        [Header("Show For Debug")]
+        [SerializeField] protected float _areaDiameter = 7.5f;
+        [SerializeField] protected BaseAction _curAction;
+        [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
+
+
+        protected IGrabbableEntity _nextGrabbableEntity;
+        protected List<IGrabbableEntity> _grabbableEntities = new List<IGrabbableEntity>();
+        protected Dictionary<IGrabbableEntity, bool> _grabbablesStates = new Dictionary<IGrabbableEntity, bool>();
+
+        protected ITriggerableEntity _nextTriggerableEntity;
+        protected List<ITriggerableEntity> _triggerableEntity = new List<ITriggerableEntity>();
+        protected Dictionary<ITriggerableEntity, bool> _triggerablesStates = new Dictionary<ITriggerableEntity, bool>();
 
         protected async Task MoveToNextGrabbable()
         {
@@ -67,10 +69,11 @@ namespace VRAgent
             }
         }
 
-        protected abstract void GetNextGrabbableEntity(out GrabbableEntity nextGrabbableEntity);
+        protected abstract void GetNextTriggerableEntity(out ITriggerableEntity nextTriggerableEntity);
+
+        protected abstract void GetNextGrabbableEntity(out IGrabbableEntity nextGrabbableEntity);
 
         #region 场景信息预处理（Scene Information Preprocessing)
-
 
         /// <summary>
         /// 存储所有场景中可抓取物体的变换信息
@@ -159,11 +162,16 @@ namespace VRAgent
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
 
-            foreach(GrabbableEntity grabbableEntity in SceneAnalyzer.Instance.grabbableEntities)
+            foreach(IGrabbableEntity grabbableEntity in SceneAnalyzer.Instance.grabbableEntities)
             {
                 _grabbables.Add(grabbableEntity.Grabbable);
                 _grabbableEntities.Add(grabbableEntity);
                 _grabbablesStates.Add(grabbableEntity, false);
+            }
+            foreach(ITriggerableEntity triggerableEntity in SceneAnalyzer.Instance.triggerableEntities)
+            {
+                _triggerableEntity.Add(triggerableEntity);
+                _triggerablesStates.Add(triggerableEntity, false);
             }
 
             StoreSceneGrabbableObjects();
@@ -177,6 +185,8 @@ namespace VRAgent
 
             _moveActionHandle = new MoveAction(_navMeshAgent, moveSpeed);
             _grabActionHandle = new GrabAction(leftHandController, _navMeshAgent, _sceneCenter, moveSpeed, () => { return _nextGrabbableEntity; });
+            _triggerActionHandle = new TriggerAction(() => { return _nextTriggerableEntity; });
+
             _ = MoveToNextGrabbable();
         }
     }

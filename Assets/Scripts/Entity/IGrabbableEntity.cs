@@ -1,15 +1,17 @@
 using BNG;
+using UnityEngine;
 
 namespace VRAgent
 {
-    public interface GrabbableEntity : BaseEntity
+    public interface IGrabbableEntity : IBaseEntity
     {
-        public enum BoxState
+        public enum GrabbableState
         {
             Grabbed
         }
 
         Grabbable Grabbable { get; }
+        Transform transform { get; }
 
         void OnGrabbed();
 

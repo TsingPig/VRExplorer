@@ -131,10 +131,15 @@ namespace VRAgent
         /// <summary>
         /// 获取最近的可抓取物体
         /// </summary>
-        protected override void GetNextGrabbableEntity(out GrabbableEntity nextGrabbableEntity)
+        protected override void GetNextGrabbableEntity(out IGrabbableEntity nextGrabbableEntity)
         {
-            nextGrabbableEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<GrabbableEntity>();
+            nextGrabbableEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<IGrabbableEntity>();
             curGrabbableIndex += 1;
+        }
+
+        protected override void GetNextTriggerableEntity(out ITriggerableEntity nextTriggerableEntity)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

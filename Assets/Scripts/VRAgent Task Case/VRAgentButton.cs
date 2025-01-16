@@ -1,22 +1,23 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using VRAgent;
 
-public class VRAgentButton : MonoBehaviour, ButtonEntity
+public class VRAgentButton : MonoBehaviour, ITriggerableEntity
 {
     #region Entity Region
 
     public string Name => "VRAgentButton";
 
-    void ButtonEntity.OnPress()
+    void ITriggerableEntity.Triggerring()
     {
-        SceneAnalyzer.Instance.TriggerState(this, ButtonEntity.ButtonState.Pressed);
+        SceneAnalyzer.Instance.TriggerState(this, ITriggerableEntity.TriggerableState.Triggerring);
         OnPress?.Invoke();
     }
 
-    void ButtonEntity.OnRelease()
+    void ITriggerableEntity.Triggerred()
     {
-        SceneAnalyzer.Instance.TriggerState(this, ButtonEntity.ButtonState.Released);
+        SceneAnalyzer.Instance.TriggerState(this, ITriggerableEntity.TriggerableState.Triggerred);
         OnRelease?.Invoke();
     }
 

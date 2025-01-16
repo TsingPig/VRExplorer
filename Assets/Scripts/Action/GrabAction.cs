@@ -15,11 +15,10 @@ namespace VRAgent
         private NavMeshAgent _agent;
         private Vector3 _sceneCenter;
         private float _moveSpeed;
-        private Func<GrabbableEntity> _grabbableEntityHandle;
+        private Func<IGrabbableEntity> _grabbableEntityHandle;
+        private IGrabbableEntity _grabbableEntity;
 
-        private GrabbableEntity _grabbableEntity;
-
-        public GrabAction(HandController handController, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed, Func<GrabbableEntity> grabbableEntityHandle)
+        public GrabAction(HandController handController, NavMeshAgent agent, Vector3 sceneCenter, float moveSpeed, Func<IGrabbableEntity> grabbableEntityHandle)
         {
             actionName = "GrabAction";
             _handController = handController;

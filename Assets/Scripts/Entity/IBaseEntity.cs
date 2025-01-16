@@ -11,7 +11,7 @@ namespace VRAgent
     /// So, it is easily for VRAgent to trigger the UnityEvent that practically exist in the class.
     /// And it is also easily for SceneAnalyzer to get the entity relation coverage using the reflection.
     /// </summary>
-    public interface BaseEntity
+    public interface IBaseEntity
     {
         string Name { get; }
     }
