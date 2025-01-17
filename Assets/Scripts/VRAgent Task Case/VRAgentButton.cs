@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using VRAgent;
@@ -7,7 +6,7 @@ public class VRAgentButton : MonoBehaviour, ITriggerableEntity
 {
     #region Entity Region
 
-    public string Name => "VRAgentButton";
+    public string Name => Str.Button;
 
     void ITriggerableEntity.Triggerring()
     {

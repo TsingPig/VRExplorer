@@ -1,11 +1,9 @@
-using BNG;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using TsingPigSDK;
-using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -53,7 +51,6 @@ namespace VRAgent
         /// </summary>
         public void RegisterAllEntities()
         {
-
             var entityTypes = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);

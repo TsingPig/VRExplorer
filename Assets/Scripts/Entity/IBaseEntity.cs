@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 namespace VRAgent
 {
@@ -14,5 +14,7 @@ namespace VRAgent
     public interface IBaseEntity
     {
         string Name { get; }
+
+        Transform transform { get; }
     }
 }

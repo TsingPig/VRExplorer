@@ -1,7 +1,10 @@
 using BNG;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using TsingPigSDK;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -9,111 +12,127 @@ using Random = UnityEngine.Random;
 
 namespace VRAgent
 {
+    public static class Str
+    {
+        public const string Box = "box";
+        public const string Button = "button";
+    }
+
     public abstract class BaseAgent : MonoBehaviour
     {
         private Vector3 _sceneCenter;
 
-        protected Vector3[] _initialGrabbablePositions;
-        protected Quaternion[] _initialGrabbableRotations;
+        protected Vector3[] _initEntityPos;
+        protected Quaternion[] _initEntityRot;
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
-
-        protected MoveAction _moveActionHandle;
-        protected GrabAction _grabActionHandle;
-        protected TriggerAction _triggerActionHandle;
 
         [Header("Configuration")]
         public HandController leftHandController;
         public XRBaseInteractor rightHandController;
         public float moveSpeed = 6f;
-        public bool randomGrabble = false;
+        public bool randomInitPos = false;
         public bool drag = false;
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
         [SerializeField] protected BaseAction _curAction;
         [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
+        [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
 
 
-        protected IGrabbableEntity _nextGrabbableEntity;
+        protected IBaseEntity _nextEntity;
         protected List<IGrabbableEntity> _grabbableEntities = new List<IGrabbableEntity>();
-        protected Dictionary<IGrabbableEntity, bool> _grabbablesStates = new Dictionary<IGrabbableEntity, bool>();
-
-        protected ITriggerableEntity _nextTriggerableEntity;
         protected List<ITriggerableEntity> _triggerableEntity = new List<ITriggerableEntity>();
-        protected Dictionary<ITriggerableEntity, bool> _triggerablesStates = new Dictionary<ITriggerableEntity, bool>();
+        protected Dictionary<IBaseEntity, bool> _entities = new Dictionary<IBaseEntity, bool>();
 
-        protected async Task MoveToNextGrabbable()
+        protected void StartSceneExplore()
         {
-            GetNextGrabbableEntity(out _nextGrabbableEntity);
+            StoreEntityPos();
+            _ = SceneExplore();
+        }
 
-            if(_nextGrabbableEntity == null) return;
-
-            await _moveActionHandle.Execute(_nextGrabbableEntity.Grabbable.transform.position);
-
-            _grabbablesStates[_nextGrabbableEntity] = true;
-
-            if(drag && _nextGrabbableEntity.Grabbable)
+        protected async Task SceneExplore()
+        {
+            GetNextEntity(out _nextEntity);
+            switch(_nextEntity.Name)
             {
-                await _grabActionHandle.Execute();
+                case Str.Box: _curTask = GrabAndDragBoxTask((IGrabbableEntity)_nextEntity); break;
+                case Str.Button: _curTask = PressButtonTask((ITriggerableEntity)_nextEntity); break;
             }
 
-            if(_grabbablesStates.Values.All(value => value))
+            Debug.Log(new RichText()
+                .Add("Entity of Task: ", bold: true)
+                .Add(_nextEntity.Name, bold: true, color: Color.yellow));
+
+            foreach(var action in _curTask)
+            {
+                await action.Execute();
+            }
+
+            _entities[_nextEntity] = true;
+
+            if(_entities.Values.All(value => value))
             {
                 SceneAnalyzer.Instance.RoundFinish();
             }
-            else
-            {
-                await MoveToNextGrabbable();
-            }
+
+            await SceneExplore();
         }
 
-        protected abstract void GetNextTriggerableEntity(out ITriggerableEntity nextTriggerableEntity);
-
-        protected abstract void GetNextGrabbableEntity(out IGrabbableEntity nextGrabbableEntity);
+        /// <summary>
+        /// 计算下一个交互的实体
+        /// </summary>
+        /// <param name="nextEntity"></param>
+        protected abstract void GetNextEntity(out IBaseEntity nextEntity);
 
         #region 场景信息预处理（Scene Information Preprocessing)
 
         /// <summary>
-        /// 存储所有场景中可抓取物体的变换信息
+        /// 存储所有实体的变换信息
         /// </summary>
-        protected void StoreSceneGrabbableObjects()
+        protected void StoreEntityPos()
         {
-            _initialGrabbablePositions = new Vector3[_grabbables.Count];
-            _initialGrabbableRotations = new Quaternion[_grabbables.Count];
-
-            for(int i = 0; i < _grabbables.Count; i++)
+            _initEntityPos = new Vector3[_entities.Count];
+            _initEntityRot = new Quaternion[_entities.Count];
+            int i = 0;
+            foreach(var entity in _entities.Keys)
             {
-                _initialGrabbablePositions[i] = _grabbables[i].transform.position;
-                _initialGrabbableRotations[i] = _grabbables[i].transform.rotation;
+                _initEntityPos[i] = entity.transform.position;
+                _initEntityRot[i] = entity.transform.rotation;
+                i++;
             }
         }
 
         /// <summary>
-        /// 重置加载所有可抓取物体的位置和旋转
+        /// 重置加载所有实体的位置和旋转
         /// </summary>
-        protected virtual void ResetSceneGrabbableObjects()
+        protected virtual void ResetEntityPos()
         {
-            for(int i = 0; i < _grabbableEntities.Count; i++)
-            {
-                _grabbablesStates[_grabbableEntities[i]] = false;
+            int i = 0;
+            var entitiesKeys = _entities.Keys.ToList();
 
-                if(randomGrabble)
+            foreach(var entity in entitiesKeys)
+            {
+                _entities[entity] = false;
+                if(randomInitPos)
                 {
-                    _grabbables[i].transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 10f, 0);
+                    entity.transform.position = _meshCenters[Random.Range(0, _meshCenters.Length - 1)] + new Vector3(0, 10f, 0);
                 }
                 else
                 {
-                    _grabbables[i].transform.position = _initialGrabbablePositions[i];
+                    entity.transform.position = _initEntityPos[i];
                 }
 
-                Rigidbody rb = _grabbables[i].GetComponent<Rigidbody>();
+                Rigidbody rb = entity.transform.GetComponent<Rigidbody>();
                 if(rb != null)
                 {
                     rb.velocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;
                 }
+
+                i++;
             }
         }
 
@@ -151,6 +170,95 @@ namespace VRAgent
 
         #endregion 场景信息预处理（Scene Information Preprocessing)
 
+        #region 任务预定义（Task Pre-defined）
+
+        /// <summary>
+        /// 随机获得一个偏移量
+        /// </summary>
+        /// <param name="originalPos"></param>
+        /// <param name="twitchRange"></param>
+        /// <returns></returns>
+        private Vector3 GetRandomTwitchTarget(Vector3 originalPos, float twitchRange = 8f)
+        {
+            Vector3 randomPos = _sceneCenter;
+            int attempts = 0;
+            int maxAttempts = 50;
+            while(attempts < maxAttempts)
+            {
+                float randomOffsetX = UnityEngine.Random.Range(-1f, 1f) * twitchRange;
+                float randomOffsetZ = UnityEngine.Random.Range(-1f, 1f) * twitchRange;
+                randomPos = originalPos + new Vector3(randomOffsetX, 0, randomOffsetZ);
+                NavMeshPath path = new NavMeshPath();
+
+                if(NavMesh.CalculatePath(originalPos, randomPos, NavMesh.AllAreas, path))
+                {
+                    if(path.status == NavMeshPathStatus.PathComplete)
+                    {
+                        break;
+                    }
+                }
+                attempts++;
+            }
+            return randomPos;
+        }
+
+        /// <summary>
+        /// 抓取、拖拽箱子任务
+        /// </summary>
+        /// <param name="grabbableEntity"></param>
+        /// <returns></returns>
+        private List<BaseAction> GrabAndDragBoxTask(IGrabbableEntity grabbableEntity)
+        {
+            List<BaseAction> task = new List<BaseAction>()
+            {
+                new MoveAction(_navMeshAgent, moveSpeed, grabbableEntity.transform.position),
+                new GrabAction(leftHandController, grabbableEntity, new List<BaseAction>(){
+                    new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position))
+                })
+            };
+            return task;
+        }
+
+        /// <summary>
+        /// 按按钮任务
+        /// </summary>
+        /// <param name="triggerableEntity"></param>
+        /// <returns></returns>
+        private List<BaseAction> PressButtonTask(ITriggerableEntity triggerableEntity)
+        {
+            List<BaseAction> task = new List<BaseAction>()
+            {
+                new MoveAction(_navMeshAgent, moveSpeed, triggerableEntity.transform.position),
+                new TriggerAction(0.5f, triggerableEntity)
+            };
+            return task;
+        }
+
+        /// <summary>
+        /// 射击任务
+        /// </summary>
+        /// <param name="grabbableEntity"></param>
+        /// <param name="triggerableEntity"></param>
+        /// <returns></returns>
+        private List<BaseAction> GrabAndShootGunTask(IGrabbableEntity grabbableEntity, ITriggerableEntity triggerableEntity)
+        {
+            List<BaseAction> task = new List<BaseAction>()
+            {
+                new MoveAction(_navMeshAgent, moveSpeed, grabbableEntity.transform.position),
+                new GrabAction(leftHandController, grabbableEntity, new List<BaseAction>()
+                {
+                    new ParallelAction(new List<BaseAction>()
+                    {
+                        new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position)),
+                        new TriggerAction(0.5f, triggerableEntity)
+                    })
+                })
+            };
+            return task;
+        }
+
+        #endregion 任务预定义（Task Pre-defined）
+
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -166,28 +274,24 @@ namespace VRAgent
             {
                 _grabbables.Add(grabbableEntity.Grabbable);
                 _grabbableEntities.Add(grabbableEntity);
-                _grabbablesStates.Add(grabbableEntity, false);
+                _entities.Add(grabbableEntity, false);
             }
             foreach(ITriggerableEntity triggerableEntity in SceneAnalyzer.Instance.triggerableEntities)
             {
                 _triggerableEntity.Add(triggerableEntity);
-                _triggerablesStates.Add(triggerableEntity, false);
+                _entities.Add(triggerableEntity, false);
             }
-
-            StoreSceneGrabbableObjects();
-            ResetSceneGrabbableObjects();
 
             SceneAnalyzer.Instance.RoundFinishEvent = () =>
             {
-                ResetSceneGrabbableObjects();
-                _ = MoveToNextGrabbable();
+                ResetEntityPos();
             };
 
-            _moveActionHandle = new MoveAction(_navMeshAgent, moveSpeed);
-            _grabActionHandle = new GrabAction(leftHandController, _navMeshAgent, _sceneCenter, moveSpeed, () => { return _nextGrabbableEntity; });
-            _triggerActionHandle = new TriggerAction(() => { return _nextTriggerableEntity; });
 
-            _ = MoveToNextGrabbable();
+
+            ResetEntityPos();
+            Invoke("StartSceneExplore", 2f);
+
         }
     }
 }

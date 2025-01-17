@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace VRAgent
 {
     public interface ITriggerableEntity : IBaseEntity
@@ -9,8 +7,6 @@ namespace VRAgent
             Triggerring,
             Triggerred
         }
-
-        Transform transform { get; }
 
         void Triggerring();
 

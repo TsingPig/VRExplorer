@@ -1,5 +1,4 @@
 using BNG;
-using UnityEngine;
 
 namespace VRAgent
 {
@@ -11,9 +10,7 @@ namespace VRAgent
         }
 
         Grabbable Grabbable { get; }
-        Transform transform { get; }
 
         void OnGrabbed();
-
     }
 }

@@ -13,27 +13,18 @@ namespace VRAgent
         private float _speed;
         private Vector3 _destination;
 
-        public MoveAction(NavMeshAgent agent, float speed, Vector3 destination = default)
+        public MoveAction(NavMeshAgent agent, float speed, Vector3 destination)
         {
-            actionName = "MoveAction";
+            Name = "MoveAction";
             _agent = agent;
             _speed = speed;
             _destination = destination;
         }
 
-        public async Task Execute(Vector3 destination)
+        public override async Task Execute()
         {
-            if(destination == null)
-            {
-                Debug.LogError($"None Destination For {actionName}, Please check the Destination Vector3");
-                return;
-            }
-            _destination = destination;
-            await Execute();
-        }
+            await base.Execute();
 
-        public async override Task Execute()
-        {
             _agent.SetDestination(_destination);
             _agent.speed = _speed;
             while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh && (_agent.pathPending || _agent.remainingDistance > 0.5f))

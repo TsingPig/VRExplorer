@@ -1,4 +1,3 @@
-using BNG;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -116,9 +115,9 @@ namespace VRAgent
         /// <summary>
         /// 重置加载所有可抓取物体的位置和旋转
         /// </summary>
-        protected override void ResetSceneGrabbableObjects()
+        protected override void ResetEntityPos()
         {
-            base.ResetSceneGrabbableObjects();
+            base.ResetEntityPos();
             ComputeDistanceMatrix();
             hamiltonianPath = SolveTSP();
 
@@ -131,15 +130,10 @@ namespace VRAgent
         /// <summary>
         /// 获取最近的可抓取物体
         /// </summary>
-        protected override void GetNextGrabbableEntity(out IGrabbableEntity nextGrabbableEntity)
+        protected override void GetNextEntity(out IBaseEntity nextEntity)
         {
-            nextGrabbableEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<IGrabbableEntity>();
+            nextEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<IGrabbableEntity>();
             curGrabbableIndex += 1;
-        }
-
-        protected override void GetNextTriggerableEntity(out ITriggerableEntity nextTriggerableEntity)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

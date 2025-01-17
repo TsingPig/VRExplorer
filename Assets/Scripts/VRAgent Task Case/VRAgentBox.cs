@@ -1,21 +1,19 @@
 using BNG;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using VRAgent;
 
 public class VRAgentBox : MonoBehaviour, IGrabbableEntity
 {
-
-    void OnGrabbed()
+    private void OnGrabbed()
     {
         Debug.Log("(Custom) Grabbed");
     }
 
     #region Entity Region
-    public string Name => "VRAgentBox";
+
+    public string Name => Str.Box;
 
     public Grabbable Grabbable => GetComponent<Grabbable>();
-
 
     void IGrabbableEntity.OnGrabbed()
     {
@@ -24,5 +22,5 @@ public class VRAgentBox : MonoBehaviour, IGrabbableEntity
         OnGrabbed();
     }
 
-    #endregion
+    #endregion Entity Region
 }
