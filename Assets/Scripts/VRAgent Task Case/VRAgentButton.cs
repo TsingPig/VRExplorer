@@ -10,13 +10,11 @@ public class VRAgentButton : MonoBehaviour, ITriggerableEntity
 
     void ITriggerableEntity.Triggerring()
     {
-        SceneAnalyzer.Instance.TriggerState(this, ITriggerableEntity.TriggerableState.Triggerring);
         OnPress?.Invoke();
     }
 
     void ITriggerableEntity.Triggerred()
     {
-        SceneAnalyzer.Instance.TriggerState(this, ITriggerableEntity.TriggerableState.Triggerred);
         OnRelease?.Invoke();
     }
 

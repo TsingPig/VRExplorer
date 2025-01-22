@@ -17,7 +17,6 @@ public class VRAgentBox : MonoBehaviour, IGrabbableEntity
 
     void IGrabbableEntity.OnGrabbed()
     {
-        SceneAnalyzer.Instance.TriggerState(this, IGrabbableEntity.GrabbableState.Grabbed);
 
         OnGrabbed();
     }
