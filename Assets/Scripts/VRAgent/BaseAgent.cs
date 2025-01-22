@@ -1,22 +1,14 @@
 using BNG;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using TsingPigSDK;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
 using Random = UnityEngine.Random;
-
+using TsingPigSDK;
 namespace VRAgent
 {
-    public static class Str
-    {
-        public const string Box = "box";
-        public const string Button = "button";
-    }
 
     public abstract class BaseAgent : MonoBehaviour
     {
@@ -47,20 +39,23 @@ namespace VRAgent
         protected List<ITriggerableEntity> _triggerableEntity = new List<ITriggerableEntity>();
         protected Dictionary<IBaseEntity, bool> _entities = new Dictionary<IBaseEntity, bool>();
 
-        protected void StartSceneExplore()
+
+        protected List<BaseAction> TaskGenerator(IBaseEntity e)
         {
-            StoreEntityPos();
-            _ = SceneExplore();
+            List<BaseAction> task = new List<BaseAction>();
+            switch(e.Name)
+            {
+                case Str.Box: task = GrabAndDragBoxTask((IGrabbableEntity)e); break;
+                case Str.Button: task = PressButtonTask((ITriggerableEntity)e); break;
+                case Str.Gun: task = GrabAndShootGunTask((IGrabbableEntity)e, (ITriggerableEntity)e); break;
+            }
+            return task;
         }
 
         protected async Task SceneExplore()
         {
             GetNextEntity(out _nextEntity);
-            switch(_nextEntity.Name)
-            {
-                case Str.Box: _curTask = GrabAndDragBoxTask((IGrabbableEntity)_nextEntity); break;
-                case Str.Button: _curTask = PressButtonTask((ITriggerableEntity)_nextEntity); break;
-            }
+            _curTask = TaskGenerator(_nextEntity);
 
             Debug.Log(new RichText()
                 .Add("Entity of Task: ", bold: true)
@@ -84,8 +79,8 @@ namespace VRAgent
         /// <summary>
         /// 计算下一个交互的实体
         /// </summary>
-        /// <param name="nextEntity"></param>
-        protected abstract void GetNextEntity(out IBaseEntity nextEntity);
+        /// <param name="e"></param>
+        protected abstract void GetNextEntity(out IBaseEntity e);
 
         #region 场景信息预处理（Scene Information Preprocessing)
 
@@ -270,16 +265,16 @@ namespace VRAgent
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
 
-            foreach(IGrabbableEntity grabbableEntity in SceneAnalyzer.Instance.grabbableEntities)
+            foreach(IGrabbableEntity e in SceneAnalyzer.Instance.grabbableEntities)
             {
-                _grabbables.Add(grabbableEntity.Grabbable);
-                _grabbableEntities.Add(grabbableEntity);
-                _entities.Add(grabbableEntity, false);
+                _grabbables.Add(e.Grabbable);
+                _grabbableEntities.Add(e);
+                if(!_entities.ContainsKey(e)) _entities.Add(e, false);
             }
-            foreach(ITriggerableEntity triggerableEntity in SceneAnalyzer.Instance.triggerableEntities)
+            foreach(ITriggerableEntity e in SceneAnalyzer.Instance.triggerableEntities)
             {
-                _triggerableEntity.Add(triggerableEntity);
-                _entities.Add(triggerableEntity, false);
+                _triggerableEntity.Add(e);
+                if(!_entities.ContainsKey(e)) _entities.Add(e, false);
             }
 
             SceneAnalyzer.Instance.RoundFinishEvent = () =>

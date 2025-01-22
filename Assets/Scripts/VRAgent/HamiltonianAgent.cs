@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 namespace VRAgent
 {
-    public class TestAgent3 : BaseAgent
+    public class HamiltonianAgent : BaseAgent
     {
         private float[,] distanceMatrix; // 距离矩阵
         private List<int> hamiltonianPath; // 哈密顿路径结果
@@ -130,9 +130,9 @@ namespace VRAgent
         /// <summary>
         /// 获取最近的可抓取物体
         /// </summary>
-        protected override void GetNextEntity(out IBaseEntity nextEntity)
+        protected override void GetNextEntity(out IBaseEntity e)
         {
-            nextEntity = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<IGrabbableEntity>();
+            e = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<IGrabbableEntity>();
             curGrabbableIndex += 1;
         }
     }

@@ -2,7 +2,6 @@ namespace TsingPigSDK
 {
     using System.Text;
     using UnityEngine;
-
     public class RichText
     {
         private StringBuilder _textBuilder;

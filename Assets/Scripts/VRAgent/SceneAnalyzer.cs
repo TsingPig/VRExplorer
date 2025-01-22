@@ -11,10 +11,6 @@ namespace VRAgent
 {
     public class SceneAnalyzer : TsingPigSDK.Singleton<SceneAnalyzer>
     {
-        /// <summary>
-        /// 通过脚本挂载的类对可交互物体进行分类，此处记录可抓取物体的挂载脚本过滤器
-        /// </summary>
-        public List<string> targetGrabTypeFilter = new List<string>();
 
         /// <summary>
         /// 所有可抓取实体
@@ -32,8 +28,7 @@ namespace VRAgent
         protected override void Awake()
         {
             base.Awake();
-            targetGrabTypeFilter.Add("XRGrabInteractable");
-            targetGrabTypeFilter.Add("Grabbable");
+
         }
 
         #region 指标（Metrics）

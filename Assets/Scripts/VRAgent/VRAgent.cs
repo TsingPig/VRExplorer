@@ -5,9 +5,9 @@ namespace VRAgent
 {
     public class VRAgent : BaseAgent
     {
-        protected override void GetNextEntity(out IBaseEntity nextEntity)
+        protected override void GetNextEntity(out IBaseEntity e)
         {
-            nextEntity = _entities.Keys
+            e = _entities.Keys
                 .Where(e => _entities[e] == false)
                 .OrderBy(e => Vector3.Distance(transform.position, e.transform.position))
                 .FirstOrDefault();
