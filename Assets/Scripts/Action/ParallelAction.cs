@@ -10,16 +10,21 @@ namespace VRAgent
         public ParallelAction(List<BaseAction> parallelActions)
         {
             this.parallelActions = parallelActions;
+            Name = "ParallelAction"; 
         }
 
         public override async Task Execute()
         {
             await base.Execute();
 
+            List<Task> tasks = new List<Task>();
+
             foreach(var action in parallelActions)
             {
-                _ = action.Execute();
+                tasks.Add(action.Execute());
             }
+
+            await Task.WhenAll(tasks);
         }
     }
 }
