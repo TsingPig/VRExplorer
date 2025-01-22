@@ -29,7 +29,6 @@ namespace VRAgent
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
-        [SerializeField] protected BaseAction _curAction;
         [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
         [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
 
@@ -39,6 +38,11 @@ namespace VRAgent
         protected List<ITriggerableEntity> _triggerableEntity = new List<ITriggerableEntity>();
         protected Dictionary<IBaseEntity, bool> _entities = new Dictionary<IBaseEntity, bool>();
 
+        protected void StartSceneExplore()
+        {
+            _ = SceneExplore();
+            StoreEntityPos();
+        }
 
         protected List<BaseAction> TaskGenerator(IBaseEntity e)
         {
