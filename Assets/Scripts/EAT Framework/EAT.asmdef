@@ -1,0 +1,18 @@
+{
+    "name": "EAT",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ae675fa5e1100441be0ade0dd1aa277",
+        "GUID:6c61e405d738767418dd3ddc8229a638",
+        "GUID:fe685ec1767f73d42b749ea8045bfe43"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,7 +1,7 @@
 using BNG;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using VRAgent;
-
 public class VRAgentBox : MonoBehaviour, IGrabbableEntity
 {
     private void OnGrabbed()
@@ -10,14 +10,14 @@ public class VRAgentBox : MonoBehaviour, IGrabbableEntity
     }
 
     #region Entity Region
+    [ExcludeFromCodeCoverage]public string Name => Str.Box;
 
-    public string Name => Str.Box;
+    
+    [ExcludeFromCodeCoverage] public Grabbable Grabbable => GetComponent<Grabbable>();
 
-    public Grabbable Grabbable => GetComponent<Grabbable>();
-
+    [ExcludeFromCodeCoverage]
     void IGrabbableEntity.OnGrabbed()
     {
-
         OnGrabbed();
     }
 

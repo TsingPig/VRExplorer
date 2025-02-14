@@ -1,18 +1,22 @@
 using UnityEngine;
 using UnityEngine.Events;
 using VRAgent;
+using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
 
 public class VRAgentButton : MonoBehaviour, ITriggerableEntity
 {
     #region Entity Region
 
-    public string Name => Str.Button;
+    [ExcludeFromCodeCoverage]public string Name => Str.Button;
 
+    [ExcludeFromCodeCoverage]
     void ITriggerableEntity.Triggerring()
     {
         OnPress?.Invoke();
     }
 
+    [ExcludeFromCodeCoverage]
     void ITriggerableEntity.Triggerred()
     {
         OnRelease?.Invoke();

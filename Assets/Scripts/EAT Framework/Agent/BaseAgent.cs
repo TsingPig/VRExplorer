@@ -268,6 +268,7 @@ namespace VRAgent
 
         private void Awake()
         {
+
             _navMeshAgent = GetComponent<NavMeshAgent>();
             MetricManager.Instance.RoundFinishEvent += () =>
             {

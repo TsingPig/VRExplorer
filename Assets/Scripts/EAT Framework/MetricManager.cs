@@ -50,7 +50,7 @@ namespace VRAgent
                 .Add("Round ")
                 .Add(_curFinishCount.ToString(), color: Color.yellow, bold: true)
                 .Add(" finished"));
-
+            
             GetTotalStateCount = 0;
             RoundFinishEvent?.Invoke();
         }

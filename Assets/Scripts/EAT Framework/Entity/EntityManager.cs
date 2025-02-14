@@ -23,7 +23,7 @@ namespace VRAgent
 
         public void RegisterAllEntities()
         {
-            var entityTypes = Assembly.GetExecutingAssembly()
+            var entityTypes = Assembly.Load("Test")
                 .GetTypes()
                 .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
