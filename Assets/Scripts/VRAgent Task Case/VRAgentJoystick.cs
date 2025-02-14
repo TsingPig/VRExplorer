@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 public class VRAgentJoystick : MonoBehaviour
 {
+
     public class ValueChangeEvent : UnityEvent<float>
     { }
 

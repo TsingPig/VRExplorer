@@ -1,4 +1,5 @@
 using BNG;
+using Google.Protobuf.WellKnownTypes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,6 +41,8 @@ namespace VRAgent
         protected void StartSceneExplore()
         {
             _ = SceneExplore();
+            MetricManager.Instance.StartRecord();
+
             StoreMonoPos();
         }
 

@@ -11,7 +11,6 @@ public class VRAgentBox : MonoBehaviour, IGrabbableEntity
 
     #region Entity Region
     [ExcludeFromCodeCoverage]public string Name => Str.Box;
-
     
     [ExcludeFromCodeCoverage] public Grabbable Grabbable => GetComponent<Grabbable>();
 
