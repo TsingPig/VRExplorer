@@ -10,8 +10,6 @@ using Random = UnityEngine.Random;
 
 namespace VRExplorer
 {
-    using HandController = BNG.HandController;
-
     public abstract class BaseExplorer : MonoBehaviour
     {
         private Vector3 _sceneCenter;
@@ -24,8 +22,6 @@ namespace VRExplorer
 
         [Header("Configuration")]
         public HandController leftHandController;
-
-        public XRBaseInteractor rightHandController;
         public float moveSpeed = 6f;
         public bool randomInitPos = false;
         public bool drag = false;

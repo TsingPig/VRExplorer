@@ -65,7 +65,7 @@ namespace VRExplorer
                         if(nestedType.IsEnum)
                         {
                             var enumValues = Enum.GetValues(nestedType);
-                            MetricManager.Instance.GetTotalStateCount += enumValues.Length;
+                            MetricManager.Instance.StateCount += enumValues.Length;
                         }
                     }
                 }

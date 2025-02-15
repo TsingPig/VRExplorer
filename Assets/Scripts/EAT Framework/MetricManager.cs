@@ -19,7 +19,7 @@ namespace VRExplorer
         /// </summary>
         /// <param name="enumType"></param>
         /// <returns></returns>
-        public int GetTotalTriggeredStateCount
+        public int TriggeredStateCount
         {
             get
             {
@@ -35,17 +35,17 @@ namespace VRExplorer
         /// <summary>
         /// 获取总状态个数
         /// </summary>
-        public int GetTotalStateCount { get; set; }
+        public int StateCount { get; set; }
 
         /// <summary>
         /// 获取总可交互物体个数
         /// </summary>
-        public int GetTotalInteractableCount
+        public int InteractableCount
         {
             get { return EntityManager.Instance.monoState.Count; }
         }
 
-        public int GetTotalCoveredInteractableCount
+        public int CoveredInteractableCount
         {
             get { return EntityManager.Instance.monoState.Count((monoPair) => { return monoPair.Value == true; }); }
         }
@@ -56,13 +56,18 @@ namespace VRExplorer
                 .Add("TimeCost: ")
                 .Add((Time.time - timeStamp).ToString(), bold: true, color: Color.yellow)
                 .Add(", TriggeredStateCount: ", bold: true)
-                .Add(GetTotalTriggeredStateCount.ToString(), bold: true, color: Color.yellow)
-                .Add(", TotalStateCount: ", bold: true)
-                .Add(GetTotalStateCount.ToString(), bold: true, color: Color.yellow)
-                .Add(", GetTotalCoveredInteractableCount: ", bold: true)
-                .Add(GetTotalCoveredInteractableCount.ToString(), bold: true, color: Color.yellow)
-                .Add(", GetTotalInteractableCount: ", bold: true)
-                .Add(GetTotalInteractableCount.ToString(), bold: true, color: Color.yellow));
+                .Add(TriggeredStateCount.ToString(), bold: true, color: Color.yellow)
+                .Add(", StateCount: ", bold: true)
+                .Add(StateCount.ToString(), bold: true, color: Color.yellow)
+                .Add(", CoveredInteractableCount: ", bold: true)
+                .Add(CoveredInteractableCount.ToString(), bold: true, color: Color.yellow)
+                .Add(", InteractableCount: ", bold: true)
+                .Add(InteractableCount.ToString(), bold: true, color: Color.yellow)
+                .Add(", Interactable Coverage: ", bold: true)
+                .Add($"{CoveredInteractableCount * 100f / InteractableCount:F2}%", bold: true, color: Color.yellow)
+                .Add(", StateCount Coverage: ", bold: true)
+                .Add($"{TriggeredStateCount * 100f / StateCount:F2}%", bold: true, color: Color.yellow));
+
         }
 
         public void RoundFinish()
@@ -73,7 +78,7 @@ namespace VRExplorer
                 .Add("Round ")
                 .Add(_curFinishCount.ToString(), color: Color.yellow, bold: true)
                 .Add(" finished"));
-            GetTotalStateCount = 0;
+            StateCount = 0;
             RoundFinishEvent?.Invoke();
         }
 
