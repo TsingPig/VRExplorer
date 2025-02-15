@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace VRAgent
+namespace VRExplorer
 {
     /// <summary>
     /// ÒÆ¶¯¶¯×÷

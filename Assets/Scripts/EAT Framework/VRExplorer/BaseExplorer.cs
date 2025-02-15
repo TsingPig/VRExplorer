@@ -1,5 +1,4 @@
 using BNG;
-using Google.Protobuf.WellKnownTypes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,11 +8,11 @@ using UnityEngine.AI;
 using UnityEngine.XR.Interaction.Toolkit;
 using Random = UnityEngine.Random;
 
-namespace VRAgent
+namespace VRExplorer
 {
     using HandController = BNG.HandController;
 
-    public abstract class BaseAgent : MonoBehaviour
+    public abstract class BaseExplorer : MonoBehaviour
     {
         private Vector3 _sceneCenter;
 
@@ -271,7 +270,6 @@ namespace VRAgent
 
         private void Awake()
         {
-
             _navMeshAgent = GetComponent<NavMeshAgent>();
             MetricManager.Instance.RoundFinishEvent += () =>
             {

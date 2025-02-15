@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace VRAgent
+namespace VRExplorer
 {
     /// <summary>
     /// BaseEntity
@@ -8,7 +8,7 @@ namespace VRAgent
     /// such as XRJoystick, which can be classified as an entity like a button, having 2 states.
     /// The state is presented in the form of enum HashSet.
     /// The entity event is presented in the form of method that needs to be implemented in the MonBehaviour-Derived class.
-    /// So, it is easily for VRAgent to trigger the UnityEvent that practically exist in the class.
+    /// So, it is easily for VRExplorer to trigger the UnityEvent that practically exist in the class.
     /// And it is also easily for SceneAnalyzer to get the entity relation coverage using the reflection.
     /// </summary>
     public interface IBaseEntity

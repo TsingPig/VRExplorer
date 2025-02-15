@@ -1,4 +1,4 @@
-namespace VRAgent
+namespace VRExplorer
 {
     public interface ITriggerableEntity : IBaseEntity
     {

@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace VRAgent
+namespace VRExplorer
 {
-    public class HamiltonianAgent : BaseAgent
+    public class HamiltonianExplorer : BaseExplorer
     {
         private float[,] distanceMatrix; // ¾àÀë¾ØÕó
         private List<int> hamiltonianPath; // ¹şÃÜ¶ÙÂ·¾¶½á¹û

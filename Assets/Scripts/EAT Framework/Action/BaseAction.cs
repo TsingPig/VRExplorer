@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
 
-namespace VRAgent
+namespace VRExplorer
 {
     [Serializable]
     public class BaseAction

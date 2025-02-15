@@ -1,6 +1,6 @@
 using BNG;
 
-namespace VRAgent
+namespace VRExplorer
 {
     public interface IGrabbableEntity : IBaseEntity
     {

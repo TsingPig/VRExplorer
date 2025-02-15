@@ -1,5 +1,4 @@
-﻿
-namespace VRAgent
+﻿namespace VRExplorer
 {
     public static class Str
     {

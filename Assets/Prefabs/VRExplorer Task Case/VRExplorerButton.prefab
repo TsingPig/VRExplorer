@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3355670631096675943}
   - component: {fileID: 3355670631096675928}
   m_Layer: 0
-  m_Name: VRAgentButton
+  m_Name: VRExplorerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

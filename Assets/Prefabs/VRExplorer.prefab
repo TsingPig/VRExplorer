@@ -413,7 +413,7 @@ GameObject:
   - component: {fileID: 496355604258214106}
   - component: {fileID: 6355174954153483858}
   m_Layer: 0
-  m_Name: VRAgent
+  m_Name: VRExplorer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

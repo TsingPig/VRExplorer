@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
-using NUnit.Framework;
 
-public class VRAgentJoystick : MonoBehaviour
+public class VRExplorerJoystick : MonoBehaviour
 {
-
     public class ValueChangeEvent : UnityEvent<float>
     { }
 

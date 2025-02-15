@@ -1,9 +1,9 @@
 using System.Linq;
 using UnityEngine;
 
-namespace VRAgent
+namespace VRExplorer
 {
-    public class VRAgent : BaseAgent
+    public class VRExplorer : BaseExplorer
     {
         protected override void GetNextMono(out MonoBehaviour nextMono)
         {

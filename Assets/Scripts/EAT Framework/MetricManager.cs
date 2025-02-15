@@ -5,15 +5,14 @@ using TsingPigSDK;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-
-namespace VRAgent
+namespace VRExplorer
 {
     public class MetricManager : Singleton<MetricManager>
     {
         private int _curFinishCount = 0;
         public float timeStamp;
-        public event Action RoundFinishEvent;
 
+        public event Action RoundFinishEvent;
 
         /// <summary>
         /// 获取总触发状态个数
@@ -84,11 +83,11 @@ namespace VRAgent
             StartCoroutine("RecordCoroutine");
         }
 
-        IEnumerator RecordCoroutine()
+        private IEnumerator RecordCoroutine()
         {
             ShowMetrics();
             yield return new WaitForSeconds(1f);
-            StartCoroutine(RecordCoroutine()); 
+            StartCoroutine(RecordCoroutine());
         }
     }
 }

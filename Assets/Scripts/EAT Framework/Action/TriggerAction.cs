@@ -1,16 +1,16 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace VRAgent
+namespace VRExplorer
 {
     /// <summary>
     /// ´¥·¢¶¯×÷
     /// TriggerAction
     /// Definition: TriggerAction is an action that has two state, triggerring and triggerred.
-    /// The former will be activated absolutely when the VRAgent started to trigger a TriggerableEntity.
-    /// The latter will be activated later, when the VRAgent finished to trigger the TriggerableEntity.
-    /// For instance, a button is a TriggerableEntity. When the VRAgent presses it,
-    /// the button switched to the triggerring state. And when the VRAgent releases it,
+    /// The former will be activated absolutely when the VRExplorer started to trigger a TriggerableEntity.
+    /// The latter will be activated later, when the VRExplorer finished to trigger the TriggerableEntity.
+    /// For instance, a button is a TriggerableEntity. When the VRExplorer presses it,
+    /// the button switched to the triggerring state. And when the VRExplorer releases it,
     /// the button switched to the triggered state.
     /// A joystick is also a triggerableEntity.
     /// </summary>

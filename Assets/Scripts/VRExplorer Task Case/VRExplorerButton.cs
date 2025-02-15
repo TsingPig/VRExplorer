@@ -1,14 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.Events;
-using VRAgent;
-using NUnit.Framework;
-using System.Diagnostics.CodeAnalysis;
+using VRExplorer;
 
-public class VRAgentButton : MonoBehaviour, ITriggerableEntity
+public class VRExplorerButton : MonoBehaviour, ITriggerableEntity
 {
     #region Entity Region
 
-    [ExcludeFromCodeCoverage]public string Name => Str.Button;
+    [ExcludeFromCodeCoverage] public string Name => Str.Button;
 
     [ExcludeFromCodeCoverage]
     void ITriggerableEntity.Triggerring()

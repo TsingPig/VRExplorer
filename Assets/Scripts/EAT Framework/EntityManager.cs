@@ -5,7 +5,7 @@ using System.Reflection;
 using TsingPigSDK;
 using UnityEngine;
 
-namespace VRAgent
+namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
     {
