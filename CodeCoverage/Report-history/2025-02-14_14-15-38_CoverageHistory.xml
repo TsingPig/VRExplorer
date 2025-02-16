@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<coverage version="1.0" date="2025-02-14_14-15-38" tag="">
-  <assembly name="Test">
-    <class name="VRAgentBox" coveredlines="3" coverablelines="3" totallines="24" coveredbranches="0" totalbranches="0" />
-    <class name="VRAgentButton" coveredlines="8" coverablelines="8" totallines="40" coveredbranches="0" totalbranches="0" />
-    <class name="VRAgentJoystick" coveredlines="0" coverablelines="5" totallines="19" coveredbranches="0" totalbranches="0" />
-  </assembly>
-</coverage>
