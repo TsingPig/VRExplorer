@@ -81,14 +81,15 @@ namespace VRExplorer
         public void StartRecord()
         {
             timeStamp = Time.time;
-            StartCoroutine("RecordCoroutine");
             CodeCoverage.StartRecording();
+            StartCoroutine("RecordCoroutine");
         }
 
         private IEnumerator RecordCoroutine()
         {
+            yield return null;
             ShowMetrics();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(30f);
             StartCoroutine(RecordCoroutine());
         }
     }

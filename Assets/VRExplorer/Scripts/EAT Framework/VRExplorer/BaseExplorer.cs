@@ -39,7 +39,6 @@ namespace VRExplorer
         {
             _ = SceneExplore();
             MetricManager.Instance.StartRecord();
-
             StoreMonoPos();
         }
 
@@ -214,6 +213,7 @@ namespace VRExplorer
             return randomPos;
         }
 
+
         /// <summary>
         /// 抓取、拖拽箱子任务
         /// </summary>
@@ -241,7 +241,7 @@ namespace VRExplorer
             List<BaseAction> task = new List<BaseAction>()
             {
                 new MoveAction(_navMeshAgent, moveSpeed, triggerableEntity.transform.position),
-                new TriggerAction(1.5f, triggerableEntity)
+                new TriggerAction(0.5f, triggerableEntity)
             };
             return task;
         }

@@ -13,6 +13,13 @@
     "com.unity.settings-manager": "1.0.1",
     "com.unity.xr.interaction.toolkit": "2.0.4"
   },
+   "samples": [
+    {
+      "displayName": "VRExplorer Tutorial",
+      "description": "Including a prefab of VRExplorer and some config files",
+      "path": ""
+    }
+  ],
   "repository": {
     "url": "https://github.com/TsingPig/VRExplorer.git",
     "type": "git",

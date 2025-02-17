@@ -75,9 +75,12 @@ def plot_coverage(coverage_data, timestamps):
     plt.show()
 
 
+path = r'D:\--UnityProject\VR\subjects\unity-vr-maze-master\unity-vr-maze-master'
+
+
 # 主函数
 def main():
-    folder_path = '../../../../CodeCoverage/Report-history'  # 指定XML文件夹路径
+    folder_path = path + '/CodeCoverage/Report-history'  # 指定XML文件夹路径
     files = read_xml_files(folder_path)
 
     timestamps = []

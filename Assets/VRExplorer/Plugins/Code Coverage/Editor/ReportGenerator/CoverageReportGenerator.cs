@@ -157,16 +157,16 @@ namespace UnityEditor.TestTools.CodeCoverage
                     // Send Analytics event (Report Only / Data & Report)
                     CoverageAnalytics.instance.SendCoverageEvent(true);
 
-                    if (!CommandLineManager.instance.batchmode &&
-                        coverageSettings.revealReportInFinder &&
-                        CoveragePreferences.instance.GetBool("OpenReportWhenGenerated", true))
-                    {
-                        string indexHtm = CoverageUtils.JoinPaths(targetDirectory, "index.htm");
-                        if (File.Exists(indexHtm))
-                            EditorUtility.RevealInFinder(indexHtm);
-                        else
-                            EditorUtility.RevealInFinder(targetDirectory);
-                    }
+                    //if (!CommandLineManager.instance.batchmode &&
+                    //    coverageSettings.revealReportInFinder &&
+                    //    CoveragePreferences.instance.GetBool("OpenReportWhenGenerated", true))
+                    //{
+                    //    string indexHtm = CoverageUtils.JoinPaths(targetDirectory, "index.htm");
+                    //    if (File.Exists(indexHtm))
+                    //        EditorUtility.RevealInFinder(indexHtm);
+                    //    else
+                    //        EditorUtility.RevealInFinder(targetDirectory);
+                    //}
                 }
                 else
                 {
