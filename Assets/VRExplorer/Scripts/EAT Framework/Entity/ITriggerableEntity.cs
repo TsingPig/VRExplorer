@@ -8,6 +8,8 @@ namespace VRExplorer
             Triggerred
         }
 
+        float TriggeringTime { get; }
+
         void Triggerring();
 
         void Triggerred();

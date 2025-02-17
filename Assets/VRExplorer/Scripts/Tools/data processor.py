@@ -66,6 +66,17 @@ def plot_coverage(coverage_data, timestamps):
     # 绘制分支覆盖率
     plt.plot(timestamps, coverage_data['branch_coverage'], label = 'Branch Coverage', marker = 'x')
 
+    # 添加数据标注
+    for i, txt in enumerate(coverage_data['line_coverage']):
+        plt.annotate(f'{txt:.2f}', (
+        timestamps[i], coverage_data['line_coverage'][i]), textcoords = "offset points", xytext = (
+        0, 10), ha = 'center')
+
+    for i, txt in enumerate(coverage_data['branch_coverage']):
+        plt.annotate(f'{txt:.2f}', (
+        timestamps[i], coverage_data['branch_coverage'][i]), textcoords = "offset points", xytext = (
+        0, -10), ha = 'center')
+
     plt.xlabel('Timestamp')
     plt.ylabel('Coverage Percentage')
     plt.title('Code Coverage Over Time')
@@ -75,7 +86,7 @@ def plot_coverage(coverage_data, timestamps):
     plt.show()
 
 
-path = r'D:\--UnityProject\VR\VRAgent_'
+path = r'D:\--UnityProject\VR\subjects\unity-vr-maze-master\unity-vr-maze-master'
 
 
 # 主函数
@@ -96,6 +107,12 @@ def main():
         timestamps.append(class_data['date'])
         line_coverages.append(line_coverage)
         branch_coverages.append(branch_coverage)
+
+        # 打印每个文件的覆盖率数据
+        print(f"File: {file}")
+        print(f"Date: {class_data['date']}")
+        print(f"Line Coverage: {line_coverage * 100:.2f}%")
+        print(f"Branch Coverage: {branch_coverage * 100:.2f}%\n")
 
     # 汇总所有数据
     coverage_data = {

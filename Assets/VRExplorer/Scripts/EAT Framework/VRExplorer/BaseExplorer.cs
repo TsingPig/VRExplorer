@@ -81,11 +81,6 @@ namespace VRExplorer
             if(EntityManager.Instance.monoState.Values.All(value => value))
             {
                 MetricManager.Instance.RoundFinish(quitAfterFirstRound);
-                if(quitAfterFirstRound)
-                {
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    return;
-                }
             }
 
             await SceneExplore();
@@ -240,7 +235,7 @@ namespace VRExplorer
             List<BaseAction> task = new List<BaseAction>()
             {
                 new MoveAction(_navMeshAgent, moveSpeed, triggerableEntity.transform.position),
-                new TriggerAction(0.5f, triggerableEntity)
+                new TriggerAction(triggerableEntity.TriggeringTime, triggerableEntity)
             };
             return task;
         }

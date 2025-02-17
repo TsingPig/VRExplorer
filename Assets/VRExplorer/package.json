@@ -2,7 +2,7 @@
   "name": "com.tsingpig.vrexplorer",
   "displayName": "VR Explorer",
   "unity": "2019.3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use this to help the developer to automated test VR App",
   "keywords": [
     "test",

@@ -9,6 +9,8 @@ public class VRExplorerButton : MonoBehaviour, ITriggerableEntity
 
     [ExcludeFromCodeCoverage] public string Name => Str.Button;
 
+    [ExcludeFromCodeCoverage] public float TriggeringTime => 0.2f;
+
     [ExcludeFromCodeCoverage]
     void ITriggerableEntity.Triggerring()
     {

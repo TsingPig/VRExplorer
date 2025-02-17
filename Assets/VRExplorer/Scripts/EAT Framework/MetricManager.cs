@@ -74,6 +74,8 @@ namespace VRExplorer
             if(quitAfterFirstRound)
             {
                 StopAllCoroutines();
+                UnityEditor.EditorApplication.isPlaying = false;
+                return;
             }
         }
 
@@ -87,7 +89,7 @@ namespace VRExplorer
         {
             yield return null;
             ShowMetrics();
-            yield return new WaitForSeconds(30f);
+            yield return new WaitForSeconds(5f);
             StartCoroutine(RecordCoroutine());
         }
     }
