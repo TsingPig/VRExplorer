@@ -75,7 +75,7 @@ def plot_coverage(coverage_data, timestamps):
     plt.show()
 
 
-path = r'D:\--UnityProject\VR\subjects\unity-vr-maze-master\unity-vr-maze-master'
+path = r'D:\--UnityProject\VR\VRAgent_'
 
 
 # 主函数

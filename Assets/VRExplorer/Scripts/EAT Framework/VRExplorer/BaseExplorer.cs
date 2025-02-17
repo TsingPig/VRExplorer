@@ -38,7 +38,6 @@ namespace VRExplorer
         protected void StartSceneExplore()
         {
             _ = SceneExplore();
-            MetricManager.Instance.StartRecord();
             StoreMonoPos();
         }
 
@@ -278,7 +277,6 @@ namespace VRExplorer
             {
                 ResetMonoPos();
             };
-            EntityManager.Instance.RegisterAllEntities();
         }
 
         private void Start()

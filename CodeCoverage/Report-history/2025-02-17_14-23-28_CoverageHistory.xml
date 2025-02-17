@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2025-02-17_14-23-28" tag="">
+  <assembly name="Test">
+    <class name="VRExplorerBox" coveredlines="0" coverablelines="3" totallines="26" coveredbranches="0" totalbranches="0" />
+    <class name="VRExplorerButton" coveredlines="0" coverablelines="8" totallines="39" coveredbranches="0" totalbranches="0" />
+    <class name="VRExplorerJoystick" coveredlines="0" coverablelines="5" totallines="18" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

@@ -73,7 +73,6 @@ namespace VRExplorer
 
             if(quitAfterFirstRound)
             {
-                CodeCoverage.StopRecording();
                 StopAllCoroutines();
             }
         }
@@ -81,7 +80,6 @@ namespace VRExplorer
         public void StartRecord()
         {
             timeStamp = Time.time;
-            CodeCoverage.StartRecording();
             StartCoroutine("RecordCoroutine");
         }
 
