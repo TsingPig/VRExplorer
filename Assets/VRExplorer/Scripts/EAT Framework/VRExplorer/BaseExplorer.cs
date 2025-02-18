@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TsingPigSDK;
-using UnityEditor.TestTools.CodeCoverage;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.XR.Interaction.Toolkit;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -23,6 +21,7 @@ namespace VRExplorer
 
         [Header("Configuration")]
         public HandController leftHandController;
+
         public float moveSpeed = 6f;
         public bool randomInitPos = false;
         public bool drag = false;
@@ -81,7 +80,6 @@ namespace VRExplorer
             {
                 await SceneExplore();
             }
-
         }
 
         /// <summary>
@@ -204,7 +202,6 @@ namespace VRExplorer
             }
             return randomPos;
         }
-
 
         /// <summary>
         /// 抓取、拖拽箱子任务
