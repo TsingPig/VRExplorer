@@ -221,10 +221,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leftHandController: {fileID: 1026356573675553863}
-  rightHandController: {fileID: 0}
   moveSpeed: 6
   randomInitPos: 0
   drag: 1
+  reportCoverageDuration: 5
   _areaDiameter: 7.5
   _grabbables: []
   _curTask: []

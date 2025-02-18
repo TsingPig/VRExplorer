@@ -10,8 +10,8 @@ namespace VRExplorer
     public class ExperimentManager : Singleton<ExperimentManager>
     {
         public float reportCoverageDuration = 5f;
-        public event Action RoundFinishEvent;
-        
+        public event Action ExperimentFinishEvent;
+
         private float _timeStamp;
 
         /// <summary>
@@ -66,20 +66,16 @@ namespace VRExplorer
             CodeCoverage.GenerateReportWithoutStopping();
         }
 
-        public void RoundFinish(bool quitAfterFirstRound)
+        public void ExperimentFinish()
         {
             ShowMetrics();
-            Debug.Log(new RichText().Add("Round Finished", color: Color.yellow, bold: true));
+            Debug.Log(new RichText().Add("Experiment Finished", color: Color.yellow, bold: true));
             StateCount = 0;
-            RoundFinishEvent?.Invoke();
+            ExperimentFinishEvent?.Invoke();
 
-            if(quitAfterFirstRound)
-            {
-                StopAllCoroutines();
-                CodeCoverage.StopRecording();
-                UnityEditor.EditorApplication.isPlaying = false;
-                return;
-            }
+            StopAllCoroutines();
+            CodeCoverage.StopRecording();
+            UnityEditor.EditorApplication.isPlaying = false;
         }
 
         public void StartRecording()

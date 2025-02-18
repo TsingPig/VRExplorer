@@ -5,6 +5,7 @@ using System.Reflection;
 using TsingPigSDK;
 using UnityEngine;
 
+
 namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
@@ -30,14 +31,14 @@ namespace VRExplorer
         /// <param name="mono"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool SetMono(MonoBehaviour mono, bool value)
+        public bool UpdateMonoState(MonoBehaviour mono, bool value)
         {
             if(mono != null)
             {
                 monoState[mono] = value;
                 if(value && monoState.Values.All(value => value))
                 {
-                    ExperimentManager.Instance.RoundFinish(true);
+                    ExperimentManager.Instance.ExperimentFinish();
                     return true;
                 }
                 return false;
@@ -45,6 +46,9 @@ namespace VRExplorer
             return false;
         }
 
+        /// <summary>
+        /// 注册所有实体，需要初始化时调用
+        /// </summary>
         public void RegisterAllEntities()
         {
             var entityTypes = Assembly.Load("Test")
@@ -141,7 +145,7 @@ namespace VRExplorer
         protected override void Awake()
         {
             base.Awake();
-            ExperimentManager.Instance.RoundFinishEvent += () =>
+            ExperimentManager.Instance.ExperimentFinishEvent += () =>
             {
                 entityStates.Clear();
                 RegisterAllEntities();

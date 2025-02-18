@@ -26,7 +26,6 @@ namespace VRExplorer
         public float moveSpeed = 6f;
         public bool randomInitPos = false;
         public bool drag = false;
-        public bool quitAfterFirstRound = true;
         public float reportCoverageDuration = 5f;
 
         [Header("Show For Debug")]
@@ -78,7 +77,7 @@ namespace VRExplorer
                 }
             }
 
-            if(!EntityManager.Instance.SetMono(_nextMono, true))
+            if(!EntityManager.Instance.UpdateMonoState(_nextMono, true))
             {
                 await SceneExplore();
             }
@@ -268,7 +267,7 @@ namespace VRExplorer
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             EntityManager.Instance.RegisterAllEntities();
-            ExperimentManager.Instance.RoundFinishEvent += () =>
+            ExperimentManager.Instance.ExperimentFinishEvent += () =>
             {
                 ResetMonoPos();
             };
