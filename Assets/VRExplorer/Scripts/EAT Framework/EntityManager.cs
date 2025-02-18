@@ -33,7 +33,7 @@ namespace VRExplorer
         /// <returns></returns>
         public bool UpdateMonoState(MonoBehaviour mono, bool value)
         {
-            if(mono != null)
+            if(mono != null && monoState.ContainsKey(mono))
             {
                 monoState[mono] = value;
                 if(value && monoState.Values.All(value => value))
@@ -135,21 +135,6 @@ namespace VRExplorer
             return null;
         }
 
-        public IEnumerable<T> GetAllEntities<T>() where T : class, IBaseEntity
-        {
-            return monoEntitiesMapping.Values
-                .SelectMany(set => set)
-                .OfType<T>();
-        }
 
-        protected override void Awake()
-        {
-            base.Awake();
-            ExperimentManager.Instance.ExperimentFinishEvent += () =>
-            {
-                entityStates.Clear();
-                RegisterAllEntities();
-            };
-        }
     }
 }

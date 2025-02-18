@@ -74,6 +74,11 @@ namespace VRExplorer
             _csvDataBuilder.AppendLine($"{Time.time - _timeStamp},{TriggeredStateCount},{StateCount},{CoveredInteractableCount},{InteractableCount},{CoveredInteractableCount * 100f / InteractableCount:F2},{TriggeredStateCount * 100f / StateCount:F2}");
             CodeCoverage.GenerateReportWithoutStopping();
         }
+        private void OnApplicationQuit()
+        {
+            SaveMetricsToCSV();
+            CodeCoverage.StopRecording();
+        }
 
         public void ExperimentFinish()
         {
@@ -81,11 +86,7 @@ namespace VRExplorer
             Debug.Log(new RichText().Add("Experiment Finished", color: Color.yellow, bold: true));
             StateCount = 0;
             ExperimentFinishEvent?.Invoke();
-
-            SaveMetricsToCSV();
-
             StopAllCoroutines();
-            CodeCoverage.StopRecording();
             UnityEditor.EditorApplication.isPlaying = false;
         }
 
@@ -93,15 +94,23 @@ namespace VRExplorer
         {
             _timeStamp = Time.time;
             StartCoroutine("RecordCoroutine");
+            ShowMetrics();
         }
 
         private IEnumerator RecordCoroutine()
         {
-            yield return null;
-            ShowMetrics();
-            yield return new WaitForSeconds(reportCoverageDuration);
-            StartCoroutine(RecordCoroutine());
+            float lastTime = Time.time;
+            while(true)
+            {
+                if(Time.time - lastTime >= reportCoverageDuration)
+                {
+                    ShowMetrics();
+                    lastTime = Time.time; 
+                }
+                yield return null;
+            }
         }
+
 
         /// <summary>
         /// 保存指标数据到CSV文件
