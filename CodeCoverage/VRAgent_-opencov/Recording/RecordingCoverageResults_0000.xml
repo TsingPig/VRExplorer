@@ -22,9 +22,9 @@
               <Name>System.Void VRExplorerBox::OnGrabbed()</Name>
               <FileRef uid="1" />
               <SequencePoints>
-                <SequencePoint vc="0" uspid="1" ordinal="0" offset="0" sl="9" sc="0" el="9" ec="0" bec="0" bev="0" fileid="1" />
-                <SequencePoint vc="0" uspid="2" ordinal="0" offset="1" sl="10" sc="0" el="10" ec="0" bec="0" bev="0" fileid="1" />
-                <SequencePoint vc="0" uspid="3" ordinal="0" offset="12" sl="11" sc="0" el="11" ec="0" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="1" ordinal="0" offset="0" sl="9" sc="5" el="9" ec="5" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="2" ordinal="0" offset="1" sl="10" sc="9" el="10" ec="9" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="3" ordinal="0" offset="12" sl="11" sc="5" el="11" ec="5" bec="0" bev="0" fileid="1" />
               </SequencePoints>
               <BranchPoints />
             </Method>
@@ -36,36 +36,36 @@
           <Methods>
             <Method visited="false" cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="6" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
               <Summary numSequencePoints="3" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" maxCrapScore="6" minCrapScore="6" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
-              <MetadataToken>100663306</MetadataToken>
+              <MetadataToken>100663307</MetadataToken>
               <Name>System.Void VRExplorerButton::OnTriggerEnter(UnityEngine.Collider)</Name>
               <FileRef uid="2" />
               <SequencePoints>
-                <SequencePoint vc="0" uspid="4" ordinal="0" offset="0" sl="31" sc="0" el="31" ec="0" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="0" uspid="5" ordinal="0" offset="1" sl="32" sc="0" el="32" ec="0" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="0" uspid="6" ordinal="0" offset="19" sl="33" sc="0" el="33" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="4" ordinal="0" offset="0" sl="33" sc="0" el="33" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="5" ordinal="0" offset="1" sl="34" sc="0" el="34" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="6" ordinal="0" offset="19" sl="35" sc="0" el="35" ec="0" bec="0" bev="0" fileid="2" />
               </SequencePoints>
               <BranchPoints />
             </Method>
             <Method visited="false" cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="6" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
               <Summary numSequencePoints="3" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" maxCrapScore="6" minCrapScore="6" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
-              <MetadataToken>100663307</MetadataToken>
+              <MetadataToken>100663308</MetadataToken>
               <Name>System.Void VRExplorerButton::OnTriggerExit(UnityEngine.Collider)</Name>
               <FileRef uid="2" />
               <SequencePoints>
-                <SequencePoint vc="0" uspid="7" ordinal="0" offset="0" sl="36" sc="0" el="36" ec="0" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="0" uspid="8" ordinal="0" offset="1" sl="37" sc="0" el="37" ec="0" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="0" uspid="9" ordinal="0" offset="19" sl="38" sc="0" el="38" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="7" ordinal="0" offset="0" sl="38" sc="0" el="38" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="8" ordinal="0" offset="1" sl="39" sc="0" el="39" ec="0" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="9" ordinal="0" offset="19" sl="40" sc="0" el="40" ec="0" bec="0" bev="0" fileid="2" />
               </SequencePoints>
               <BranchPoints />
             </Method>
             <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="true" isStatic="false" isGetter="false" isSetter="false">
               <Summary numSequencePoints="2" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
-              <MetadataToken>100663308</MetadataToken>
+              <MetadataToken>100663309</MetadataToken>
               <Name>VRExplorerButton::VRExplorerButton()</Name>
               <FileRef uid="2" />
               <SequencePoints>
-                <SequencePoint vc="0" uspid="10" ordinal="0" offset="0" sl="26" sc="5" el="26" ec="5" bec="0" bev="0" fileid="2" />
-                <SequencePoint vc="0" uspid="11" ordinal="0" offset="11" sl="28" sc="5" el="28" ec="5" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="10" ordinal="0" offset="0" sl="28" sc="5" el="28" ec="5" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="11" ordinal="0" offset="11" sl="30" sc="5" el="30" ec="5" bec="0" bev="0" fileid="2" />
               </SequencePoints>
               <BranchPoints />
             </Method>
@@ -77,7 +77,7 @@
           <Methods>
             <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
               <Summary numSequencePoints="3" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
-              <MetadataToken>100663310</MetadataToken>
+              <MetadataToken>100663311</MetadataToken>
               <Name>System.Void VRExplorerJoystick::Start()</Name>
               <FileRef uid="3" />
               <SequencePoints>
@@ -89,7 +89,7 @@
             </Method>
             <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="true" isStatic="false" isGetter="false" isSetter="false">
               <Summary numSequencePoints="2" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
-              <MetadataToken>100663311</MetadataToken>
+              <MetadataToken>100663312</MetadataToken>
               <Name>VRExplorerJoystick::VRExplorerJoystick()</Name>
               <FileRef uid="3" />
               <SequencePoints>

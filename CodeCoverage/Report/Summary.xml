@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CoverageReport scope="Summary">
   <Summary>
-    <Generatedon>2025/2/17 - 14:23:44</Generatedon>
+    <Generatedon>2025/2/18 - 12:15:10</Generatedon>
     <Parser>MultiReportParser (3x OpenCoverParser)</Parser>
     <Assemblies>1</Assemblies>
     <Classes>3</Classes>
     <Files>3</Files>
-    <Coveredlines>6</Coveredlines>
-    <Uncoveredlines>10</Uncoveredlines>
+    <Coveredlines>11</Coveredlines>
+    <Uncoveredlines>5</Uncoveredlines>
     <Coverablelines>16</Coverablelines>
-    <Totallines>83</Totallines>
-    <Linecoverage>37.5</Linecoverage>
+    <Totallines>85</Totallines>
+    <Linecoverage>68.7</Linecoverage>
     <Coveredbranches>0</Coveredbranches>
     <Totalbranches>0</Totalbranches>
-    <Coveredmethods>2</Coveredmethods>
+    <Coveredmethods>4</Coveredmethods>
     <Totalmethods>6</Totalmethods>
-    <Methodcoverage>33.3</Methodcoverage>
+    <Methodcoverage>66.6</Methodcoverage>
   </Summary>
   <Coverage>
-    <Assembly name="Test" classes="3" coverage="37.5" coveredlines="6" coverablelines="16" totallines="83" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="2" totalmethods="6" methodcoverage="33.3">
+    <Assembly name="Test" classes="3" coverage="68.7" coveredlines="11" coverablelines="16" totallines="85" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="4" totalmethods="6" methodcoverage="66.6">
       <Class name="VRExplorerBox" coverage="100" coveredlines="3" coverablelines="3" totallines="26" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="1" totalmethods="1" methodcoverage="100" />
-      <Class name="VRExplorerButton" coverage="37.5" coveredlines="3" coverablelines="8" totallines="39" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="1" totalmethods="3" methodcoverage="33.3" />
+      <Class name="VRExplorerButton" coverage="100" coveredlines="8" coverablelines="8" totallines="41" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="3" totalmethods="3" methodcoverage="100" />
       <Class name="VRExplorerJoystick" coverage="0" coveredlines="0" coverablelines="5" totallines="18" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="0" totalmethods="2" methodcoverage="0" />
     </Assembly>
   </Coverage>

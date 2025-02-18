@@ -19,7 +19,31 @@ namespace VRExplorer
         /// </summary>
         public Dictionary<MonoBehaviour, List<IBaseEntity>> monoEntitiesMapping = new Dictionary<MonoBehaviour, List<IBaseEntity>>();
 
+        /// <summary>
+        /// 存储所有mono是否被探索过
+        /// </summary>
         public Dictionary<MonoBehaviour, bool> monoState = new Dictionary<MonoBehaviour, bool>();
+
+        /// <summary>
+        /// 更新mono状态，并判断是否需要结束测试
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool SetMono(MonoBehaviour mono, bool value)
+        {
+            if(mono != null)
+            {
+                monoState[mono] = value;
+                if(value && monoState.Values.All(value => value))
+                {
+                    ExperimentManager.Instance.RoundFinish(true);
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
 
         public void RegisterAllEntities()
         {
@@ -65,7 +89,7 @@ namespace VRExplorer
                         if(nestedType.IsEnum)
                         {
                             var enumValues = Enum.GetValues(nestedType);
-                            MetricManager.Instance.StateCount += enumValues.Length;
+                            ExperimentManager.Instance.StateCount += enumValues.Length;
                         }
                     }
                 }
@@ -117,7 +141,7 @@ namespace VRExplorer
         protected override void Awake()
         {
             base.Awake();
-            MetricManager.Instance.RoundFinishEvent += () =>
+            ExperimentManager.Instance.RoundFinishEvent += () =>
             {
                 entityStates.Clear();
                 RegisterAllEntities();

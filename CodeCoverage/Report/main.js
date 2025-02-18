@@ -224,13 +224,13 @@ var assemblies = [
   {
     "name": "Test",
     "classes": [
-      { "name": "VRExplorerBox", "rp": "Test_VRExplorerBox.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [0,100], "bch": [], "hc": [{ "et": "2025/2/17 - 14:23:28", "cl": 0, "ucl": 3, "cal": 3, "tl": 26, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:43", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:44", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }] },
-      { "name": "VRExplorerButton", "rp": "Test_VRExplorerButton.html", "cl": 3, "ucl": 5, "cal": 8, "tl": 39, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [0,37.5], "bch": [], "hc": [{ "et": "2025/2/17 - 14:23:28", "cl": 0, "ucl": 8, "cal": 8, "tl": 39, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:43", "cl": 3, "ucl": 5, "cal": 8, "tl": 39, "lcq": 37.5, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:44", "cl": 3, "ucl": 5, "cal": 8, "tl": 39, "lcq": 37.5, "cb": 0, "tb": 0, "bcq": 0 }] },
-      { "name": "VRExplorerJoystick", "rp": "Test_VRExplorerJoystick.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [0], "bch": [], "hc": [{ "et": "2025/2/17 - 14:23:28", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:43", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/17 - 14:23:44", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }] },
+      { "name": "VRExplorerBox", "rp": "Test_VRExplorerBox.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [100], "bch": [], "hc": [{ "et": "2025/2/18 - 12:15:08", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/18 - 12:15:09", "cl": 3, "ucl": 0, "cal": 3, "tl": 26, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }] },
+      { "name": "VRExplorerButton", "rp": "Test_VRExplorerButton.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 41, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [100], "bch": [], "hc": [{ "et": "2025/2/18 - 12:15:08", "cl": 8, "ucl": 0, "cal": 8, "tl": 41, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/18 - 12:15:09", "cl": 8, "ucl": 0, "cal": 8, "tl": 41, "lcq": 100, "cb": 0, "tb": 0, "bcq": 0 }] },
+      { "name": "VRExplorerJoystick", "rp": "Test_VRExplorerJoystick.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [0], "bch": [], "hc": [{ "et": "2025/2/18 - 12:15:08", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }, { "et": "2025/2/18 - 12:15:09", "cl": 0, "ucl": 5, "cal": 5, "tl": 18, "lcq": 0, "cb": 0, "tb": 0, "bcq": 0 }] },
     ]},
 ];
 
-var historicCoverageExecutionTimes = ["2025/2/17 - 14:23:43", "2025/2/17 - 14:23:28"];
+var historicCoverageExecutionTimes = ["2025/2/18 - 12:15:08"];
 
 var riskHotspotMetrics = [
 ];

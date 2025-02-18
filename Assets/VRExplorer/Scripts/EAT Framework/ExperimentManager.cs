@@ -7,12 +7,12 @@ using Debug = UnityEngine.Debug;
 using UnityEditor.TestTools.CodeCoverage;
 namespace VRExplorer
 {
-    public class MetricManager : Singleton<MetricManager>
+    public class ExperimentManager : Singleton<ExperimentManager>
     {
-        private int _curFinishCount = 0;
-        public float timeStamp;
-
+        public float reportCoverageDuration = 5f;
         public event Action RoundFinishEvent;
+        
+        private float _timeStamp;
 
         /// <summary>
         /// 获取总触发状态个数
@@ -45,6 +45,9 @@ namespace VRExplorer
             get { return EntityManager.Instance.monoState.Count; }
         }
 
+        /// <summary>
+        /// 获取总探索过的可交互物体个数
+        /// </summary>
         public int CoveredInteractableCount
         {
             get { return EntityManager.Instance.monoState.Count((monoPair) => { return monoPair.Value == true; }); }
@@ -53,7 +56,7 @@ namespace VRExplorer
         public void ShowMetrics()
         {
             Debug.Log(new RichText()
-                .Add("TimeCost: ").Add((Time.time - timeStamp).ToString(), bold: true, color: Color.yellow)
+                .Add("TimeCost: ").Add((Time.time - _timeStamp).ToString(), bold: true, color: Color.yellow)
                 .Add(", TriggeredStateCount: ", bold: true).Add(TriggeredStateCount.ToString(), bold: true, color: Color.yellow)
                 .Add(", StateCount: ", bold: true).Add(StateCount.ToString(), bold: true, color: Color.yellow)
                 .Add(", CoveredInteractableCount: ", bold: true).Add(CoveredInteractableCount.ToString(), bold: true, color: Color.yellow)
@@ -66,22 +69,22 @@ namespace VRExplorer
         public void RoundFinish(bool quitAfterFirstRound)
         {
             ShowMetrics();
-            _curFinishCount++;
-            Debug.Log(new RichText().Add("Round ").Add(_curFinishCount.ToString(), color: Color.yellow, bold: true).Add(" finished"));
+            Debug.Log(new RichText().Add("Round Finished", color: Color.yellow, bold: true));
             StateCount = 0;
             RoundFinishEvent?.Invoke();
 
             if(quitAfterFirstRound)
             {
                 StopAllCoroutines();
+                CodeCoverage.StopRecording();
                 UnityEditor.EditorApplication.isPlaying = false;
                 return;
             }
         }
 
-        public void StartRecord()
+        public void StartRecording()
         {
-            timeStamp = Time.time;
+            _timeStamp = Time.time;
             StartCoroutine("RecordCoroutine");
         }
 
@@ -89,7 +92,7 @@ namespace VRExplorer
         {
             yield return null;
             ShowMetrics();
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(reportCoverageDuration);
             StartCoroutine(RecordCoroutine());
         }
     }

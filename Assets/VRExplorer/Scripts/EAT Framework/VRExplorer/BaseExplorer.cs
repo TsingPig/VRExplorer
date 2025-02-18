@@ -27,6 +27,7 @@ namespace VRExplorer
         public bool randomInitPos = false;
         public bool drag = false;
         public bool quitAfterFirstRound = true;
+        public float reportCoverageDuration = 5f;
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
@@ -37,6 +38,7 @@ namespace VRExplorer
 
         protected void StartSceneExplore()
         {
+            ExperimentManager.Instance.StartRecording();
             _ = SceneExplore();
             StoreMonoPos();
         }
@@ -76,14 +78,11 @@ namespace VRExplorer
                 }
             }
 
-            EntityManager.Instance.monoState[_nextMono] = true;
-
-            if(EntityManager.Instance.monoState.Values.All(value => value))
+            if(!EntityManager.Instance.SetMono(_nextMono, true))
             {
-                MetricManager.Instance.RoundFinish(quitAfterFirstRound);
+                await SceneExplore();
             }
 
-            await SceneExplore();
         }
 
         /// <summary>
@@ -268,17 +267,18 @@ namespace VRExplorer
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
-            MetricManager.Instance.RoundFinishEvent += () =>
+            EntityManager.Instance.RegisterAllEntities();
+            ExperimentManager.Instance.RoundFinishEvent += () =>
             {
                 ResetMonoPos();
             };
+            ExperimentManager.Instance.reportCoverageDuration = reportCoverageDuration;
         }
 
         private void Start()
         {
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
-
             Invoke("StartSceneExplore", 2f);
         }
     }
