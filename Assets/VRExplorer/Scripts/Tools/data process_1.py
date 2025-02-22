@@ -30,6 +30,7 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
             # 判断文件是否存在
             if os.path.exists(interactable_csv_filepath):
                 interactable_data = []
+                time_cost = []
                 with open(interactable_csv_filepath, mode = 'r', newline = '') as interactable_csvfile:
                     interactable_csv_reader = csv.reader(interactable_csvfile)
                     next(interactable_csv_reader)  # 跳过表头
@@ -37,6 +38,7 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
                     # 提取 'InteractableCoverage' 列的数据
                     for row in interactable_csv_reader:
                         interactable_data.append(row[5])
+                        time_cost.append(row[0])
 
 
             # 打开CSV文件并写入表头

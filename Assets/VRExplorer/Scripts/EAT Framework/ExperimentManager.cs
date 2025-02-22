@@ -117,7 +117,7 @@ namespace VRExplorer
         /// </summary>
         private void SaveMetricsToCSV()
         {
-            string filePath = "Temp/InteractableAndStateCoverageReport.csv";
+            string filePath = "_Experiment/InteractableAndStateCoverageReport.csv";
 
             if(!File.Exists(filePath))
             {
