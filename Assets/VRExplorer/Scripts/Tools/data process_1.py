@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 # 设置路径，输入数据文件夹路径
-input_folder = r"D:\--UnityProject\VR\subjects\unity-vr-maze-master\Experiment"
+input_folder = r"D:\--UnityProject\VR\subjects\UnityCityView\_Experiment"
 
 # 汇总文件路径
 summary_csv_filename = "coverage_summary.csv"
@@ -12,7 +12,7 @@ summary_csv_filepath = os.path.join(input_folder, summary_csv_filename)
 # 打开总汇总CSV文件并写入表头
 with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
     summary_csv_writer = csv.writer(summary_csvfile)
-    summary_csv_writer.writerow(['Folder Name', 'Report Date', 'Code Line Coverage (%)', 'Method Coverage (%)'])
+    summary_csv_writer.writerow(['Folder Name', 'ELOC Coverage (%)', 'Method Coverage (%)'])
 
     # 遍历每个CodeCoverage_xxx文件夹
     for folder_name in os.listdir(input_folder):
@@ -44,7 +44,7 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
             # 打开CSV文件并写入表头
             with open(csv_filepath, mode = 'w', newline = '') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                csv_writer.writerow(['Time', 'Code Line Coverage', 'InteractableCoverage'])
+                csv_writer.writerow(['Time', 'ELOC Coverage', 'InteractableCoverage'])
 
                 # 遍历Report-history文件夹中的所有XML文件
                 report_history_path = os.path.join(folder_path, 'Report-history')
@@ -58,7 +58,6 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
                         root = tree.getroot()
 
                         # 获取report的日期
-                        report_date = root.attrib['date']
 
                         # 计算整个程序集的覆盖率
                         total_covered_lines = 0
@@ -74,13 +73,13 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
 
                         # 计算覆盖率
                         if total_coverable_lines > 0:
-                            coverage = (total_covered_lines / total_coverable_lines) * 100
+                            ELOC_coverage = (total_covered_lines / total_coverable_lines) * 100
                         else:
-                            coverage = 0.0
+                            ELOC_coverage = 0.0
 
                         # 写入数据并附加 'InteractableCoverage'
                         interactable_coverage = interactable_data[i] if i < len(interactable_data) else 'N/A'  # 确保不会越界
-                        csv_writer.writerow([i * 5, f"{coverage:.2f}", interactable_coverage])
+                        csv_writer.writerow([i * 5, f"{ELOC_coverage:.2f}", interactable_coverage])
                         i += 1
 
                 # 处理Summary.xml文件
@@ -90,11 +89,11 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
                     root = tree.getroot()
 
                     # 获取Summary中的coverage和methodcoverage
-                    coverage = root.find('.//Assembly').attrib['coverage']
-                    methodcoverage = root.find('.//Assembly').attrib['methodcoverage']
+                    ELOC_coverage = float(root.find('.//Assembly').attrib['coveredlines']) / float(root.find('.//Assembly').attrib['coverablelines'])* 100
+                    method_coverage = float(root.find('.//Assembly').attrib['coveredmethods']) / float(root.find('.//Assembly').attrib['totalmethods']) * 100
 
-                    # 写入总汇总CSV文件
-                    summary_csv_writer.writerow([folder_name, 'N/A', coverage, methodcoverage])
+                    # 写入总汇总CSV文件分类
+                    summary_csv_writer.writerow([folder_name, round(ELOC_coverage, 2), round(method_coverage, 2)])
 
 print("Data conversion and summary completed.")
 

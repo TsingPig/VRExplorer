@@ -60,7 +60,7 @@ def f1():
             model_data = subset[subset['Model'] == model]
 
             # Plot Code Line Coverage
-            line_coverage_plot, = plt.plot(model_data['Time'], model_data['Code Line Coverage'],
+            plt.plot(model_data['Time'], model_data['Code Line Coverage'],
                                            color = color, linestyle = '-', linewidth = 3, marker = 'o', markersize = 8, label = f'{model} Line Coverage')
 
             # Add data label for the initial point of Code Line Coverage
@@ -69,13 +69,13 @@ def f1():
                      verticalalignment = 'bottom', horizontalalignment = 'right')
 
             # Plot Interactable Coverage
-            interactable_coverage_plot, = plt.plot(model_data['Time'], model_data['InteractableCoverage'],
+            plt.plot(model_data['Time'], model_data['InteractableCoverage'],
                                                    color = color, linestyle = '--', linewidth = 3, marker = 'x', markersize = 8, label = f'{model} Interactable Coverage')
             x_offset = 2
             # Add data label for the final (convergent) point of Interactable Coverage
             plt.text(model_data['Time'].iloc[-1] + x_offset, model_data['InteractableCoverage'].iloc[-1],
                      f"{model_data['InteractableCoverage'].iloc[-1]:.2f}%", color = color, fontsize = 14,
-                     verticalalignment = 'center', horizontalalignment = 'left')
+                         verticalalignment = 'center', horizontalalignment = 'left')
 
             # Add data label for the final (convergent) point of Code Line Coverage
             plt.text(model_data['Time'].iloc[-1] + x_offset, model_data['Code Line Coverage'].iloc[-1],
@@ -97,6 +97,5 @@ def f1():
         plt.legend(loc = 'upper left', fontsize = 10)
 
     plt.tight_layout()
-    plt.savefig('Group1_Model_Comparisons.png', dpi = 300, bbox_inches = 'tight')
     plt.show()
 f1()
