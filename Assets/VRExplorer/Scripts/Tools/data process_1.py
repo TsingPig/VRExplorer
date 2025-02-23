@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 # 设置路径，输入数据文件夹路径
-input_folder = r"D:\--UnityProject\VR\subjects\UnityCityView\_Experiment"
+input_folder = r"D:\--UnityProject\VR\subjects\UnityVR\_Experiment"
 
 # 汇总文件路径
 summary_csv_filename = "coverage_summary.csv"
@@ -79,7 +79,7 @@ with open(summary_csv_filepath, mode = 'w', newline = '') as summary_csvfile:
 
                         # 写入数据并附加 'InteractableCoverage'
                         interactable_coverage = interactable_data[i] if i < len(interactable_data) else 'N/A'  # 确保不会越界
-                        csv_writer.writerow([i * 5, f"{ELOC_coverage:.2f}", interactable_coverage])
+                        csv_writer.writerow([round(float(time_cost[i]), 1) if i < len(interactable_data) else 'N/A', f"{ELOC_coverage:.2f}", interactable_coverage])
                         i += 1
 
                 # 处理Summary.xml文件

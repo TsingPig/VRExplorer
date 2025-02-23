@@ -12,7 +12,7 @@ namespace VRExplorer
 {
     public class ExperimentManager : Singleton<ExperimentManager>
     {
-        public float reportCoverageDuration = 5f;
+        public float reportCoverageDuration = 1f;
 
         public event Action ExperimentFinishEvent;
 
@@ -74,6 +74,7 @@ namespace VRExplorer
             _csvDataBuilder.AppendLine($"{Time.time - _timeStamp},{TriggeredStateCount},{StateCount},{CoveredInteractableCount},{InteractableCount},{CoveredInteractableCount * 100f / InteractableCount:F2},{TriggeredStateCount * 100f / StateCount:F2}");
             CodeCoverage.GenerateReportWithoutStopping();
         }
+
         private void OnApplicationQuit()
         {
             SaveMetricsToCSV();
@@ -105,12 +106,11 @@ namespace VRExplorer
                 if(Time.time - lastTime >= reportCoverageDuration)
                 {
                     ShowMetrics();
-                    lastTime = Time.time; 
+                    lastTime = Time.time;
                 }
                 yield return null;
             }
         }
-
 
         /// <summary>
         /// 保存指标数据到CSV文件

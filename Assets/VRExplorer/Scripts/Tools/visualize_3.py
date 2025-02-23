@@ -16,7 +16,7 @@ def parse_folder_name(folder_name):
 
 # Read all CSV files
 all_data = []
-for folder in glob.glob(r"D:\--UnityProject\VR\subjects\UnityCityView\_Experiment\CodeCoverage_*"):
+for folder in glob.glob(r"D:\--UnityProject\VR\subjects\UnityVR\_Experiment\CodeCoverage_*"):
     if os.path.isdir(folder):
         model = parse_folder_name(os.path.basename(folder))
         csv_file = os.path.join(folder, f"{os.path.basename(folder)}_coverage.csv")
@@ -39,7 +39,7 @@ model_combinations = df['Model'].drop_duplicates().values
 # 3. Group 2: Model Performance ----------------------
 
 def f1():
-    plt.figure(figsize = (16, 8))
+    plt.figure(figsize = (12, 4))
 
     # Loop through both models (just two models now)
     for model, color in zip(model_combinations, ['#2c91ed', '#f0a73a']):
@@ -57,7 +57,7 @@ def f1():
         # Add data labels for initial and final points
         plt.text(subset['Time'].iloc[0], subset['ELOC Coverage'].iloc[0],
                  f"{subset['ELOC Coverage'].iloc[0]:.2f}%", fontsize = 14, verticalalignment = 'bottom', horizontalalignment = 'right')
-        x_offset = 0.5
+        x_offset = 0.05
 
         plt.text(subset['Time'].iloc[-1] + x_offset, subset['ELOC Coverage'].iloc[-1],
                  f"{subset['ELOC Coverage'].iloc[-1]:.2f}%", fontsize = 14, color = color,verticalalignment = 'center', horizontalalignment = 'left')

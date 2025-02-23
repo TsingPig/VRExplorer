@@ -268,7 +268,6 @@ namespace VRExplorer
             {
                 ResetMonoPos();
             };
-            ExperimentManager.Instance.reportCoverageDuration = reportCoverageDuration;
         }
 
         private void Start()

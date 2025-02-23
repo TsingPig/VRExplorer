@@ -1,90 +1,88 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import glob
-import os
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
+from PIL import Image, ImageTk
 import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
 
-# 1. Data Preparation -------------------------------------------------
-def parse_folder_name(folder_name):
-    """Extract model and parameter information from folder name"""
-    parts = folder_name.split('_')
-    model = parts[1]  # VRExplorer or VRGuide
-    move = int(parts[2].replace('move', ''))
-    turn = int(parts[3].replace('turn', ''))
-    return model, move, turn
+# 打开图片文件
+def open_image():
+    filepath = filedialog.askopenfilename(title = "选择图片", filetypes = [("Image files", "*.jpg;*.png;*.jpeg")])
+    if filepath:
+        img = Image.open(filepath)
+
+        # 高度固定为400，宽度按比例缩放
+        base_height = 400
+        aspect_ratio = img.width / img.height
+        new_width = int(base_height * aspect_ratio)
+        img = img.resize((new_width, base_height))
+
+        img_tk = ImageTk.PhotoImage(img)
+        label_image.config(image = img_tk)
+        label_image.image = img_tk
+
+        # 提取主题色
+        extract_colors(img)
 
 
-# Read all CSV files
-all_data = []
-for folder in glob.glob("D:/--UnityProject/VR/subjects/unity-vr-maze-master/Experiment/CodeCoverage_*"):
-    if os.path.isdir(folder):
-        model, move, turn = parse_folder_name(os.path.basename(folder))
-        csv_file = os.path.join(folder, f"{os.path.basename(folder)}_coverage.csv")
+# 提取图片的主要色
+def extract_colors(img):
+    global palette_frame  # 在使用之前声明 palette_frame 为全局变量
+    img = img.convert("RGB")
+    img_array = np.array(img)
+    img_array = img_array.reshape((img_array.shape[0] * img_array.shape[1], 3))
 
-        if os.path.exists(csv_file):
-            df = pd.read_csv(csv_file)
-            df['Model'] = model
-            df['MoveSpeed'] = move
-            df['TurnSpeed'] = turn
-            all_data.append(df)
+    # 使用KMeans聚类算法
+    kmeans = KMeans(n_clusters = 6)
+    kmeans.fit(img_array)
+    colors = kmeans.cluster_centers_.astype(int)
 
-df = pd.concat(all_data)
-# Remove rows with NaN or inf values from the dataframe
-df = df.replace([np.inf, -np.inf], np.nan).dropna()
-
-# 2. Group 1: Model Comparisons Across Different Parameters ----------------------------
-param_combinations = df[['MoveSpeed', 'TurnSpeed']].drop_duplicates().values
+    # 更新颜色调色板和显示的RGB, Hex值
+    update_palette(colors)
 
 
+def update_palette(colors):
+    global palette_frame
+    palette_frame.pack_forget()  # 清空旧的调色板
 
-# 3. Group 2: Model Performance Across Parameters ----------------------
+    palette_frame = tk.Frame(window)
+    palette_frame.pack(pady = 10)
 
-def f2():
-    plt.figure(figsize=(18, 10))
+    for color in colors:
+        hex_code = rgb_to_hex(color)
+        rgb_code = f"RGB: {tuple(color)}"
 
-    # VRExplorer plot
-    plt.subplot(2, 1, 1)
-    for (move, turn), color in zip(param_combinations, ['#1f77b4', '#2ca02c', '#d62728']):
-        subset = df[(df['Model'] == 'VRExplorer') & (df['MoveSpeed'] == move) & (df['TurnSpeed'] == turn)]
+        # 创建颜色块和相应的RGB值显示
+        frame = tk.Frame(palette_frame)
+        frame.pack(pady = 2, fill = "x", padx = 10)
 
-        # Plot Code Line Coverage with transparency
-        plt.plot(subset['Time'], subset['Code Line Coverage'],
-                 color=color, linestyle='-', marker='o', markersize=6, label=f'Move {move} m/s, Turn {turn} deg/s Line', alpha=0.6)
+        color_label = tk.Label(frame, bg = hex_code, width = 10, height = 2)
+        color_label.pack(side = "left")
 
-        # Plot Interactable Coverage with transparency
-        plt.plot(subset['Time'], subset['InteractableCoverage'],
-                 color=color, linestyle='--', marker='x', markersize=6, label=f'Move {move} m/s, Turn {turn} deg/s Interactable', alpha=0.6)
-
-    plt.title('VRExplorer Performance: Parameter Comparisons', fontsize=16)
-    plt.xlabel('Time (s)', fontsize=12)
-    plt.ylabel('Coverage (%)', fontsize=12)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(loc='upper left', fontsize=12)
-
-    # VRGuide plot
-    plt.subplot(2, 1, 2)
-    for (move, turn), color in zip(param_combinations, ['#1f77b4', '#2ca02c', '#d62728']):
-        subset = df[(df['Model'] == 'VRGuide') & (df['MoveSpeed'] == move) & (df['TurnSpeed'] == turn)]
-
-        # Plot Code Line Coverage with transparency
-        plt.plot(subset['Time'], subset['Code Line Coverage'],
-                 color=color, linestyle='--',linewidth = 5, markersize=6, label=f'Move {move} m/s, Turn {turn} deg/s Line', alpha=0.6)
-
-        # Plot Interactable Coverage with transparency
-        plt.plot(subset['Time'], subset['InteractableCoverage'],
-                 color=color, linestyle='--',linewidth = 5, markersize=6, label=f'Move {move} m/s, Turn {turn} deg/s Interactable', alpha=0.6)
-
-    plt.title('VRGuide Performance: Parameter Comparisons', fontsize=16)
-    plt.xlabel('Time (s)', fontsize=12)
-    plt.ylabel('Coverage (%)', fontsize=12)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(loc='upper left', fontsize=10)
-
-    plt.tight_layout()
-    plt.savefig('Group2_Parameter_Comparisons.png', dpi=300, bbox_inches='tight')
-    plt.show()
-
-f2()
+        hex_label = tk.Label(frame, text = f"{hex_code}  {rgb_code}", width = 40, anchor = "w")
+        hex_label.pack(side = "left")
 
 
+def rgb_to_hex(rgb):
+    return '#{:02x}{:02x}{:02x}'.format(rgb[0], rgb[1], rgb[2])
+
+
+# 创建GUI窗口
+window = tk.Tk()
+window.title("颜色提取器")
+
+# 显示图片的Label
+label_image = tk.Label(window)
+label_image.pack(pady = 20)
+
+# 打开图片按钮
+btn_open = tk.Button(window, text = "打开图片", command = open_image)
+btn_open.pack()
+
+# 颜色调色板Frame
+palette_frame = tk.Frame(window)  # 初始化 palette_frame
+palette_frame.pack(pady = 10)
+
+window.mainloop()

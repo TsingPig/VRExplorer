@@ -5,7 +5,6 @@ using System.Reflection;
 using TsingPigSDK;
 using UnityEngine;
 
-
 namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
@@ -134,7 +133,5 @@ namespace VRExplorer
             Debug.LogError($"{mono} GetEntity result is null");
             return null;
         }
-
-
     }
 }
