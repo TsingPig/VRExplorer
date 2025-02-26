@@ -8469,13 +8469,13 @@ Transform:
   m_GameObject: {fileID: 1664743391450593945}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4707598737328222908}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 40, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3612763546231456681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13685,6 +13685,37 @@ CapsuleCollider:
   m_Height: 0.07
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2676268291322501817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 117055574950374298}
+  m_Layer: 0
+  m_Name: LeftController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &117055574950374298
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2676268291322501817}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4707598737328222908}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2678166184841574468
 GameObject:
   m_ObjectHideFlags: 0
@@ -23785,7 +23816,7 @@ Transform:
   m_GameObject: {fileID: 4707598737328222909}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.2, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5127, y: 1.5127, z: 1.5127}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8952270950511436044}
@@ -23795,6 +23826,7 @@ Transform:
   - {fileID: 954310462375901112}
   - {fileID: 373739927974071071}
   - {fileID: 2110672425437877455}
+  - {fileID: 117055574950374298}
   m_Father: {fileID: 1662211248147916643}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -27435,7 +27467,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!1 &5587736421394118211
 GameObject:
   m_ObjectHideFlags: 0
@@ -28933,11 +28965,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HandSide: 0
-  DefaultHoldType: 0
+  DefaultHoldType: 1
   DefaultGrabButton: 0
   GripAmount: 0.9
   ReleaseGripAmount: 0.5
-  GrabCheckSeconds: 0.5
+  GrabCheckSeconds: 0
   EquipGrabbableOnStart: {fileID: 0}
   HandsGraphics: {fileID: 8952270950511436044}
   HeldGrabbable: {fileID: 0}
