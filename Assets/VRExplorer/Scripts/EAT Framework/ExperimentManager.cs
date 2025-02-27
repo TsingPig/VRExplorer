@@ -88,7 +88,7 @@ namespace VRExplorer
             StateCount = 0;
             ExperimentFinishEvent?.Invoke();
             StopAllCoroutines();
-            UnityEditor.EditorApplication.isPlaying = false;
+            //UnityEditor.EditorApplication.isPlaying = false;
         }
 
         public void StartRecording()
