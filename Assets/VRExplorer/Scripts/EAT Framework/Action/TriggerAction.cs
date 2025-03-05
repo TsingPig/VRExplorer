@@ -16,28 +16,28 @@ namespace VRExplorer
     /// </summary>
     public class TriggerAction : BaseAction
     {
-        private float _triggerringTime = 0f;
-        private ITriggerableEntity _triggerableEntity;
+        protected float _triggerringTime = 0f;
+        protected ITriggerableEntity _transformableEntity;
 
         public TriggerAction(float triggerringTime, ITriggerableEntity triggerableEntity)
         {
             Name = "TriggerAction";
             _triggerringTime = triggerringTime;
-            _triggerableEntity = triggerableEntity;
+            _transformableEntity = triggerableEntity;
         }
 
         public override async Task Execute()
         {
             await base.Execute();
 
-            EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerring);
-            _triggerableEntity.Triggerring();
+            EntityManager.Instance.TriggerState(_transformableEntity, ITriggerableEntity.TriggerableState.Triggerring);
+            _transformableEntity.Triggerring();
 
             float time = Time.time;
             while(Time.time - time <= _triggerringTime) await Task.Yield();
 
-            EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
-            _triggerableEntity.Triggerred();
+            EntityManager.Instance.TriggerState(_transformableEntity, ITriggerableEntity.TriggerableState.Triggerred);
+            _transformableEntity.Triggerred();
         }
     }
 }

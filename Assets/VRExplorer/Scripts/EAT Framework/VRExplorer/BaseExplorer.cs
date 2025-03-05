@@ -46,8 +46,9 @@ namespace VRExplorer
             List<BaseAction> task = new List<BaseAction>();
             switch(EntityManager.Instance.monoEntitiesMapping[mono][0].Name)
             {
+                case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
+                case Str.Triggerable: task = TriggerTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
                 case Str.Box: task = GrabAndDragBoxTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
-                case Str.Button: task = PressButtonTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
                 case Str.Gun:
                 task = GrabAndShootGunTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono),
                     EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
@@ -221,11 +222,11 @@ namespace VRExplorer
         }
 
         /// <summary>
-        /// 按按钮任务
+        /// 触发任务
         /// </summary>
         /// <param name="triggerableEntity"></param>
         /// <returns></returns>
-        private List<BaseAction> PressButtonTask(ITriggerableEntity triggerableEntity)
+        private List<BaseAction> TriggerTask(ITriggerableEntity triggerableEntity)
         {
             List<BaseAction> task = new List<BaseAction>()
             {
@@ -236,11 +237,36 @@ namespace VRExplorer
         }
 
         /// <summary>
-        /// 射击任务
+        /// 变换任务
+        /// TransformTask
+        /// Definition: Creates a list of actions to perform a smooth transform on a target entity.
         /// </summary>
-        /// <param name="grabbableEntity"></param>
-        /// <param name="triggerableEntity"></param>
-        /// <returns></returns>
+        /// <param name="transformableEntity">可变换的实体</param>
+        /// <param name="targetPosition">目标位置</param>
+        /// <param name="targetRotation">目标旋转</param>
+        /// <param name="targetScale">目标缩放</param>
+        /// <param name="duration">持续时间</param>
+        /// <returns>变换任务列表</returns>
+        private List<BaseAction> TransformTask(ITransformableEntity transformableEntity)
+        {
+            List<BaseAction> task = new List<BaseAction>()
+            {
+                new MoveAction(_navMeshAgent, moveSpeed, transformableEntity.transform.position),
+                new TransformAction(transformableEntity, 
+                    transformableEntity.TriggeringTime, 
+                    transformableEntity.DeltaPosition, 
+                    transformableEntity.DeltaRotation, 
+                    transformableEntity.DeltaScale)
+            };
+            return task;
+        }
+
+        /// <summary>
+        /// Task to approach the gun and fire
+        /// </summary>
+        /// <param name="grabbableEntity">Grabbable Entity  of the gun Mono</param>
+        /// <param name="triggerableEntity">Triggerable Entity  of the gun Mono</param>
+        /// <returns>Task in the form List<Action> </returns>
         private List<BaseAction> GrabAndShootGunTask(IGrabbableEntity grabbableEntity, ITriggerableEntity triggerableEntity)
         {
             List<BaseAction> task = new List<BaseAction>()

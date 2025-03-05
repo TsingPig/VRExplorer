@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace VRExplorer
@@ -16,5 +17,17 @@ namespace VRExplorer
         string Name { get; }
 
         Transform transform { get; }
+    }
+
+    public interface IRotatableEntity
+    {
+        void SetRotationAngle(float angle);
+        void RotateByDelta(float delta);
+        float CurrentAngle { get; }
+        float MinimumAngle { get; }
+        float MaximumAngle { get; }
+
+        [ExcludeFromCodeCoverage]
+        void NotifyValueChange(float value);
     }
 }

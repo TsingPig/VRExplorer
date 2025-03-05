@@ -12,7 +12,7 @@ namespace VRExplorer
 {
     public class ExperimentManager : Singleton<ExperimentManager>
     {
-        public float reportCoverageDuration = 1f;
+        public float reportCoverageDuration = 15f;
 
         public event Action ExperimentFinishEvent;
 
@@ -78,7 +78,7 @@ namespace VRExplorer
         private void OnApplicationQuit()
         {
             SaveMetricsToCSV();
-            CodeCoverage.StopRecording();
+            //CodeCoverage.StopRecording();
         }
 
         public void ExperimentFinish()
