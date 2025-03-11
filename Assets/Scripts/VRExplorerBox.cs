@@ -12,7 +12,7 @@ public class VRExplorerBox : MonoBehaviour, IGrabbableEntity
 
     #region Entity Region
 
-    [ExcludeFromCodeCoverage] public string Name => Str.Box;
+    [ExcludeFromCodeCoverage] public string Name => Str.Grabbable;
 
     [ExcludeFromCodeCoverage] public Grabbable Grabbable => GetComponent<Grabbable>();
 

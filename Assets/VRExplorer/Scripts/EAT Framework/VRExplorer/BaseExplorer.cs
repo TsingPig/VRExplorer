@@ -48,7 +48,7 @@ namespace VRExplorer
             {
                 case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
                 case Str.Triggerable: task = TriggerTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
-                case Str.Box: task = GrabAndDragBoxTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
+                case Str.Grabbable: task = GrabAndDragBoxTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
                 case Str.Gun:
                 task = GrabAndShootGunTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono),
                     EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
