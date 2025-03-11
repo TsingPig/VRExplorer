@@ -9,6 +9,12 @@ namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
     {
+
+        /// <summary>
+        /// VRExplorer的Mono指针
+        /// </summary>
+        public MonoBehaviour vrexplorerMono;
+
         /// <summary>
         /// 存储每个Entity的触发状态
         /// </summary>

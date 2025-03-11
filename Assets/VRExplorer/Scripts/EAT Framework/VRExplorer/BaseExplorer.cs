@@ -67,14 +67,14 @@ namespace VRExplorer
 
             foreach(var action in _curTask)
             {
-                try
-                {
+                //try
+                //{
                     await action.Execute();
-                }
-                catch(System.Exception ex)
-                {
-                    Debug.LogError($"Error during action {action.Name}: {ex.Message}");
-                }
+                //}
+                //catch(System.Exception ex)
+                //{
+                   // Debug.LogError($"Error during action {action.Name}: {ex.Message}");
+                //}
             }
 
             if(!EntityManager.Instance.UpdateMonoState(_nextMono, true))
@@ -290,6 +290,7 @@ namespace VRExplorer
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             EntityManager.Instance.RegisterAllEntities();
+            EntityManager.Instance.vrexplorerMono = this;
             ExperimentManager.Instance.ExperimentFinishEvent += () =>
             {
                 ResetMonoPos();

@@ -24,8 +24,17 @@ namespace VRExplorer
         {
             await base.Execute();
 
-            EntityManager.Instance.TriggerState(_transformableEntity, ITriggerableEntity.TriggerableState.Triggerring);
-            _transformableEntity.Triggerring();
+            EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerring);
+
+            try
+            {
+                _triggerableEntity.Triggerring();
+            }
+            catch(System.Exception ex)
+            {
+                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
+            }
+
 
             Vector3 startPosition = _targetTransform.localPosition;
             Quaternion startRotation = _targetTransform.localRotation;
@@ -50,8 +59,17 @@ namespace VRExplorer
             _targetTransform.localRotation = targetRotation;
             _targetTransform.localScale = targetScale;
 
-            EntityManager.Instance.TriggerState(_transformableEntity, ITriggerableEntity.TriggerableState.Triggerred);
-            _transformableEntity.Triggerred();
+            EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
+
+            try
+            {
+                _triggerableEntity.Triggerred();
+            }
+            catch(System.Exception ex)
+            {
+                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
+            }
+
         }
 
 

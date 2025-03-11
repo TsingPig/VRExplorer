@@ -27,7 +27,8 @@ namespace VRExplorer
 
             _agent.SetDestination(_destination);
             _agent.speed = _speed;
-            while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh && (_agent.pathPending || _agent.remainingDistance > 0.5f))
+            while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh &&
+                   (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
             {
                 await Task.Yield();
             }
