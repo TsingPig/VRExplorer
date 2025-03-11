@@ -25,15 +25,7 @@ namespace VRExplorer
             await base.Execute();
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerring);
-
-            try
-            {
-                _triggerableEntity.Triggerring();
-            }
-            catch(System.Exception ex)
-            {
-                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
-            }
+            _triggerableEntity.Triggerring();
 
 
             Vector3 startPosition = _targetTransform.localPosition;
@@ -60,15 +52,8 @@ namespace VRExplorer
             _targetTransform.localScale = targetScale;
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
+            _triggerableEntity.Triggerred();
 
-            try
-            {
-                _triggerableEntity.Triggerred();
-            }
-            catch(System.Exception ex)
-            {
-                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
-            }
 
         }
 

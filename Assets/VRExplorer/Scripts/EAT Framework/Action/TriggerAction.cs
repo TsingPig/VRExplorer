@@ -31,28 +31,14 @@ namespace VRExplorer
             await base.Execute();
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerring);
-
-            try
-            {
-                _triggerableEntity.Triggerring();
-            }
-            catch(System.Exception ex)
-            {
-                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
-            }
+            _triggerableEntity.Triggerring();
 
             float time = Time.time;
             while(Time.time - time <= _triggerringTime) await Task.Yield();
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
-            try
-            {
-                _triggerableEntity.Triggerring();
-            }
-            catch(System.Exception ex)
-            {
-                Debug.LogWarning($"Error during action {Name}: {ex.Message}");
-            }
+            _triggerableEntity.Triggerred();
+
         }
     }
 }

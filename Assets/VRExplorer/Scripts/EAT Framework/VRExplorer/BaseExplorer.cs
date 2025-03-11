@@ -65,17 +65,7 @@ namespace VRExplorer
                 .Add("Mono of Task: ", bold: true)
                 .Add(_nextMono.name, bold: true, color: Color.yellow));
 
-            foreach(var action in _curTask)
-            {
-                //try
-                //{
-                    await action.Execute();
-                //}
-                //catch(System.Exception ex)
-                //{
-                   // Debug.LogError($"Error during action {action.Name}: {ex.Message}");
-                //}
-            }
+            foreach(var action in _curTask) await action.Execute();
 
             if(!EntityManager.Instance.UpdateMonoState(_nextMono, true))
             {
@@ -252,10 +242,10 @@ namespace VRExplorer
             List<BaseAction> task = new List<BaseAction>()
             {
                 new MoveAction(_navMeshAgent, moveSpeed, transformableEntity.transform.position),
-                new TransformAction(transformableEntity, 
-                    transformableEntity.TriggeringTime, 
-                    transformableEntity.DeltaPosition, 
-                    transformableEntity.DeltaRotation, 
+                new TransformAction(transformableEntity,
+                    transformableEntity.TriggeringTime,
+                    transformableEntity.DeltaPosition,
+                    transformableEntity.DeltaRotation,
                     transformableEntity.DeltaScale)
             };
             return task;
