@@ -268,6 +268,11 @@ namespace VRExplorer
                     {
                         new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position)),
                         new TriggerAction(2.5f, triggerableEntity)
+                    }),
+                    new ParallelAction(new List<BaseAction>()
+                    {
+                        new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position)),
+                        new TriggerAction(2.5f, triggerableEntity)
                     })
                 })
             };
