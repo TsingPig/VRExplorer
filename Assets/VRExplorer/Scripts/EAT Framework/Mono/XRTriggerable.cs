@@ -12,7 +12,7 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         interactable = GetComponent<XRBaseInteractable>();
     }
 
-    public float TriggeringTime => 0.5f;
+    public float TriggeringTime => 1.5f;
 
     public string Name => Str.Triggerable;
 
@@ -30,8 +30,12 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         }
         var e = new SelectExitEventArgs() { interactorObject = interactor };
         var h = new HoverExitEventArgs() { interactorObject = interactor };
+        var a = new DeactivateEventArgs() { interactorObject = interactor };
         interactable.selectExited.Invoke(e);
         interactable.hoverExited.Invoke(h);
+        interactable.lastSelectExited.Invoke(e);
+        interactable.lastHoverExited.Invoke(h);
+        interactable.deactivated.Invoke(a);
     }
 
     public void Triggerring()
@@ -48,7 +52,11 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         }
         var e = new SelectEnterEventArgs() { interactorObject = interactor };
         var h = new HoverEnterEventArgs() { interactorObject = interactor };
+        var a = new ActivateEventArgs() { interactorObject = interactor };
         interactable.selectEntered.Invoke(e);
         interactable.hoverEntered.Invoke(h);
+        interactable.firstSelectEntered.Invoke(e);
+        interactable.firstHoverEntered.Invoke(h);
+        interactable.activated.Invoke(a);
     }
 }
