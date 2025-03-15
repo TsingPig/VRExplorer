@@ -56,8 +56,11 @@ namespace VRExplorer
         /// </summary>
         public void RegisterAllEntities()
         {
-            var entityTypes = Assembly.Load("Test")
-                .GetTypes()
+            //var entityTypes = Assembly.Load("Test")
+            //    .GetTypes()
+            //    .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+            var entityTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
                 .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
             foreach(var entityType in entityTypes)
