@@ -1,57 +1,59 @@
-name: Sync VRExplorer to VRExplorer_Release Repo
-
+name: Sync Folder
 on:
   push:
     paths:
-      - 'Assets/VRExplorer/**'
-    branches:
-      - main
-
+      - 'Assets/VRExplorer/**' # 监听子内容的变化
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # 允许推送更改
-
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 获取完整历史记录
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Setup Git
+      - name: Configure Git
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
 
-      - name: Authenticate with Personal Access Token
+      - name: Check if new repository exists
+        id: check_repo
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/TsingPig/VRExplorer.git
+          NEW_REPO="VRExplorer_Release"
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            https://api.github.com/repos/${{ github.repository_owner }}/$NEW_REPO)
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Fetch All Branches
+      - name: Create new repository if not exists
+        if: steps.check_repo.outputs.exists == 'false'
         run: |
-          git fetch --all
+          NEW_REPO="VRExplorer_Release"
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            https://api.github.com/user/repos \
+            -d '{"name":"'$NEW_REPO'", "private":false}'
 
-      - name: Prepare VRExplorer_Release Repository
+      - name: Sync folder contents to new repository
         run: |
-          # 如果 VRExplorer_Release 仓库不存在，创建它
-          REPO_URL="https://github.com/TsingPig/VRExplorer_Release.git"
-          git ls-remote --exit-code --heads $REPO_URL || git clone $REPO_URL VRExplorer_Release
-          cd VRExplorer_Release
-          git checkout main || git checkout -b main  # 如果仓库中没有 main 分支则创建它
+          # 设置变量
+          FOLDER_PATH="Assets/VRExplorer"
+          NEW_REPO="VRExplorer_Release"
+          NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
 
-      - name: Copy Changed Files from VRExplorer to VRExplorer_Release
-        run: |
-          cd ..
-          # 将 VRExplorer 的变更文件复制到 VRExplorer_Release 中
-          rsync -av --exclude='.git' Assets/VRExplorer/ VRExplorer_Release/
+          # 创建新文件夹并复制子内容
+          mkdir $NEW_REPO
+          cp -r "$FOLDER_PATH"/* "$NEW_REPO/"
 
-      - name: Commit Changes to VRExplorer_Release
-        run: |
-          cd VRExplorer_Release
-          # 检查是否有文件变化
-          git diff --exit-code || (
-            git add .
-            git commit -m "Sync VRExplorer contents from main"
-            git push origin main
-          )
+          # 初始化 Git 并推送
+          cd $NEW_REPO
+          git init -b main  # 初始化并指定默认分支为 main
+          git add .
+          git commit -m "Synced folder from original repo"
+          git remote add origin $NEW_REPO_URL
+          git push -u origin main --force
