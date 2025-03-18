@@ -2,7 +2,7 @@
   "name": "com.henrylab.vrexplorer",
   "displayName": "VR Explorer",
   "unity": "2019.3",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "VRExplorer is a model-based testing approach leveraging NavMesh and finite state machines to explore VR environments and interact with virtual objects effectively.",
   "keywords": [
     "test",
