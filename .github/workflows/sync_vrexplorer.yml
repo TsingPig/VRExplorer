@@ -1,0 +1,46 @@
+name: Sync VRExplorer to Release Branch
+
+on:
+  push:
+    paths:
+      - 'Assets/VRExplorer/**'  # 仅监听 VRExplorer 目录的变更
+    branches:
+      - main  # 你的开发分支（如果不是 main，请修改）
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史记录，确保可以切换分支
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create or Switch to Release Branch
+        run: |
+          if git show-ref --verify --quiet refs/remotes/origin/release; then
+            git checkout release
+          else
+            git checkout -b release
+            git push origin release  # 初始化 release 分支
+          fi
+
+      - name: Sync VRExplorer Contents
+        run: |
+          mkdir -p Assets/VRExplorer
+          rsync -a --delete Assets/VRExplorer/ .  # 同步 VRExplorer 目录（删除旧文件）
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update VRExplorer from main"
+            git push origin release
+          fi
