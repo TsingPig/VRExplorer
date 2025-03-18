@@ -1,4 +1,4 @@
-name: Sync VRExplorer to Release Branch
+name: Sync VRExplorer to VRExplorer_Release Repo
 
 on:
   push:
@@ -12,11 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # 允许推送更改
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 获取完整历史记录
 
       - name: Setup Git
         run: |
@@ -31,26 +32,26 @@ jobs:
         run: |
           git fetch --all
 
-      - name: Create or Switch to Release Branch
+      - name: Prepare VRExplorer_Release Repository
         run: |
-          if git ls-remote --heads origin release | grep release; then
-            git checkout release
-            git pull origin release
-          else
-            git checkout -b release
-            git push origin release
-          fi
+          # 如果 VRExplorer_Release 仓库不存在，创建它
+          REPO_URL="https://github.com/TsingPig/VRExplorer_Release.git"
+          git ls-remote --exit-code --heads $REPO_URL || git clone $REPO_URL VRExplorer_Release
+          cd VRExplorer_Release
+          git checkout main || git checkout -b main  # 如果仓库中没有 main 分支则创建它
 
-      - name: Sync VRExplorer Contents
+      - name: Copy Changed Files from VRExplorer to VRExplorer_Release
         run: |
-          rsync -a --delete Assets/VRExplorer/ Assets/VRExplorer/
+          cd ..
+          # 将 VRExplorer 的变更文件复制到 VRExplorer_Release 中
+          rsync -av --exclude='.git' Assets/VRExplorer/ VRExplorer_Release/
 
-      - name: Commit and Push Changes
+      - name: Commit Changes to VRExplorer_Release
         run: |
-          git add Assets/VRExplorer
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update VRExplorer from main"
-            git push origin release
-          fi
+          cd VRExplorer_Release
+          # 检查是否有文件变化
+          git diff --exit-code || (
+            git add .
+            git commit -m "Sync VRExplorer contents from main"
+            git push origin main
+          )
