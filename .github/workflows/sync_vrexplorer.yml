@@ -1,9 +1,9 @@
-name: Sync VRExplorer to Release Branch
+name: Sync Assets/Explorer to Release Branch
 
 on:
   push:
     paths:
-      - 'Assets/VRExplorer/**'
+      - 'Assets/Explorer/**'
     branches:
       - main
 
@@ -33,22 +33,17 @@ jobs:
         run: |
           if git ls-remote --heads origin release | grep release; then
             git checkout release
-            git pull origin release  # 确保本地最新
+            git rm -rf .  # 清除 release 分支的所有内容
+            git commit -m "Clear release branch"
           else
-            git checkout -b release  # 创建新的 release 分支
-            git push origin release  # 初始化 release 分支
-          fi
-
-      - name: Sync VRExplorer Contents
-        run: |
-          rsync -a --delete Assets/VRExplorer/ Assets/VRExplorer/
-
-      - name: Commit and Push Changes
-        run: |
-          git add Assets/VRExplorer
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update VRExplorer from main"
+            git checkout --orphan release  # 创建新的空分支
+            git commit --allow-empty -m "Initial empty commit"
             git push origin release
           fi
+
+      - name: Sync Assets/Explorer to Release Branch
+        run: |
+          git checkout main -- Assets/Explorer  # 从 main 分支提取 Assets/Explorer
+          git add Assets/Explorer
+          git commit -m "Update Assets/Explorer from main"
+          git push origin release
