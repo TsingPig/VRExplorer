@@ -25,24 +25,27 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/TsingPig/VRExplorer.git
 
+      - name: Fetch All Branches
+        run: |
+          git fetch --all
+
       - name: Create or Switch to Release Branch
         run: |
           if git ls-remote --heads origin release | grep release; then
             git checkout release
             git pull origin release  # 确保本地最新
           else
-            git checkout -b release
+            git checkout -b release  # 创建新的 release 分支
             git push origin release  # 初始化 release 分支
           fi
 
       - name: Sync VRExplorer Contents
         run: |
-          mkdir -p Assets/VRExplorer
-          rsync -a --delete Assets/VRExplorer/ .
+          rsync -a --delete Assets/VRExplorer/ Assets/VRExplorer/
 
       - name: Commit and Push Changes
         run: |
-          git add .
+          git add Assets/VRExplorer
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
