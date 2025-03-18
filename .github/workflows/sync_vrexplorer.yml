@@ -21,14 +21,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Authenticate with GitHub Token
+      - name: Authenticate with Personal Access Token
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/TsingPig/VRExplorer.git
 
       - name: Create or Switch to Release Branch
         run: |
-          if git show-ref --verify --quiet refs/remotes/origin/release; then
+          if git ls-remote --heads origin release | grep release; then
             git checkout release
+            git pull origin release  # 确保本地最新
           else
             git checkout -b release
             git push origin release  # 初始化 release 分支
