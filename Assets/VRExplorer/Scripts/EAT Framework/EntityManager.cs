@@ -9,6 +9,12 @@ namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
     {
+
+        /// <summary>
+        /// VRExplorer的Mono指针
+        /// </summary>
+        public MonoBehaviour vrexplorerMono;
+
         /// <summary>
         /// 存储每个Entity的触发状态
         /// </summary>
@@ -49,9 +55,12 @@ namespace VRExplorer
         /// 注册所有实体，需要初始化时调用
         /// </summary>
         public void RegisterAllEntities()
-        {
-            var entityTypes = Assembly.Load("Test")
-                .GetTypes()
+        {       
+            //var entityTypes = Assembly.Load("Test")
+            //    .GetTypes()
+            //    .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+            var entityTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
                 .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
             foreach(var entityType in entityTypes)

@@ -12,7 +12,7 @@ namespace VRExplorer
 {
     public class ExperimentManager : Singleton<ExperimentManager>
     {
-        public float reportCoverageDuration = 1f;
+        public float reportCoverageDuration = 15f;
 
         public event Action ExperimentFinishEvent;
 
@@ -78,7 +78,7 @@ namespace VRExplorer
         private void OnApplicationQuit()
         {
             SaveMetricsToCSV();
-            CodeCoverage.StopRecording();
+            //CodeCoverage.StopRecording();
         }
 
         public void ExperimentFinish()
@@ -117,12 +117,19 @@ namespace VRExplorer
         /// </summary>
         private void SaveMetricsToCSV()
         {
-            string filePath = "_Experiment/InteractableAndStateCoverageReport.csv";
+            string filePath = Path.Combine(Application.dataPath, "../_Experiment/InteractableAndStateCoverageReport.csv");
+
+            string directoryPath = Path.GetDirectoryName(filePath);
+            if(!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
 
             if(!File.Exists(filePath))
             {
                 _csvDataBuilder.Insert(0, "TimeCost,TriggeredStateCount,StateCount,CoveredInteractableCount,InteractableCount,InteractableCoverage,StateCountCoverage\n");
             }
+
             File.WriteAllText(filePath, _csvDataBuilder.ToString());
             Debug.Log($"Metrics saved to {filePath}");
         }

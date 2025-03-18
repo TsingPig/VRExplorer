@@ -16,8 +16,8 @@ namespace VRExplorer
     /// </summary>
     public class TriggerAction : BaseAction
     {
-        private float _triggerringTime = 0f;
-        private ITriggerableEntity _triggerableEntity;
+        protected float _triggerringTime = 0f;
+        protected ITriggerableEntity _triggerableEntity;
 
         public TriggerAction(float triggerringTime, ITriggerableEntity triggerableEntity)
         {
@@ -38,6 +38,7 @@ namespace VRExplorer
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
             _triggerableEntity.Triggerred();
+
         }
     }
 }
