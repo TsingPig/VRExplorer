@@ -43,6 +43,7 @@ jobs:
 
       - name: Sync VRExplorer Contents
         run: |
+          # 只同步 Assets/VRExplorer 目录的内容
           rsync -a --delete Assets/VRExplorer/ Assets/VRExplorer/
 
       - name: Commit and Push Changes
