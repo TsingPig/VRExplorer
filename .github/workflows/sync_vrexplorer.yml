@@ -3,9 +3,9 @@ name: Sync VRExplorer to Release Branch
 on:
   push:
     paths:
-      - 'Assets/VRExplorer/**'  # 仅监听 VRExplorer 目录的变更
+      - 'Assets/VRExplorer/**'
     branches:
-      - main  # 你的开发分支（如果不是 main，请修改）
+      - main
 
 jobs:
   sync:
@@ -14,12 +14,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史记录，确保可以切换分支
+          fetch-depth: 0  # 获取完整历史记录
 
       - name: Setup Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Authenticate with GitHub Token
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/TsingPig/VRExplorer.git
 
       - name: Create or Switch to Release Branch
         run: |
@@ -33,7 +37,7 @@ jobs:
       - name: Sync VRExplorer Contents
         run: |
           mkdir -p Assets/VRExplorer
-          rsync -a --delete Assets/VRExplorer/ .  # 同步 VRExplorer 目录（删除旧文件）
+          rsync -a --delete Assets/VRExplorer/ .
 
       - name: Commit and Push Changes
         run: |
