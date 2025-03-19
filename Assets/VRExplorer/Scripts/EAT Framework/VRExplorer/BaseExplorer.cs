@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -12,12 +13,25 @@ namespace VRExplorer
     public abstract class BaseExplorer : MonoBehaviour
     {
         private Vector3 _sceneCenter;
+        private int _explorationEventIndex = 0;
+        private int _explorationEventsExecuted = 0;
 
         protected Vector3[] _initMonoPos;
         protected Quaternion[] _initMonoRot;
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
+        protected UnityEvent _nextExplorationEvent
+        {
+            get
+            {
+                var e = explorationEvents[_explorationEventIndex];
+                _explorationEventIndex = (_explorationEventIndex + 1) % explorationEvents.Count;
+                _explorationEventsExecuted++;
+                return e;
+            }
+        }
+
 
         [Header("Configuration")]
         public HandController leftHandController;
@@ -26,6 +40,8 @@ namespace VRExplorer
         public bool randomInitPos = false;
         public bool drag = false;
         public float reportCoverageDuration = 5f;
+        public float explorationEventFrequency = 0.5f;
+        public List<UnityEvent> explorationEvents = new List<UnityEvent>();
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
@@ -44,6 +60,7 @@ namespace VRExplorer
         protected List<BaseAction> TaskGenerator(MonoBehaviour mono)
         {
             List<BaseAction> task = new List<BaseAction>();
+
             switch(EntityManager.Instance.monoEntitiesMapping[mono][0].Name)
             {
                 case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
@@ -58,20 +75,55 @@ namespace VRExplorer
 
         protected async Task SceneExplore()
         {
-            GetNextMono(out _nextMono);
-            _curTask = TaskGenerator(_nextMono);
+            bool explorationEventsCompleted = (_explorationEventsExecuted >= explorationEvents.Count);
+            bool monoTasksCompleted = EntityManager.Instance.UpdateMonoState(_nextMono, true); // 假设有方法检查是否所有 Mono 都完成
 
-            Debug.Log(new RichText()
-                .Add("Mono of Task: ", bold: true)
-                .Add(_nextMono.name, bold: true, color: Color.yellow));
+            if(!explorationEventsCompleted && !monoTasksCompleted)
+            {
+                float FSM = Random.Range(0, 1f);
+                if(FSM <= explorationEventFrequency)
+                {
+                    _curTask = BaseTask();
+                    Debug.Log(new RichText()
+                        .Add("Task: ", bold: true)
+                        .Add("BaseTask", bold: true, color: Color.yellow));
+                }
+                else
+                {
+                    GetNextMono(out _nextMono);
+                    _curTask = TaskGenerator(_nextMono);
+                    Debug.Log(new RichText()
+                        .Add("Mono of Task: ", bold: true)
+                        .Add(_nextMono.name, bold: true, color: Color.yellow));
+                }
+            }
+            else if(!explorationEventsCompleted)
+            {
+                _curTask = BaseTask();
+                Debug.Log(new RichText()
+                    .Add("Task: ", bold: true)
+                    .Add("BaseTask", bold: true, color: Color.yellow));
+            }
+            else
+            {
+                GetNextMono(out _nextMono);
+                _curTask = TaskGenerator(_nextMono);
+                Debug.Log(new RichText()
+                    .Add("Mono of Task: ", bold: true)
+                    .Add(_nextMono.name, bold: true, color: Color.yellow));
+            }
 
-            foreach(var action in _curTask) await action.Execute();
+            foreach(var action in _curTask)
+            {
+                await action.Execute();
+            }
 
-            if(!EntityManager.Instance.UpdateMonoState(_nextMono, true))
+            if(!explorationEventsCompleted || !monoTasksCompleted)
             {
                 await SceneExplore();
             }
         }
+
 
         /// <summary>
         /// 计算下一个交互的 mono
@@ -207,6 +259,16 @@ namespace VRExplorer
                 new GrabAction(leftHandController, grabbableEntity, new List<BaseAction>(){
                     new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position))
                 })
+            };
+            return task;
+        }
+
+        private List<BaseAction> BaseTask()
+        {
+            List<BaseAction> task = new List<BaseAction>()
+            {
+                new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position)),
+                new BaseAction(_nextExplorationEvent.Invoke)
             };
             return task;
         }
