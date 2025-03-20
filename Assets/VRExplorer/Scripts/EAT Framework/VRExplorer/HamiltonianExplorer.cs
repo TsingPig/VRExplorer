@@ -7,13 +7,10 @@ namespace VRExplorer
 {
     public class HamiltonianExplorer : BaseExplorer
     {
-        private float[,] distanceMatrix; // 距离矩阵
-        private List<int> hamiltonianPath; // 哈密顿路径结果
+        private float[,] distanceMatrix; 
+        private List<int> hamiltonianPath; 
         private int curGrabbableIndex = 0;
 
-        /// <summary>
-        /// 计算距离矩阵
-        /// </summary>
         private void ComputeDistanceMatrix()
         {
             int count = _grabbables.Count;
@@ -33,7 +30,7 @@ namespace VRExplorer
                 }
                 else
                 {
-                    distanceMatrix[count, i] = float.MaxValue; // Set to an unreachable value
+                    distanceMatrix[count, i] = float.MaxValue; 
                     distanceMatrix[i, count] = float.MaxValue;
                 }
             }
@@ -54,7 +51,7 @@ namespace VRExplorer
                     }
                     else
                     {
-                        distanceMatrix[i, j] = float.MaxValue; // Set to an unreachable value if no path exists
+                        distanceMatrix[i, j] = float.MaxValue; 
                     }
                 }
             }
@@ -68,46 +65,37 @@ namespace VRExplorer
         {
             int n = _grabbables.Count;
             List<int> path = new List<int>();
-            List<int> bestPath = new List<int>(); // 用来存储最短路径
-            float bestDistance = float.MaxValue;  // 用来存储最短路径的距离
+            List<int> bestPath = new List<int>();
+            float bestDistance = float.MaxValue;  
 
-            bool[] visited = new bool[n];  // 标记是否访问过某个节点
+            bool[] visited = new bool[n];  
 
-            // 递归回溯函数
             void Backtrack(int currentNode, float currentDistance, List<int> currentPath)
             {
-                // 如果所有节点都访问过了，检查是否是最短路径
                 if(currentPath.Count == n)
                 {
                     if(currentDistance < bestDistance)
                     {
                         bestDistance = currentDistance;
-                        bestPath = new List<int>(currentPath);  // 更新最短路径
+                        bestPath = new List<int>(currentPath);  
                     }
                     return;
                 }
 
-                // 递归地访问每一个未访问的节点
                 for(int i = 0; i < n; i++)
                 {
                     if(visited[i]) continue;
 
-                    // 访问当前节点
                     visited[i] = true;
                     currentPath.Add(i);
                     float newDistance = currentDistance + distanceMatrix[currentNode, i];  // 更新当前路径的距离
-
-                    // 递归
                     Backtrack(i, newDistance, currentPath);
-
-                    // 回溯，撤销选择
                     visited[i] = false;
                     currentPath.RemoveAt(currentPath.Count - 1);
                 }
             }
 
-            // 从初始节点（即代理的起始位置）开始，执行回溯
-            Backtrack(n, 0, path);  // 从起点开始回溯
+            Backtrack(n, 0, path); 
 
             return bestPath;
         }
@@ -122,7 +110,6 @@ namespace VRExplorer
             hamiltonianPath = SolveTSP();
 
             string pathString = string.Join(" -> ", hamiltonianPath.Select(i => i.ToString()).ToArray());
-            //Debug.Log("Hamiltonian Path: " + pathString);
 
             curGrabbableIndex = 0;
         }

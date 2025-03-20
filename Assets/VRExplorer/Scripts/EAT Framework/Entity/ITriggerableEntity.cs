@@ -14,5 +14,4 @@ namespace VRExplorer
 
         void Triggerred();
     }
-
 }

@@ -5,7 +5,7 @@ using UnityEngine.AI;
 namespace VRExplorer
 {
     /// <summary>
-    /// ÒÆ¶¯¶¯×÷
+    /// Player Move Action
     /// </summary>
     public class MoveAction : BaseAction
     {
@@ -34,5 +34,4 @@ namespace VRExplorer
             }
         }
     }
-
 }

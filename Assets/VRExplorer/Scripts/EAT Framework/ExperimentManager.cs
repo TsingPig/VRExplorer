@@ -18,7 +18,6 @@ namespace VRExplorer
 
         private float _timeStamp;
 
-        // 用于保存所有实验记录
         private StringBuilder _csvDataBuilder = new StringBuilder();
 
         /// <summary>

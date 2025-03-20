@@ -4,7 +4,6 @@ using UnityEngine;
 namespace VRExplorer
 {
     /// <summary>
-    /// ´¥·¢¶¯×÷
     /// TriggerAction
     /// Definition: TriggerAction is an action that has two state, triggerring and triggerred.
     /// The former will be activated absolutely when the VRExplorer started to trigger a TriggerableEntity.
@@ -38,7 +37,6 @@ namespace VRExplorer
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
             _triggerableEntity.Triggerred();
-
         }
     }
 }

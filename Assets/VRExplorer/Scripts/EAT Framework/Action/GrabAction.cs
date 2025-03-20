@@ -5,9 +5,6 @@ namespace VRExplorer
 {
     using HandController = BNG.HandController;
 
-    /// <summary>
-    /// ÍÏ×§¶¯×÷
-    /// </summary>
     public class GrabAction : BaseAction
     {
         private HandController _handController;
