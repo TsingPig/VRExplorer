@@ -8,7 +8,7 @@ namespace VRExplorer
     [Serializable]
     public class BaseAction
     {
-        [SerializeField] private string _name;
+        [SerializeField] private string _name = "BaseAction";
         protected Action _callback = null;
 
         public BaseAction(Action callback = null)
@@ -21,7 +21,7 @@ namespace VRExplorer
         public virtual async Task Execute()
         {
             Debug.Log(new RichText().Add("Action: ").Add(Name, color: new Color(0f, 0.5f, 1f)));
-            await Task.CompletedTask;
+            await Task.Yield();
             _callback?.Invoke();
         }
     }

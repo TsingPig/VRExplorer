@@ -27,7 +27,6 @@ namespace VRExplorer
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerring);
             _triggerableEntity.Triggerring();
 
-
             Vector3 startPosition = _targetTransform.localPosition;
             Quaternion startRotation = _targetTransform.localRotation;
             Vector3 startScale = _targetTransform.localScale;
@@ -53,10 +52,6 @@ namespace VRExplorer
 
             EntityManager.Instance.TriggerState(_triggerableEntity, ITriggerableEntity.TriggerableState.Triggerred);
             _triggerableEntity.Triggerred();
-
-
         }
-
-
     }
 }

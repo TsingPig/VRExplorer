@@ -21,6 +21,7 @@ namespace VRExplorer
         protected NavMeshAgent _navMeshAgent;
         protected NavMeshTriangulation _triangulation;
         protected Vector3[] _meshCenters;
+
         protected UnityEvent _nextExplorationEvent
         {
             get
@@ -32,7 +33,6 @@ namespace VRExplorer
             }
         }
 
-
         [Header("Configuration")]
         public HandController leftHandController;
 
@@ -40,7 +40,7 @@ namespace VRExplorer
         public bool randomInitPos = false;
         public bool drag = false;
         public float reportCoverageDuration = 5f;
-        public float explorationEventFrequency = 0.5f;
+        public float explorationEventFrequency;
         public List<UnityEvent> explorationEvents = new List<UnityEvent>();
 
         [Header("Show For Debug")]
@@ -123,7 +123,6 @@ namespace VRExplorer
                 await SceneExplore();
             }
         }
-
 
         /// <summary>
         /// 计算下一个交互的 mono

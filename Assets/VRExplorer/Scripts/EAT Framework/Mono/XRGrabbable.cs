@@ -1,15 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using TsingPigSDK;
-using VRExplorer;
-using UnityEngine.XR.Interaction.Toolkit;
 using BNG;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using VRExplorer;
 
 public class XRGrabbable : MonoBehaviour, IGrabbableEntity
 {
-    XRBaseInteractable interactable;
+    private XRBaseInteractable interactable;
 
     public Grabbable Grabbable
     {
@@ -49,5 +45,4 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
         interactable.firstHoverEntered.Invoke(h);
         interactable.activated.Invoke(a);
     }
-
 }

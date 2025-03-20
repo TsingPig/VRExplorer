@@ -1,15 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
+
 public class XRTriggerable : MonoBehaviour, ITriggerableEntity
 {
-    XRBaseInteractable interactable;
+    private XRBaseInteractable interactable;
+
     private void Start()
     {
         interactable = GetComponent<XRBaseInteractable>();
+        if(interactable == null) interactable = gameObject.AddComponent<XRBaseInteractable>();
     }
 
     public float TriggeringTime => 1.5f;

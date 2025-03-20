@@ -4,6 +4,8 @@ using VRExplorer;
 
 public class XRTransformable : MonoBehaviour, ITransformableEntity
 {
+    public float triggeringTime = 3f;
+
     public Transform destination;
 
     public Vector3 DeltaPosition => destination.position - transform.position;
@@ -12,7 +14,7 @@ public class XRTransformable : MonoBehaviour, ITransformableEntity
 
     public Vector3 DeltaScale => new Vector3(0, 0, 0);
 
-    public float TriggeringTime => 3f;
+    public float TriggeringTime => triggeringTime;
 
     public string Name => Str.Transformable;
 
