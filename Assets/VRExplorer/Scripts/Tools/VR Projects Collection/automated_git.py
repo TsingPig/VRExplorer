@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # 定义存放仓库的目标文件夹路径
-target_directory = "F:\--CodeRepo\--CodeRepo\TsingPig_Lab\LLM"
+target_directory = "D:\--UnityProject\VR\VRExplorer_subjects"
 
 # 确保目标文件夹存在
 if not os.path.exists(target_directory):
