@@ -1,15 +1,20 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
 
 public class XRTriggerable : MonoBehaviour, ITriggerableEntity
 {
-    private XRBaseInteractable interactable;
+    private XRBaseInteractable _interactable;
+    private XRBaseInteractor _interactor;
+    public List<UnityEvent> events = new List<UnityEvent>();
 
     private void Start()
     {
-        interactable = GetComponent<XRBaseInteractable>();
-        if(interactable == null) interactable = gameObject.AddComponent<XRBaseInteractable>();
+        if(_interactable == null) _interactable = GetComponent<XRBaseInteractable>();
+        if(_interactor == null) _interactor = GetComponent<XRBaseInteractor>();
     }
 
     public float TriggeringTime => 1.5f;
@@ -31,11 +36,36 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         var e = new SelectExitEventArgs() { interactorObject = interactor };
         var h = new HoverExitEventArgs() { interactorObject = interactor };
         var a = new DeactivateEventArgs() { interactorObject = interactor };
-        interactable.selectExited.Invoke(e);
-        interactable.hoverExited.Invoke(h);
-        interactable.lastSelectExited.Invoke(e);
-        interactable.lastHoverExited.Invoke(h);
-        interactable.deactivated.Invoke(a);
+        if(_interactable)
+        {
+            _interactable.selectExited.Invoke(e);
+            _interactable.hoverExited.Invoke(h);
+            _interactable.lastSelectExited.Invoke(e);
+            _interactable.lastHoverExited.Invoke(h);
+            _interactable.deactivated.Invoke(a);
+        }
+
+        e = new SelectExitEventArgs() {  };
+        h = new HoverExitEventArgs() {};
+        a = new DeactivateEventArgs() { interactorObject = interactor };
+        if(_interactor)
+        {
+            try
+            {
+                _interactor.selectExited.Invoke(e);
+                _interactor.hoverExited.Invoke(h);
+            }
+            catch(Exception except)
+            {
+                Debug.Log(except.ToString());
+            }
+
+        }
+
+        foreach(var eve in events)
+        {
+            eve?.Invoke();
+        }
     }
 
     public void Triggerring()
@@ -53,10 +83,28 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         var e = new SelectEnterEventArgs() { interactorObject = interactor };
         var h = new HoverEnterEventArgs() { interactorObject = interactor };
         var a = new ActivateEventArgs() { interactorObject = interactor };
-        interactable.selectEntered.Invoke(e);
-        interactable.hoverEntered.Invoke(h);
-        interactable.firstSelectEntered.Invoke(e);
-        interactable.firstHoverEntered.Invoke(h);
-        interactable.activated.Invoke(a);
+        if(_interactable)
+        {
+            _interactable.selectEntered.Invoke(e);
+            _interactable.hoverEntered.Invoke(h);
+            _interactable.firstSelectEntered.Invoke(e);
+            _interactable.firstHoverEntered.Invoke(h);
+            _interactable.activated.Invoke(a);
+        }
+        e = new SelectEnterEventArgs() {  };
+        h = new HoverEnterEventArgs() { };
+        if(_interactor)
+        {
+            try
+            {
+                _interactor.selectEntered.Invoke(e);
+                _interactor.hoverEntered.Invoke(h);
+            }
+            catch(Exception except)
+            {
+                Debug.Log(except.ToString());
+            }
+        }
+
     }
 }
