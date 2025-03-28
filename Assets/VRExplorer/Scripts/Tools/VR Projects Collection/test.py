@@ -1,7 +1,7 @@
 import requests
 
 # GitHub Token
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = ""
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"}
 
 
