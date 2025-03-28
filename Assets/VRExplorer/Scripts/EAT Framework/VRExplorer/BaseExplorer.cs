@@ -6,6 +6,7 @@ using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using static UnityEditor.PlayerSettings;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -65,7 +66,7 @@ namespace VRExplorer
             {
                 case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
                 case Str.Triggerable: task = TriggerTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
-                case Str.Grabbable: task = GrabAndDragBoxTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
+                case Str.Grabbable: task = GrabTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
                 case Str.Gun:
                 task = GrabAndShootGunTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono),
                     EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
@@ -246,17 +247,20 @@ namespace VRExplorer
         }
 
         /// <summary>
-        /// 抓取、拖拽箱子任务
+        /// 抓取、拖拽任务
         /// </summary>
         /// <param name="grabbableEntity"></param>
         /// <returns></returns>
-        private List<BaseAction> GrabAndDragBoxTask(IGrabbableEntity grabbableEntity)
+        private List<BaseAction> GrabTask(IGrabbableEntity grabbableEntity)
         {
+            Vector3 pos;
+            if(grabbableEntity.Destination) { pos = grabbableEntity.Destination.position; }
+            else { pos = GetRandomTwitchTarget(transform.position); }
             List<BaseAction> task = new List<BaseAction>()
             {
                 new MoveAction(_navMeshAgent, moveSpeed, grabbableEntity.transform.position),
                 new GrabAction(leftHandController, grabbableEntity, new List<BaseAction>(){
-                    new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position))
+                    new MoveAction(_navMeshAgent, moveSpeed, pos)
                 })
             };
             return task;

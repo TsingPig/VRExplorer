@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace VRExplorer
 {
@@ -39,6 +41,7 @@ namespace VRExplorer
 
         private void Release()
         {
+            Debug.Log("Release");
             _handController.grabber.TryRelease();
         }
     }

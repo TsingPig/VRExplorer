@@ -6,14 +6,17 @@ using VRExplorer;
 public class XRGrabbable : MonoBehaviour, IGrabbableEntity
 {
     private XRBaseInteractable interactable;
+    public string Name => Str.Grabbable;
+    public Transform destination = null;
 
     public Grabbable Grabbable
     {
         get
         {
             var g = GetComponent<Grabbable>();
-            if(g) return g;
-            return gameObject.AddComponent<Grabbable>();
+            if(!g) g = gameObject.AddComponent<Grabbable>();
+            g.GrabPhysics = GrabPhysics.Kinematic;
+            return g;
         }
     }
 
@@ -22,7 +25,9 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
         interactable = GetComponent<XRBaseInteractable>();
     }
 
-    public string Name => Str.Grabbable;
+
+
+    public Transform Destination => destination;
 
     public void OnGrabbed()
     {

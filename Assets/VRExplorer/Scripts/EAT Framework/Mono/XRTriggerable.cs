@@ -16,8 +16,8 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
         if(_interactable == null) _interactable = GetComponent<XRBaseInteractable>();
         if(_interactor == null) _interactor = GetComponent<XRBaseInteractor>();
     }
-
-    public float TriggeringTime => 1.5f;
+    public float triggeringTime = 0.5f;
+    public float TriggeringTime => triggeringTime;
 
     public string Name => Str.Triggerable;
 
