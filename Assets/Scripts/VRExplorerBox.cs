@@ -16,6 +16,8 @@ public class VRExplorerBox : MonoBehaviour, IGrabbableEntity
 
     [ExcludeFromCodeCoverage] public Grabbable Grabbable => GetComponent<Grabbable>();
 
+    public Transform Destination => null;
+
     [ExcludeFromCodeCoverage]
     void IGrabbableEntity.OnGrabbed()
     {

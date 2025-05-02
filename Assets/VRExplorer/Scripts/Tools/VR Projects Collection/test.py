@@ -1,73 +1,40 @@
-import requests
+import os
+import re
 
-# GitHub Token
-GITHUB_TOKEN = ""
-HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"}
+def is_valid_char(char):
+    """检查字符是否合法（a-z, A-Z, 0-9, _, +, -, ., ,, =）"""
+    return char.isalnum() or char in {'_', '+', '-', '.', ',', '='}
 
+def sanitize_filename(filename):
+    """替换非法字符为下划线 _"""
+    new_name = []
+    for char in filename:
+        if is_valid_char(char):
+            new_name.append(char)
+        else:
+            new_name.append('_')  # 替换非法字符
+    return ''.join(new_name)
 
-def fetch_repo_info(repo_url):
-    """
-    Fetch repository information using GitHub API.
-    """
-    # Extract owner and repo name
-    owner_repo = repo_url.replace("https://github.com/", "").split('/tree/')[0].strip("/")
-    try:
-        owner, repo = owner_repo.split("/")
-    except ValueError:
-        print(f"Invalid repository URL format: {repo_url}")
-        return None
+def rename_files_in_directory(directory):
+    """遍历文件夹并重命名文件"""
+    for root, dirs, files in os.walk(directory):
+        for name in files + dirs:
+            old_path = os.path.join(root, name)
+            new_name = sanitize_filename(name)
+            new_path = os.path.join(root, new_name)
 
-    # Fetch repository data
-    repo_api_url = f"https://api.github.com/repos/{owner}/{repo}"
-    response = requests.get(repo_api_url, headers=HEADERS)
+            if new_name != name:  # 如果文件名有变化
+                try:
+                    os.rename(old_path, new_path)
+                    print(f"✅ 重命名: {name} → {new_name}")
+                except Exception as e:
+                    print(f"❌ 重命名失败: {name} (错误: {e})")
 
-    if response.status_code == 200:
-        repo_data = response.json()
-        # Fetch commit data for the default branch
-        default_branch = repo_data.get("default_branch", "main")
-        commits_api_url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={default_branch}&per_page=1"
-        commits_response = requests.get(commits_api_url, headers=HEADERS)
-        commit_count = int(commits_response.headers.get("Link", "0").split("&page=")[-1].split(">")[0]) if "Link" in commits_response.headers else 0
-
-        # Gather repository data
-        return {
-            "url": repo_url,
-            "stars": repo_data.get("stargazers_count", 0),
-            "commits": commit_count,
-            "branches": repo_data.get("branches", 0),
-            "forks": repo_data.get("forks_count", 0),
-            "open_issues": repo_data.get("open_issues_count", 0),
-        }
+if __name__ == "__main__":
+    target_dir = input("请输入要处理的文件夹路径: ").strip()
+    if os.path.isdir(target_dir):
+        print(f"🔍 正在处理文件夹: {target_dir}")
+        rename_files_in_directory(target_dir)
+        print("🎉 文件名清理完成！")
     else:
-        print(f"Error fetching repository data for {repo_url} - {response.status_code}")
-        return None
-
-
-def process_repositories(input_file="_result.txt", output_file="result_sorted.txt"):
-    """
-    Process repository URLs, fetch information, and sort based on criteria.
-    """
-    with open(input_file, 'r') as file:
-        repo_urls = [line.strip() for line in file.readlines()]
-
-    repo_infos = []
-    for repo_url in repo_urls:
-        print(f"Processing repository: {repo_url}")
-        repo_info = fetch_repo_info(repo_url)
-        if repo_info:
-            repo_infos.append(repo_info)
-
-    # Sort repositories by stars (desc) and commits (desc)
-    repo_infos.sort(key=lambda x: (-x["stars"], -x["commits"]))
-
-    # Write results to file
-    with open(output_file, 'w') as file:
-        file.write("URL, Stars, Commits, Branches, Forks, Open Issues\n")
-        for info in repo_infos:
-            file.write(f"{info['url']}, {info['stars']}, {info['commits']}, {info['branches']}, {info['forks']}, {info['open_issues']}\n")
-
-    print(f"Results saved to {output_file}")
-
-
-# Run the process
-process_repositories()
+        print("❌ 错误: 文件夹路径无效！")
