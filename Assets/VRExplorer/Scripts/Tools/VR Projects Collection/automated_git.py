@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # 定义存放仓库的目标文件夹路径
-target_directory = "D:\--UnityProject\VR\VRExplorer_subjects"
+target_directory = "D:\--UnityProject\VR\VRExplorer_projects_dataset"
 
 # 确保目标文件夹存在
 if not os.path.exists(target_directory):

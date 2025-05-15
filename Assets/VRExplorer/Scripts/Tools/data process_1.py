@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 # 设置路径，输入数据文件夹路径
-input_folder = r"D:\--UnityProject\VR\subjects\UnityVR\_Experiment"
+input_folder = r"D:\--UnityProject\VR\subjects\unity-vr-maze\unity-vr-maze-master\_Experiment"
 
 # 汇总文件路径
 summary_csv_filename = "coverage_summary.csv"

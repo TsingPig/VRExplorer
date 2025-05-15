@@ -17,7 +17,7 @@ def parse_folder_name(folder_name):
 
 # Read all CSV files
 all_data = []
-for folder in glob.glob("D:/--UnityProject/VR/subjects/unity-vr-maze-master/Experiment/CodeCoverage_*"):
+for folder in glob.glob("D:/--UnityProject/VR/subjects/unity-vr-maze/Experiment/CodeCoverage_*"):
     if os.path.isdir(folder):
         model, move, turn = parse_folder_name(os.path.basename(folder))
         csv_file = os.path.join(folder, f"{os.path.basename(folder)}_coverage.csv")
@@ -65,7 +65,7 @@ def f1():
 
             # Add data label for the initial point of Code Line Coverage
             plt.text(model_data['Time'].iloc[0], model_data['Code Line Coverage'].iloc[0],
-                     f"{model_data['Code Line Coverage'].iloc[0]:.2f}%", fontsize = 14,
+                     f"{model_data['Code Line Coverage'].iloc[0]:.2f}%", fontsize = 1,
                      verticalalignment = 'bottom', horizontalalignment = 'right')
 
             # Plot Interactable Coverage
@@ -74,28 +74,32 @@ def f1():
             x_offset = 2
             # Add data label for the final (convergent) point of Interactable Coverage
             plt.text(model_data['Time'].iloc[-1] + x_offset, model_data['InteractableCoverage'].iloc[-1],
-                     f"{model_data['InteractableCoverage'].iloc[-1]:.2f}%", color = color, fontsize = 14,
+                     f"{model_data['InteractableCoverage'].iloc[-1]:.2f}%", color = color, fontsize = 18,
                          verticalalignment = 'center', horizontalalignment = 'left')
 
             # Add data label for the final (convergent) point of Code Line Coverage
             plt.text(model_data['Time'].iloc[-1] + x_offset, model_data['Code Line Coverage'].iloc[-1],
-                     f"{model_data['Code Line Coverage'].iloc[-1]:.2f}%", color = color, fontsize = 14,
+                     f"{model_data['Code Line Coverage'].iloc[-1]:.2f}%", color = color, fontsize = 18,
                      verticalalignment = 'center', horizontalalignment = 'left')
 
-            # Draw vertical line from final point to X-axis (Time = 0)
-            plt.vlines(model_data['Time'].iloc[-1], 0, model_data['InteractableCoverage'].iloc[-1],
-                       color = color, linestyle = ':', linewidth = 3)
-            # Add label at the intersection with X-axis
-            plt.text(model_data['Time'].iloc[-1], 0, f"Time Cost: {model_data['Time'].iloc[-1]:.2f}s",
-                     fontsize = 14, color = color, verticalalignment = 'top', horizontalalignment = 'center')
+            # # Draw vertical line from final point to X-axis (Time = 0)
+            # plt.vlines(model_data['Time'].iloc[-1], 0, model_data['InteractableCoverage'].iloc[-1],
+            #            color = color, linestyle = ':', linewidth = 3)
+            # # Add label at the intersection with X-axis
+            # plt.text(model_data['Time'].iloc[-1], 0, f"Time Cost: {model_data['Time'].iloc[-1]:.2f}s",
+            #          fontsize = 14, color = color, verticalalignment = 'top', horizontalalignment = 'center')
 
         # Title and labels for clarity
-        plt.title(f'Model Performance: Move Speed = {move} m/s, Turn Speed = {turn} deg/s', fontsize = 14)
-        plt.xlabel('Time (s)', fontsize = 12)
-        plt.ylabel('Coverage (%)', fontsize = 12)
+        plt.title(f'Move Speed = {move} m/s, Turn Speed = {turn} deg/s', fontsize = 18)
+        plt.xlabel('Time (s)', fontsize = 16)
+        plt.ylabel('Coverage (%)', fontsize = 16)
+        plt.xticks(fontsize = 16)  # Adjust X-axis tick font size
+        plt.yticks(fontsize = 16)  # Adjust X-axis tick font size
         plt.grid(True, linestyle = '--', alpha = 0.6)
-        plt.legend(loc = 'upper left', fontsize = 10)
+        plt.legend(loc = 'lower right', fontsize = 16)
 
     plt.tight_layout()
+
     plt.show()
+
 f1()

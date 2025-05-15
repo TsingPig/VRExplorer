@@ -353,7 +353,7 @@ namespace VRExplorer
             EntityManager.Instance.vrexplorerMono = this;
             ExperimentManager.Instance.ExperimentFinishEvent += () =>
             {
-                ResetMonoPos();
+                //ResetMonoPos();
             };
         }
 

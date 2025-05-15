@@ -1,40 +1,61 @@
 import os
-import re
+import shutil
 
-def is_valid_char(char):
-    """检查字符是否合法（a-z, A-Z, 0-9, _, +, -, ., ,, =）"""
-    return char.isalnum() or char in {'_', '+', '-', '.', ',', '='}
 
-def sanitize_filename(filename):
-    """替换非法字符为下划线 _"""
-    new_name = []
-    for char in filename:
-        if is_valid_char(char):
-            new_name.append(char)
-        else:
-            new_name.append('_')  # 替换非法字符
-    return ''.join(new_name)
+def delete_common_files(folder_a, folder_b):
+    """
+    删除A文件夹中所有在B文件夹中也存在的文件
 
-def rename_files_in_directory(directory):
-    """遍历文件夹并重命名文件"""
-    for root, dirs, files in os.walk(directory):
-        for name in files + dirs:
-            old_path = os.path.join(root, name)
-            new_name = sanitize_filename(name)
-            new_path = os.path.join(root, new_name)
+    参数:
+        folder_a (str): 要清理的文件夹路径
+        folder_b (str): 包含参考文件的文件夹路径
+    """
+    # 获取两个文件夹中的所有文件名
+    files_a = set(os.listdir(folder_a))
+    files_b = set(os.listdir(folder_b))
 
-            if new_name != name:  # 如果文件名有变化
-                try:
-                    os.rename(old_path, new_path)
-                    print(f"✅ 重命名: {name} → {new_name}")
-                except Exception as e:
-                    print(f"❌ 重命名失败: {name} (错误: {e})")
+    # 找出两个文件夹中都存在的文件
+    common_files = files_a & files_b
+
+    if not common_files:
+        print("没有找到重复文件")
+        return
+
+    # 删除A文件夹中的重复文件
+    deleted_count = 0
+    for filename in common_files:
+        file_path = os.path.join(folder_a, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                print(f"已删除: {file_path}")
+                deleted_count += 1
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+                print(f"已删除目录: {file_path}")
+                deleted_count += 1
+        except Exception as e:
+            print(f"删除 {file_path} 时出错: {e}")
+
+    print(f"\n完成! 共删除了 {deleted_count} 个文件/目录")
+
 
 if __name__ == "__main__":
-    target_dir = input("请输入要处理的文件夹路径: ").strip()
-    if os.path.isdir(target_dir):
-        print(f"🔍 正在处理文件夹: {target_dir}")
-        rename_files_in_directory(target_dir)
-        print("🎉 文件名清理完成！")
+    # 输入文件夹路径
+    folder_a = input("请输入要清理的文件夹路径(A): ").strip()
+    folder_b = input("请输入参考文件夹路径(B): ").strip()
+
+    # 验证路径是否存在
+    if not os.path.isdir(folder_a):
+        print(f"错误: 文件夹 {folder_a} 不存在")
+        exit(1)
+    if not os.path.isdir(folder_b):
+        print(f"错误: 文件夹 {folder_b} 不存在")
+        exit(1)
+
+    # 确认操作
+    confirm = input(f"确定要从 {folder_a} 中删除所有在 {folder_b} 中存在的文件吗? (y/n): ").lower()
+    if confirm == 'y':
+        delete_common_files(folder_a, folder_b)
     else:
-        print("❌ 错误: 文件夹路径无效！")
+        print("操作已取消")

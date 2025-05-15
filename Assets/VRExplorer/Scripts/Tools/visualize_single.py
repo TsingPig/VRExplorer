@@ -16,7 +16,7 @@ def parse_folder_name(folder_name):
 
 # Read all CSV files
 all_data = []
-for folder in glob.glob(r"D:\--UnityProject\VR\subjects\UnityVR\_Experiment\CodeCoverage_*"):
+for folder in glob.glob(r"D:\--UnityProject\VR\subjects\unity-vr-maze\unity-vr-maze-master\_Experiment\CodeCoverage_*"):
     if os.path.isdir(folder):
         model = parse_folder_name(os.path.basename(folder))
         csv_file = os.path.join(folder, f"{os.path.basename(folder)}_coverage.csv")
@@ -56,30 +56,31 @@ def f1():
 
         # Add data labels for initial and final points
         plt.text(subset['Time'].iloc[0], subset['ELOC Coverage'].iloc[0],
-                 f"{subset['ELOC Coverage'].iloc[0]:.2f}%", fontsize = 14, verticalalignment = 'bottom', horizontalalignment = 'right')
-        x_offset = 0.05
+                 f"{subset['ELOC Coverage'].iloc[0]:.2f}%", fontsize = 15, verticalalignment = 'bottom', horizontalalignment = 'right')
+        x_offset = 1.1
 
         plt.text(subset['Time'].iloc[-1] + x_offset, subset['ELOC Coverage'].iloc[-1],
-                 f"{subset['ELOC Coverage'].iloc[-1]:.2f}%", fontsize = 14, color = color,verticalalignment = 'center', horizontalalignment = 'left')
+                 f"{subset['ELOC Coverage'].iloc[-1]:.2f}%", fontsize = 15, color = color,verticalalignment = 'center', horizontalalignment = 'left')
 
         plt.text(subset['Time'].iloc[-1]+ x_offset, subset['InteractableCoverage'].iloc[-1],
-                 f"{subset['InteractableCoverage'].iloc[-1]:.2f}%", fontsize = 14,color = color, verticalalignment = 'center', horizontalalignment = 'left')
+                 f"{subset['InteractableCoverage'].iloc[-1]:.2f}%", fontsize = 15,color = color, verticalalignment = 'center', horizontalalignment = 'left')
 
-        # Draw vertical line from final point to X-axis (Time = 0)
-        plt.vlines(subset['Time'].iloc[-1], 0, subset['InteractableCoverage'].iloc[-1],
-                   color = color, linestyle = ':', linewidth = 3)
+        # # Draw vertical line from final point to X-axis (Time = 0)
+        # plt.vlines(subset['Time'].iloc[-1], 0, subset['InteractableCoverage'].iloc[-1],
+        #            color = color, linestyle = ':', linewidth = 3)
 
 
-        # Add label at the intersection with X-axis
-        plt.text(subset['Time'].iloc[-1], 0, f"{subset['Time'].iloc[-1]:.2f}s",
-                 fontsize = 14, color = color, verticalalignment = 'top', horizontalalignment = 'center')
+        # # Add label at the intersection with X-axis
+        # plt.text(subset['Time'].iloc[-1], 0, f"{subset['Time'].iloc[-1]:.2f}s",
+        #          fontsize = 15, color = color, verticalalignment = 'top', horizontalalignment = 'center')
     # Title and labels for clarity
-    # plt.title('Model Performance Comparison', fontsize = 16)
-    plt.xlabel('Time (s)', fontsize = 14)
-    plt.ylabel('Coverage (%)', fontsize = 14)
+    # plt.title('Model Performance Comparison', fontsize = 15)
+    plt.xlabel('Time (s)', fontsize = 18)
+    plt.ylabel('Coverage (%)', fontsize = 18)
     plt.grid(True, linestyle = '--', alpha = 0.6)
-    plt.legend(loc = 'upper left', fontsize = 12)
-
+    plt.legend(loc = 'lower right', fontsize = 14)
+    plt.xticks(fontsize = 14)  # 调整X轴刻度字体大小
+    plt.yticks(fontsize = 14)  # 调整X轴刻度字体大小
     plt.tight_layout()
     plt.show()
 
