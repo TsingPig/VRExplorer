@@ -2,6 +2,7 @@ import os
 import re
 import csv
 
+root_path = None
 def get_unity_version(project_path):
     version_file = os.path.join(project_path, 'ProjectSettings', 'ProjectVersion.txt')
     if os.path.exists(version_file):
@@ -70,7 +71,12 @@ def get_scenes_and_gameobjects(project_path):
             print(f"Failed to parse {scene}: {e}")
 
     return len(scene_files), gameobject_count
-
+def get_first_subdirectory(A, B):
+    # 去掉前缀路径 B
+    relative_path = os.path.relpath(A, B)
+    # 拆分路径并获取第一个部分
+    first_subdir = relative_path.split(os.sep)[0]
+    return first_subdir
 def analyze_project(project_path):
     print(f"分析项目: {project_path}")
     version = get_unity_version(project_path)
@@ -80,7 +86,7 @@ def analyze_project(project_path):
     scene_count, gameobject_count = get_scenes_and_gameobjects(project_path)
 
     return {
-        'Project': os.path.basename(project_path),
+        'Project': get_first_subdirectory(project_path, root_path),
         'UnityVersion': version,
         'CSharpScripts': cs_count,
         'CSharpLines': cs_lines,

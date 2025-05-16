@@ -75,7 +75,6 @@ https://github.com/dotClique/dotpool-unity
 https://github.com/theashutoshn/LatheMachine-VR
 https://github.com/acur97/ARKADIUS
 https://github.com/d3val/VR-Room---Eduardo-A
-https://github.com/Mrgove10/Unity-VR-template
 https://github.com/jordialfonsop/Castle-Quest-The-Search-For-The-Treasure
 https://github.com/ofsouzap/VRcade
 https://github.com/AdrianVides56/0x0B-unity-vr_room
