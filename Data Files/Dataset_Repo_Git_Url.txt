@@ -78,7 +78,6 @@ https://github.com/jordialfonsop/Castle-Quest-The-Search-For-The-Treasure
 https://github.com/ofsouzap/VRcade
 https://github.com/AdrianVides56/0x0B-unity-vr_room
 https://github.com/Aynur19/Unity_XR-Quest
-https://github.com/theashutoshn/Classroom-VR
 https://github.com/J-Scan/MRIExperience
 https://github.com/Chgv99/wind-turbine-vr
 https://github.com/alexisseurin/6-Unity-VR-FactoryFrenzy
@@ -98,6 +97,3 @@ https://github.com/SanyaKirilv/VRHackaton_UnityGame
 https://github.com/jvelazqueztraut/ymiyp-vr
 https://github.com/chubozeko/MechaRacer
 https://github.com/ShinjiMC/TryNotDie
-unity-vr-maze
-UnityVR
-UnityCityView
