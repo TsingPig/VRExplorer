@@ -26,10 +26,10 @@ scatter_color = '#FFA600'  # 散点图颜色
 # 2. 数据准备 ================================================
 file_path = r'F:\--CodeRepo\--CodeRepo\Paper Reading\____Writing\Data Files\unity_projects_summary.csv'
 df = pd.read_csv(file_path)
-columns_to_plot = ['Scripts', 'LOC', 'Files', 'Scenes']
+columns_to_plot = ['Scripts', 'LOC', 'Files', 'Scenes', 'GameObjects']
 
 # 3. 创建图形 ================================================
-fig, axes = plt.subplots(1, 4, figsize=(6, 3))
+fig, axes = plt.subplots(1, 5, figsize=(6, 3))
 
 # 4. 绘图循环 ================================================
 for ax, col in zip(axes, columns_to_plot):
@@ -63,7 +63,7 @@ for ax, col in zip(axes, columns_to_plot):
     ax.grid(True, axis='y', linestyle=':', linewidth=0.5, alpha=0.5)
 
     # 对LOC和Scripts使用对数刻度
-    if col in ['LOC', 'Scripts']:
+    if col in ['LOC', 'Scripts', 'GameObjects']:
         ax.set_yscale('log')
         ax.set_ylabel(f'{col} (log scale)')
 
