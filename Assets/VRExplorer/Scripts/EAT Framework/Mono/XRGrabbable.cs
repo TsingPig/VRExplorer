@@ -7,15 +7,29 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
 {
     private XRBaseInteractable interactable;
     public string Name => Str.Grabbable;
-    public Transform destination = null;
 
+    /// <summary>
+    /// Kinematic Physics locks the object in place on the hand / grabber. PhysicsJoint allows collisions with the environment.
+    /// </summary>
+    [Tooltip("Kinematic Physics locks the object in place on the hand / grabber. Physics Joint and Velocity types allow collisions with the environment.")]
+    public GrabPhysics GrabPhysics = GrabPhysics.Kinematic;
+
+    /// <summary>
+    /// Snap to a location or grab anywhere on the object
+    /// </summary>
+    [Tooltip("Snap to a location or grab anywhere on the object")]
+    public GrabType GrabMechanic = GrabType.Snap;
+
+
+    public Transform destination = null;
     public Grabbable Grabbable
     {
         get
         {
             var g = GetComponent<Grabbable>();
             if(!g) g = gameObject.AddComponent<Grabbable>();
-            g.GrabPhysics = GrabPhysics.Kinematic;
+            g.GrabPhysics = GrabPhysics;
+            g.GrabMechanic = GrabMechanic;
             return g;
         }
     }
