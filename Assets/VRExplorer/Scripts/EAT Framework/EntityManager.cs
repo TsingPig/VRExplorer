@@ -42,7 +42,6 @@ namespace VRExplorer
                 monoState[mono] = value;
                 if(value && monoState.Values.All(value => value))
                 {
-                    ExperimentManager.Instance.ExperimentFinish();
                     return true;
                 }
                 return false;

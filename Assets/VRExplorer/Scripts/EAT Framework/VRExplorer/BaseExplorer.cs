@@ -51,97 +51,6 @@ namespace VRExplorer
         [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
         [SerializeField] protected MonoBehaviour _nextMono;
 
-
-        private void OnApplicationQuit()
-        {
-            _applicationQuitting = true;
-        }
-        protected async Task StartSceneExplore()
-        {
-            ExperimentManager.Instance.StartRecording();
-            StoreMonoPos();
-            while(!_applicationQuitting)
-            {
-                try
-                {
-                    await SceneExplore();
-                }
-                catch(Exception except)
-                {
-                    Debug.LogError(except.ToString());
-                }
-                await Task.Yield();
-            }
-        }
-
-
-        protected List<BaseAction> TaskGenerator(MonoBehaviour mono)
-        {
-            List<BaseAction> task = new List<BaseAction>();
-
-            switch(EntityManager.Instance.monoEntitiesMapping[mono][0].Name)
-            {
-                case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
-                case Str.Triggerable: task = TriggerTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
-                case Str.Grabbable: task = GrabTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
-                case Str.Gun:
-                task = GrabAndShootGunTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono),
-                    EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
-            }
-            return task;
-        }
-
-        protected async Task SceneExplore()
-        {
-            bool explorationEventsCompleted = (_explorationEventsExecuted >= explorationEvents.Count);
-            bool monoTasksCompleted = EntityManager.Instance.UpdateMonoState(_nextMono, true);
-            Debug.Log($"{Str.DebugTag}monoTasksCompleted: {monoTasksCompleted}");
-            if(!explorationEventsCompleted && !monoTasksCompleted)
-            {
-                float FSM = Random.Range(0, 1f);
-                if(FSM <= explorationEventFrequency)
-                {
-                    _curTask = BaseTask();
-                    Debug.Log(new RichText()
-                        .Add("Task: ", bold: true)
-                        .Add("BaseTask", bold: true, color: Color.yellow));
-                }
-                else
-                {
-                    GetNextMono(out _nextMono);
-                    _curTask = TaskGenerator(_nextMono);
-                    Debug.Log(new RichText()
-                        .Add("Mono of Task: ", bold: true)
-                        .Add(_nextMono.name, bold: true, color: Color.yellow));
-                }
-            }
-            else if(!explorationEventsCompleted)
-            {
-                _curTask = BaseTask();
-                Debug.Log(new RichText()
-                    .Add("Task: ", bold: true)
-                    .Add("BaseTask", bold: true, color: Color.yellow));
-            }
-            else if(!monoTasksCompleted)
-            {
-                GetNextMono(out _nextMono);
-                _curTask = TaskGenerator(_nextMono);
-                Debug.Log(new RichText()
-                    .Add("Mono of Task: ", bold: true)
-                    .Add(_nextMono.name, bold: true, color: Color.yellow));
-            }
-            foreach(var action in _curTask)
-            {
-                await action.Execute();
-            }
-        }
-
-        /// <summary>
-        /// 计算下一个交互的 mono
-        /// </summary>
-        /// <param name="mono"></param>
-        protected abstract void GetNextMono(out MonoBehaviour mono);
-
         #region 场景信息预处理（Scene Information Preprocessing)
 
         /// <summary>
@@ -224,6 +133,140 @@ namespace VRExplorer
         }
 
         #endregion 场景信息预处理（Scene Information Preprocessing)
+
+        #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
+
+        private void OnApplicationQuit()
+        {
+            _applicationQuitting = true;
+        }
+
+        /// <summary>
+        /// 重复执行场景探索。
+        /// 初始时记录场景信息，当结束运行时自动结束异步任务。
+        /// </summary>
+        /// <returns></returns>
+        protected async Task RepeatSceneExplore()
+        {
+            ExperimentManager.Instance.StartRecording();
+            StoreMonoPos();
+            while(!_applicationQuitting)
+            {
+                //try
+                //{
+                await SceneExplore();
+                //}
+                //catch(Exception except)
+                //{
+                //    Debug.LogError(except.ToString());
+                //}
+                for(int i = 0; i < 30; i++)
+                {
+                    await Task.Yield();
+                }
+                //if((_explorationEventsExecuted >= explorationEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value))
+                //{
+                //    ExperimentManager.Instance.ExperimentFinish();
+                //}
+            }
+        }
+
+        /// <summary>
+        /// 任务生成器，通过输入Mono信息，解析Entity标识符名，返回对应的任务模型
+        /// </summary>
+        /// <param name="mono">当前需要交互的Mono</param>
+        /// <returns></returns>
+        protected List<BaseAction> TaskGenerator(MonoBehaviour mono)
+        {
+            List<BaseAction> task = new List<BaseAction>();
+
+            switch(EntityManager.Instance.monoEntitiesMapping[mono][0].Name)
+            {
+                case Str.Transformable: task = TransformTask(EntityManager.Instance.GetEntity<ITransformableEntity>(mono)); break;
+                case Str.Triggerable: task = TriggerTask(EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
+                case Str.Grabbable: task = GrabTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono)); break;
+                case Str.Gun:
+                task = GrabAndShootGunTask(EntityManager.Instance.GetEntity<IGrabbableEntity>(mono),
+                    EntityManager.Instance.GetEntity<ITriggerableEntity>(mono)); break;
+            }
+            return task;
+        }
+
+        protected async Task AutonomousEventInvocation()
+        {
+            _curTask = BaseTask();
+            Debug.Log(new RichText()
+                .Add("Task: ", bold: true)
+                .Add("BaseTask", bold: true, color: Color.yellow));
+            foreach(var action in _curTask)
+            {
+                await action.Execute();
+            }
+        }
+
+        protected async Task TaskExecutation()
+        {
+            try
+            {
+                GetNextMono(out _nextMono);
+                _curTask = TaskGenerator(_nextMono);
+                Debug.Log(new RichText()
+                    .Add("Mono of Task: ", bold: true)
+                    .Add(_nextMono.name, bold: true, color: Color.yellow));
+                foreach(var action in _curTask)
+                {
+                    await action.Execute();
+                }
+                Debug.Log(1);
+                ExperimentManager.Instance.ShowMetrics();
+                EntityManager.Instance.UpdateMonoState(_nextMono, true);
+                ExperimentManager.Instance.ShowMetrics();
+                Debug.Log(2);
+            }
+            catch(Exception except)
+            {
+                Debug.LogError(except.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 场景探索。
+        /// 基于条件分支实现了PFSM
+        /// </summary>
+        /// <returns></returns>
+        protected async Task SceneExplore()
+        {
+            bool explorationEventsCompleted = (_explorationEventsExecuted >= explorationEvents.Count);
+            bool monoTasksCompleted = EntityManager.Instance.monoState.Values.All(value => value);
+            if(!explorationEventsCompleted && !monoTasksCompleted)
+            {
+                float FSM = Random.Range(0, 1f);
+                if(FSM <= explorationEventFrequency)
+                {
+                    await AutonomousEventInvocation();
+                }
+                else
+                {
+                    await TaskExecutation();
+                }
+            }
+            else if(!explorationEventsCompleted)
+            {
+                await AutonomousEventInvocation();
+            }
+            else if(!monoTasksCompleted)
+            {
+                await TaskExecutation();
+            }
+        }
+
+        /// <summary>
+        /// 计算下一个交互的 mono
+        /// </summary>
+        /// <param name="mono"></param>
+        protected abstract void GetNextMono(out MonoBehaviour mono);
+
+        #endregion
 
         #region 任务预定义（Task Pre-defined）
 
@@ -389,7 +432,7 @@ namespace VRExplorer
         {
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
-            Invoke("StartSceneExplore", 2f);
+            Invoke("RepeatSceneExplore", 2f);
         }
     }
 }
