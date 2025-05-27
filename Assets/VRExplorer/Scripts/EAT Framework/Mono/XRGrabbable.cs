@@ -9,6 +9,14 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
     public string Name => Str.Grabbable;
 
     /// <summary>
+    /// Whether to enable physics simulation when releasing the object.
+    /// If true, the object will be affected by gravity, collisions, and other physics.
+    /// If false, the object's velocity will be set to zero upon release.
+    /// </summary>
+    [Tooltip("If enabled, the released object will be affected by physics (gravity/collisions). If disabled, the object will remain stationary.")]
+    public bool usePhysicsOnRelease = false;
+
+    /// <summary>
     /// Kinematic Physics locks the object in place on the hand / grabber. PhysicsJoint allows collisions with the environment.
     /// </summary>
     [Tooltip("Kinematic Physics locks the object in place on the hand / grabber. Physics Joint and Velocity types allow collisions with the environment.")]
@@ -63,5 +71,13 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
         interactable.firstSelectEntered.Invoke(e);
         interactable.firstHoverEntered.Invoke(h);
         interactable.activated.Invoke(a);
+    }
+
+    public void OnReleased()
+    {
+        if(usePhysicsOnRelease)
+        {
+            Grabbable.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
     }
 }

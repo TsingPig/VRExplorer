@@ -43,6 +43,7 @@ namespace VRExplorer
         {
             Debug.Log("Release");
             _handController.grabber.TryRelease();
+            _grabbableEntity.OnReleased();
         }
     }
 }

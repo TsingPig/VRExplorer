@@ -23,6 +23,10 @@ public class XRTransformable : MonoBehaviour, ITransformableEntity
     private void Start()
     {
         interactable = GetComponent<XRBaseInteractable>();
+        if( interactable == null)
+        {
+            interactable = gameObject.AddComponent<XRGrabInteractable>();
+        }
     }
 
     public void Triggerred()

@@ -14,5 +14,7 @@ namespace VRExplorer
         Grabbable Grabbable { get; }
 
         void OnGrabbed();
+
+        void OnReleased();
     }
 }
