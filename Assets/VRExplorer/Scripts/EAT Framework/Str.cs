@@ -10,5 +10,7 @@
         public const string Transformable = "transformable";
 
         #endregion Customized
+
+        public const string DebugTag = "VRExplorer Console: ";
     }
 }

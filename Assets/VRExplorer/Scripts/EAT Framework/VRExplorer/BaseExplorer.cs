@@ -1,4 +1,5 @@
 using BNG;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace VRExplorer
         private Vector3 _sceneCenter;
         private int _explorationEventIndex = 0;
         private int _explorationEventsExecuted = 0;
+        private bool _applicationQuitting = false;
 
         protected Vector3[] _initMonoPos;
         protected Quaternion[] _initMonoRot;
@@ -33,30 +35,45 @@ namespace VRExplorer
                 return e;
             }
         }
+        [Header("Experimental Configuration")]
+        private float reportCoverageDuration = 5f;
 
-        [Header("Configuration")]
+        [Header("Exploration Configuration")]
         public HandController leftHandController;
-
         public float moveSpeed = 6f;
+        public float explorationEventFrequency;
         public bool randomInitPos = false;
         public bool drag = false;
-        public float reportCoverageDuration = 5f;
-        public float explorationEventFrequency;
         public List<UnityEvent> explorationEvents = new List<UnityEvent>();
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
-
-        [SerializeField] protected List<Grabbable> _grabbables = new List<Grabbable>();
         [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
         [SerializeField] protected MonoBehaviour _nextMono;
 
-        protected void StartSceneExplore()
+
+        private void OnApplicationQuit()
+        {
+            _applicationQuitting = true;
+        }
+        protected async Task StartSceneExplore()
         {
             ExperimentManager.Instance.StartRecording();
-            _ = SceneExplore();
             StoreMonoPos();
+            while(!_applicationQuitting)
+            {
+                try
+                {
+                    await SceneExplore();
+                }
+                catch(Exception except)
+                {
+                    Debug.LogError(except.ToString());
+                }
+                await Task.Yield();
+            }
         }
+
 
         protected List<BaseAction> TaskGenerator(MonoBehaviour mono)
         {
@@ -77,8 +94,8 @@ namespace VRExplorer
         protected async Task SceneExplore()
         {
             bool explorationEventsCompleted = (_explorationEventsExecuted >= explorationEvents.Count);
-            bool monoTasksCompleted = EntityManager.Instance.UpdateMonoState(_nextMono, true); // 假设有方法检查是否所有 Mono 都完成
-
+            bool monoTasksCompleted = EntityManager.Instance.UpdateMonoState(_nextMono, true);
+            Debug.Log($"{Str.DebugTag}monoTasksCompleted: {monoTasksCompleted}");
             if(!explorationEventsCompleted && !monoTasksCompleted)
             {
                 float FSM = Random.Range(0, 1f);
@@ -105,7 +122,7 @@ namespace VRExplorer
                     .Add("Task: ", bold: true)
                     .Add("BaseTask", bold: true, color: Color.yellow));
             }
-            else
+            else if(!monoTasksCompleted)
             {
                 GetNextMono(out _nextMono);
                 _curTask = TaskGenerator(_nextMono);
@@ -113,15 +130,9 @@ namespace VRExplorer
                     .Add("Mono of Task: ", bold: true)
                     .Add(_nextMono.name, bold: true, color: Color.yellow));
             }
-
             foreach(var action in _curTask)
             {
                 await action.Execute();
-            }
-
-            if(!explorationEventsCompleted || !monoTasksCompleted)
-            {
-                await SceneExplore();
             }
         }
 
@@ -351,12 +362,29 @@ namespace VRExplorer
             _navMeshAgent = GetComponent<NavMeshAgent>();
             EntityManager.Instance.RegisterAllEntities();
             EntityManager.Instance.vrexplorerMono = this;
+            ExperimentManager.Instance.reportCoverageDuration = reportCoverageDuration;
             ExperimentManager.Instance.ExperimentFinishEvent += () =>
             {
                 //ResetMonoPos();
             };
+            //Application.logMessageReceived += HandleException; 
         }
 
+        ///// <summary>
+        ///// 监听所有未处理的异常（主线程、异步任务等）
+        ///// </summary>
+        ///// <param name="logString"></param>
+        ///// <param name="stackTrace"></param>
+        ///// <param name="type"></param>
+        //void HandleException(string logString, string stackTrace, LogType type)
+        //{
+        //    if(type == LogType.Exception)
+        //    {
+        //        Debug.LogError($"全局捕获异常: {logString}\n堆栈: {stackTrace}");
+        //        // 可选：将错误上报到服务器或写入文件
+        //        // ReportToServer(logString, stackTrace);
+        //    }
+        //}
         private void Start()
         {
             _triangulation = NavMesh.CalculateTriangulation();

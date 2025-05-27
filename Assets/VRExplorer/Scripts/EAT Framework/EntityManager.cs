@@ -76,7 +76,7 @@ namespace VRExplorer
         /// 注册实体并初始化状态
         /// </summary>
         /// <param name="entity"></param>
-        private void RegisterEntity(IBaseEntity entity)
+        public void RegisterEntity(IBaseEntity entity)
         {
             MonoBehaviour mono = entity.transform.GetComponent<MonoBehaviour>();
 
@@ -89,6 +89,7 @@ namespace VRExplorer
 
             if(!entityStates.ContainsKey(entity))
             {
+                Debug.Log($"{Str.DebugTag}Entity'{entity.Name}' Registered");
                 entityStates[entity] = new HashSet<Enum>();
 
                 var interfaces = entity.GetType().GetInterfaces();

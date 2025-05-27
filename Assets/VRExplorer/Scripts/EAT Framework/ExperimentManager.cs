@@ -84,9 +84,9 @@ namespace VRExplorer
         {
             ShowMetrics();
             Debug.Log(new RichText().Add("Experiment Finished", color: Color.yellow, bold: true));
-            StateCount = 0;
-            ExperimentFinishEvent?.Invoke();
-            StopAllCoroutines();
+            //StateCount = 0;
+            //ExperimentFinishEvent?.Invoke();
+            //StopAllCoroutines();
             //UnityEditor.EditorApplication.isPlaying = false;
         }
 

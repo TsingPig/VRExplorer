@@ -5,7 +5,8 @@ using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
 
-public class XRTriggerable : MonoBehaviour, ITriggerableEntity
+
+public class XRTriggerable : XRBase, ITriggerableEntity
 {
     private XRBaseInteractable _interactable;
     private XRBaseInteractor _interactor;
@@ -19,7 +20,7 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
     public float triggeringTime = 0.5f;
     public float TriggeringTime => triggeringTime;
 
-    public string Name => Str.Triggerable;
+    public new string Name => Str.Triggerable;
 
     public void Triggerred()
     {
@@ -45,8 +46,8 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
             _interactable.deactivated.Invoke(a);
         }
 
-        e = new SelectExitEventArgs() {  };
-        h = new HoverExitEventArgs() {};
+        e = new SelectExitEventArgs() { };
+        h = new HoverExitEventArgs() { };
         a = new DeactivateEventArgs() { interactorObject = interactor };
         if(_interactor)
         {
@@ -57,14 +58,22 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
             }
             catch(Exception except)
             {
-                Debug.Log(except.ToString());
+                Debug.LogError(except.ToString());
             }
 
         }
 
         foreach(var eve in events)
         {
-            eve?.Invoke();
+            try
+            {
+                eve?.Invoke();
+
+            }
+            catch(Exception except)
+            {
+                Debug.LogError(except.ToString());
+            }
         }
     }
 
@@ -91,7 +100,7 @@ public class XRTriggerable : MonoBehaviour, ITriggerableEntity
             _interactable.firstHoverEntered.Invoke(h);
             _interactable.activated.Invoke(a);
         }
-        e = new SelectEnterEventArgs() {  };
+        e = new SelectEnterEventArgs() { };
         h = new HoverEnterEventArgs() { };
         if(_interactor)
         {
