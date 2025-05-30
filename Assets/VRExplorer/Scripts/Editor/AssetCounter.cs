@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEditor;
 using System.IO;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 public class AssetCounter : MonoBehaviour
 {
@@ -20,6 +20,7 @@ public class AssetCounter : MonoBehaviour
         int prefabFiles = CountFilesByExtension(assetsPath, ".prefab");
         Debug.Log($"Total prefabs: {prefabFiles}");
     }
+
     public static void CountActiveGameObjectsInScene()
     {
         GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();

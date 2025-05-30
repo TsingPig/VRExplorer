@@ -18,7 +18,6 @@ public class XRTransformable : XRBase, ITransformableEntity
 
     public float TriggeringTime => triggeringTime;
 
-
     public void Triggerred()
     {
         var obj = EntityManager.Instance.vrexplorerMono.gameObject;

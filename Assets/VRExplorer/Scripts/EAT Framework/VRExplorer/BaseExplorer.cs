@@ -7,7 +7,6 @@ using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
-using static UnityEditor.PlayerSettings;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -35,13 +34,16 @@ namespace VRExplorer
                 return e;
             }
         }
+
         [Header("Experimental Configuration")]
         [SerializeField] private float reportCoverageDuration = 5f;
+
         [Tooltip("Set it to true when you are sure all the Interactable Objects can be covered")]
         [SerializeField] private bool exitAfterTesting = true;
 
         [Header("Exploration Configuration")]
         public HandController leftHandController;
+
         public float moveSpeed = 6f;
         public float explorationEventFrequency;
         public bool randomInitPos = false;
@@ -50,6 +52,7 @@ namespace VRExplorer
 
         [Header("Show For Debug")]
         [SerializeField] protected float _areaDiameter = 7.5f;
+
         [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
         [SerializeField] protected MonoBehaviour _nextMono;
 
@@ -259,7 +262,7 @@ namespace VRExplorer
         /// <param name="mono"></param>
         protected abstract void GetNextMono(out MonoBehaviour mono);
 
-        #endregion
+        #endregion 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
 
         #region 任务预定义（Task Pre-defined）
 
@@ -403,7 +406,7 @@ namespace VRExplorer
             {
                 //ResetMonoPos();
             };
-            //Application.logMessageReceived += HandleException; 
+            //Application.logMessageReceived += HandleException;
         }
 
         private void Start()

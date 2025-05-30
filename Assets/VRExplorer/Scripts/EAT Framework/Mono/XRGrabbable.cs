@@ -5,7 +5,7 @@ using VRExplorer;
 
 public class XRGrabbable : XRBase, IGrabbableEntity
 {
-    public string Name => Str.Grabbable;
+    public new string Name => Str.Grabbable;
 
     /// <summary>
     /// 当释放物体时是否启用物理模拟
@@ -27,8 +27,8 @@ public class XRGrabbable : XRBase, IGrabbableEntity
     [Tooltip("Snap to a location or grab anywhere on the object")]
     public GrabType GrabMechanic = GrabType.Snap;
 
-
     public Transform destination = null;
+
     public Grabbable Grabbable
     {
         get
@@ -40,7 +40,6 @@ public class XRGrabbable : XRBase, IGrabbableEntity
             return g;
         }
     }
-
 
     public Transform Destination => destination;
 

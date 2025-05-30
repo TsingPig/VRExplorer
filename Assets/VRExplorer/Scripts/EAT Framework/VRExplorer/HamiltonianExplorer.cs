@@ -1,14 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace VRExplorer
 {
     public class HamiltonianExplorer : BaseExplorer
     {
-        //private float[,] distanceMatrix; 
-        //private List<int> hamiltonianPath; 
+        //private float[,] distanceMatrix;
+        //private List<int> hamiltonianPath;
         //private int curGrabbableIndex = 0;
 
         //private void ComputeDistanceMatrix()
@@ -30,7 +27,7 @@ namespace VRExplorer
         //        }
         //        else
         //        {
-        //            distanceMatrix[count, i] = float.MaxValue; 
+        //            distanceMatrix[count, i] = float.MaxValue;
         //            distanceMatrix[i, count] = float.MaxValue;
         //        }
         //    }
@@ -51,7 +48,7 @@ namespace VRExplorer
         //            }
         //            else
         //            {
-        //                distanceMatrix[i, j] = float.MaxValue; 
+        //                distanceMatrix[i, j] = float.MaxValue;
         //            }
         //        }
         //    }
@@ -66,9 +63,9 @@ namespace VRExplorer
         //    int n = _grabbables.Count;
         //    List<int> path = new List<int>();
         //    List<int> bestPath = new List<int>();
-        //    float bestDistance = float.MaxValue;  
+        //    float bestDistance = float.MaxValue;
 
-        //    bool[] visited = new bool[n];  
+        //    bool[] visited = new bool[n];
 
         //    void Backtrack(int currentNode, float currentDistance, List<int> currentPath)
         //    {
@@ -77,7 +74,7 @@ namespace VRExplorer
         //            if(currentDistance < bestDistance)
         //            {
         //                bestDistance = currentDistance;
-        //                bestPath = new List<int>(currentPath);  
+        //                bestPath = new List<int>(currentPath);
         //            }
         //            return;
         //        }
@@ -95,7 +92,7 @@ namespace VRExplorer
         //        }
         //    }
 
-        //    Backtrack(n, 0, path); 
+        //    Backtrack(n, 0, path);
 
         //    return bestPath;
         //}

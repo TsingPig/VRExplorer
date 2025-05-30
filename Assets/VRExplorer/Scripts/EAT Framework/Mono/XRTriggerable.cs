@@ -5,7 +5,6 @@ using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
 
-
 public class XRTriggerable : XRBase, ITriggerableEntity
 {
     public new string Name => Str.Triggerable;
@@ -13,10 +12,9 @@ public class XRTriggerable : XRBase, ITriggerableEntity
     public List<UnityEvent> triggerringEvents = new List<UnityEvent>();
     public List<UnityEvent> triggerredEvents = new List<UnityEvent>();
 
-
     public float triggeringTime = 0.5f;
-    public float TriggeringTime => triggeringTime;
 
+    public float TriggeringTime => triggeringTime;
 
     public void Triggerred()
     {
@@ -56,7 +54,6 @@ public class XRTriggerable : XRBase, ITriggerableEntity
             {
                 Debug.LogError(except.ToString());
             }
-
         }
 
         foreach(var eve in triggerredEvents)
@@ -64,7 +61,6 @@ public class XRTriggerable : XRBase, ITriggerableEntity
             try
             {
                 eve?.Invoke();
-
             }
             catch(Exception except)
             {
@@ -115,7 +111,6 @@ public class XRTriggerable : XRBase, ITriggerableEntity
             try
             {
                 eve?.Invoke();
-
             }
             catch(Exception except)
             {
