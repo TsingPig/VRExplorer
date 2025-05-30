@@ -8,19 +8,15 @@ using VRExplorer;
 
 public class XRTriggerable : XRBase, ITriggerableEntity
 {
-    private XRBaseInteractable _interactable;
-    private XRBaseInteractor _interactor;
-    public List<UnityEvent> events = new List<UnityEvent>();
+    public new string Name => Str.Triggerable;
 
-    private void Start()
-    {
-        if(_interactable == null) _interactable = GetComponent<XRBaseInteractable>();
-        if(_interactor == null) _interactor = GetComponent<XRBaseInteractor>();
-    }
+    public List<UnityEvent> triggerringEvents = new List<UnityEvent>();
+    public List<UnityEvent> triggerredEvents = new List<UnityEvent>();
+
+
     public float triggeringTime = 0.5f;
     public float TriggeringTime => triggeringTime;
 
-    public new string Name => Str.Triggerable;
 
     public void Triggerred()
     {
@@ -63,7 +59,7 @@ public class XRTriggerable : XRBase, ITriggerableEntity
 
         }
 
-        foreach(var eve in events)
+        foreach(var eve in triggerredEvents)
         {
             try
             {
@@ -114,6 +110,17 @@ public class XRTriggerable : XRBase, ITriggerableEntity
                 Debug.Log(except.ToString());
             }
         }
+        foreach(var eve in triggerredEvents)
+        {
+            try
+            {
+                eve?.Invoke();
 
+            }
+            catch(Exception except)
+            {
+                Debug.LogError(except.ToString());
+            }
+        }
     }
 }

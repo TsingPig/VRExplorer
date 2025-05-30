@@ -37,7 +37,7 @@ namespace VRExplorer
         /// <returns></returns>
         public bool UpdateMonoState(MonoBehaviour mono, bool value)
         {
-            if(mono != null && monoState.ContainsKey(mono))
+            if(monoState.ContainsKey(mono))
             {
                 monoState[mono] = value;
                 if(value && monoState.Values.All(value => value))

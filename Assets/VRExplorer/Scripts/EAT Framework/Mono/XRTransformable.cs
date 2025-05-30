@@ -2,9 +2,11 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
 
-public class XRTransformable : MonoBehaviour, ITransformableEntity
+public class XRTransformable : XRBase, ITransformableEntity
 {
-    public float triggeringTime = 3f;
+    public new string Name => Str.Transformable;
+
+    public float triggeringTime = 0.5f;
 
     public Transform destination;
 
@@ -16,18 +18,6 @@ public class XRTransformable : MonoBehaviour, ITransformableEntity
 
     public float TriggeringTime => triggeringTime;
 
-    public string Name => Str.Transformable;
-
-    private XRBaseInteractable interactable;
-
-    private void Start()
-    {
-        interactable = GetComponent<XRBaseInteractable>();
-        if( interactable == null)
-        {
-            interactable = gameObject.AddComponent<XRGrabInteractable>();
-        }
-    }
 
     public void Triggerred()
     {
@@ -44,11 +34,11 @@ public class XRTransformable : MonoBehaviour, ITransformableEntity
         var e = new SelectExitEventArgs() { interactorObject = interactor };
         var h = new HoverExitEventArgs() { interactorObject = interactor };
         var a = new DeactivateEventArgs() { interactorObject = interactor };
-        interactable.selectExited.Invoke(e);
-        interactable.hoverExited.Invoke(h);
-        interactable.lastSelectExited.Invoke(e);
-        interactable.lastHoverExited.Invoke(h);
-        interactable.deactivated.Invoke(a);
+        _interactable.selectExited.Invoke(e);
+        _interactable.hoverExited.Invoke(h);
+        _interactable.lastSelectExited.Invoke(e);
+        _interactable.lastHoverExited.Invoke(h);
+        _interactable.deactivated.Invoke(a);
     }
 
     public void Triggerring()
@@ -66,10 +56,10 @@ public class XRTransformable : MonoBehaviour, ITransformableEntity
         var e = new SelectEnterEventArgs() { interactorObject = interactor };
         var h = new HoverEnterEventArgs() { interactorObject = interactor };
         var a = new ActivateEventArgs() { interactorObject = interactor };
-        interactable.selectEntered.Invoke(e);
-        interactable.hoverEntered.Invoke(h);
-        interactable.firstSelectEntered.Invoke(e);
-        interactable.firstHoverEntered.Invoke(h);
-        interactable.activated.Invoke(a);
+        _interactable.selectEntered.Invoke(e);
+        _interactable.hoverEntered.Invoke(h);
+        _interactable.firstSelectEntered.Invoke(e);
+        _interactable.firstHoverEntered.Invoke(h);
+        _interactable.activated.Invoke(a);
     }
 }

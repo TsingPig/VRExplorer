@@ -3,9 +3,8 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using VRExplorer;
 
-public class XRGrabbable : MonoBehaviour, IGrabbableEntity
+public class XRGrabbable : XRBase, IGrabbableEntity
 {
-    private XRBaseInteractable interactable;
     public string Name => Str.Grabbable;
 
     /// <summary>
@@ -13,7 +12,7 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
     /// 如果为true，物体会受到重力、碰撞等物理影响
     /// 如果为false，物体在释放瞬间速度设置为0。
     /// </summary>
-    [Tooltip("启用时释放物体会受物理影响(重力/碰撞)，禁用时物体会保持静止")]
+    [Tooltip("启用时释放物体会受惯性影响")]
     public bool usePhysicsOnRelease = false;
 
     /// <summary>
@@ -42,12 +41,6 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
         }
     }
 
-    private void Start()
-    {
-        interactable = GetComponent<XRBaseInteractable>();
-    }
-
-
 
     public Transform Destination => destination;
 
@@ -66,11 +59,11 @@ public class XRGrabbable : MonoBehaviour, IGrabbableEntity
         var e = new SelectEnterEventArgs() { interactorObject = interactor };
         var h = new HoverEnterEventArgs() { interactorObject = interactor };
         var a = new ActivateEventArgs() { interactorObject = interactor };
-        interactable.selectEntered.Invoke(e);
-        interactable.hoverEntered.Invoke(h);
-        interactable.firstSelectEntered.Invoke(e);
-        interactable.firstHoverEntered.Invoke(h);
-        interactable.activated.Invoke(a);
+        _interactable.selectEntered.Invoke(e);
+        _interactable.hoverEntered.Invoke(h);
+        _interactable.firstSelectEntered.Invoke(e);
+        _interactable.firstHoverEntered.Invoke(h);
+        _interactable.activated.Invoke(a);
     }
 
     public void OnReleased()

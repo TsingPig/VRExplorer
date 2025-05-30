@@ -36,7 +36,9 @@ namespace VRExplorer
             }
         }
         [Header("Experimental Configuration")]
-        private float reportCoverageDuration = 5f;
+        [SerializeField] private float reportCoverageDuration = 5f;
+        [Tooltip("Set it to true when you are sure all the Interactable Objects can be covered")]
+        [SerializeField] private bool exitAfterTesting = true;
 
         [Header("Exploration Configuration")]
         public HandController leftHandController;
@@ -152,22 +154,17 @@ namespace VRExplorer
             StoreMonoPos();
             while(!_applicationQuitting)
             {
-                //try
-                //{
                 await SceneExplore();
-                //}
-                //catch(Exception except)
-                //{
-                //    Debug.LogError(except.ToString());
-                //}
+                //ExperimentManager.Instance.ShowMetrics();
                 for(int i = 0; i < 30; i++)
                 {
                     await Task.Yield();
                 }
-                //if((_explorationEventsExecuted >= explorationEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value))
-                //{
-                //    ExperimentManager.Instance.ExperimentFinish();
-                //}
+                if(exitAfterTesting && (_explorationEventsExecuted >= explorationEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value))
+                {
+                    //ExperimentManager.Instance.ExperimentFinish();
+                    UnityEditor.EditorApplication.isPlaying = false;
+                }
             }
         }
 
@@ -217,11 +214,7 @@ namespace VRExplorer
                 {
                     await action.Execute();
                 }
-                Debug.Log(1);
-                ExperimentManager.Instance.ShowMetrics();
                 EntityManager.Instance.UpdateMonoState(_nextMono, true);
-                ExperimentManager.Instance.ShowMetrics();
-                Debug.Log(2);
             }
             catch(Exception except)
             {
@@ -413,21 +406,6 @@ namespace VRExplorer
             //Application.logMessageReceived += HandleException; 
         }
 
-        ///// <summary>
-        ///// 监听所有未处理的异常（主线程、异步任务等）
-        ///// </summary>
-        ///// <param name="logString"></param>
-        ///// <param name="stackTrace"></param>
-        ///// <param name="type"></param>
-        //void HandleException(string logString, string stackTrace, LogType type)
-        //{
-        //    if(type == LogType.Exception)
-        //    {
-        //        Debug.LogError($"全局捕获异常: {logString}\n堆栈: {stackTrace}");
-        //        // 可选：将错误上报到服务器或写入文件
-        //        // ReportToServer(logString, stackTrace);
-        //    }
-        //}
         private void Start()
         {
             _triangulation = NavMesh.CalculateTriangulation();

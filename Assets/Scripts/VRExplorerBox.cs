@@ -24,5 +24,10 @@ public class VRExplorerBox : MonoBehaviour, IGrabbableEntity
         OnGrabbed();
     }
 
+    [ExcludeFromCodeCoverage]
+    public void OnReleased()
+    {
+    }
+
     #endregion Entity Region
 }
