@@ -1,8 +1,11 @@
 # Bug Report
 
-We found two bugs in [GatienVilain/EscapeGameVR: Virtual reality Escape Game on Unity (github.com)](https://github.com/GatienVilain/EscapeGameVR) and have reported it to the developers (not confirm yet).
+We found two bugs in [GatienVilain/EscapeGameVR: Virtual reality Escape Game on Unity (github.com)](https://github.com/GatienVilain/EscapeGameVR) and have reported it to the developers (not confirm yet). And we had detected the confirmed functional bug in UnityCityView.
 
-## Functional Bug (tool-reported)
+## Functional Bugs
+
+### EscapeGameVR
+
 After placing three colored blocks and instantiating the bow, triggering the `ArrowControler.cs`'s `ReleaseArrow()` method causes an exception:
 
 > UnityEngine.*Unassigned Reference Exception*:  The variable arrowSpawnPoint of ArrowControler has not been assigned.
@@ -11,7 +14,7 @@ After placing three colored blocks and instantiating the bow, triggering the `Ar
 
     This is due to a missing reference in the bow’s prefab (Assets/Prefabs/Bow/Bow_Wooden_no_string_prefab.prefab), while in ``ArrowControler.cs,` `ReleaseArrow(float strength)`, the code line `arrow.transform.position = arrowSpawnPoint.transform.position;'`it is used.
 
-![img](https://icnw6pwioyaz.feishu.cn/space/api/box/stream/download/asynccode/?code=YzJiODNiZjc4MGQ2OWZlM2NmNzNmMTEzYmZiNmMyOGVfRk9kN1J2aUVsSGFKNWFyYnpSZkNwc1ozbFZSQXc4cGNfVG9rZW46T0ZVOGIwcVZ4b283S294TzFMSWNtNnRibkZGXzE3NDg1MDI5OTM6MTc0ODUwNjU5M19WNA)
+![img](.\Picture\c74c396a-2d11-422d-aa39-205d59893950.png)
 
 - Full Console Information:
 
@@ -31,9 +34,27 @@ VRExplorer.TriggerAction/<Execute>d__3:MoveNext () (at D:/--UnityProject/VR/VREx
 UnityEngine.UnitySynchronizationContext:ExecuteTasks ()
 ```
 
+### UnityCityView
 
+We had succefully detected the bug which had beed confirmed.
 
-## **Missing Prefab Resource** (tool-assisted + manual):
+```
+System.ArgumentOutOfRangeException: Index and length must refer to a location within the string.
+Parameter name: length
+  at System.String.Substring (System.Int32 startIndex, System.Int32 length) [0x0004c] in <34c8028f8a3946349d8f0d77e409a1ae>:0 
+  at Hotel.showlabel () [0x00001] in D:\--UnityProject\VR\subjects\UnityCityView\Assets\Scripts\Hotel.cs:23 
+  at UnityEngine.Events.InvokableCall.Invoke () [0x00010] in <7ec46b65c5b844eba68646b3c21027d3>:0 
+  at UnityEngine.Events.UnityEvent.Invoke () [0x00022] in <7ec46b65c5b844eba68646b3c21027d3>:0 
+  at XRTriggerable.Triggerred () [0x00165] in D:\--UnityProject\VR\subjects\UnityCityView\Library\PackageCache\com.henrylab.vrexplorer@06a5b566fe\Scripts\EAT Framework\Mono\XRTriggerable.cs:63 
+UnityEngine.Debug:LogError (object)
+XRTriggerable:Triggerred () (at Library/PackageCache/com.henrylab.vrexplorer@06a5b566fe/Scripts/EAT Framework/Mono/XRTriggerable.cs:67)
+VRExplorer.TriggerAction/<Execute>d__3:MoveNext () (at Library/PackageCache/com.henrylab.vrexplorer@06a5b566fe/Scripts/EAT Framework/Action/TriggerAction.cs:39)
+UnityEngine.UnitySynchronizationContext:ExecuteTasks ()
+```
+
+![1748672196234](.\Picture\1748672196234.jpg)
+
+## **Missing Prefab Resource** Bug
 The prefab(Assets/Prefabs/Bow/Arrow_prefab.prefab). It has been missing.
 
 - Root Cause: 
@@ -56,6 +77,6 @@ Prefab instance problem: Arrow_prefab (Missing Prefab with guid: 0154d2e39ddf4e0
 UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 ```
 
-![img](https://icnw6pwioyaz.feishu.cn/space/api/box/stream/download/asynccode/?code=ZTJjOTM5Nzg1NjNiMjJkOTYwZmYxOGQ5MmJkZjA1N2VfNmc4OWlpd25ONHd5RzI1aENrTUtYUkhNeE9OVGlEOURfVG9rZW46Sk81OGI1b01kbzlKQTR4SGFTeGNKS1Fmbk9jXzE3NDg1MDMwNjk6MTc0ODUwNjY2OV9WNA)
+![1748672196234](.\Picture\a17cdbfa-b47e-4ba2-8394-5c68b8ec1c91.png)
 
 These bugs are relatively hidden and require completing multiple steps to trigger.
