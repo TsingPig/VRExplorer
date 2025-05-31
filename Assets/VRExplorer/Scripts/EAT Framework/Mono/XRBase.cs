@@ -16,7 +16,12 @@ public class XRBase : MonoBehaviour, IBaseEntity
 
     protected void Start()
     {
-        if(_interactable == null) _interactable = gameObject.AddComponent<XRGrabInteractable>();
+        if(_interactable == null)
+        {
+            _interactable = gameObject.AddComponent<XRGrabInteractable>();
+            transform.GetComponent<Rigidbody>().useGravity = false;
+        }
         if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
+
     }
 }
