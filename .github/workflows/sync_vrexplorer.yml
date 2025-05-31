@@ -15,59 +15,28 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Check if new repository exists
-        id: check_repo
+      - name: Prepare sync
         run: |
-          NEW_REPO="VRExplorer_Release"
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
-            https://api.github.com/repos/${{ github.repository_owner }}/$NEW_REPO)
-          if [ "$RESPONSE" -eq 200 ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create new repository if not exists
-        if: steps.check_repo.outputs.exists == 'false'
-        run: |
-          NEW_REPO="VRExplorer_Release"
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
-            https://api.github.com/user/repos \
-            -d '{"name":"'$NEW_REPO'", "auto_init":false, "private":false}'
-
-      - name: Sync folder contents to new repository
-        run: |
+          # 设置变量
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
-          CLONE_DIR="sync_workspace"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
+          TEMP_DIR="sync_temp_$(date +%s)"
 
-          # 始终从空白目录开始
-          rm -rf "$CLONE_DIR"
-          mkdir -p "$CLONE_DIR"
+          # 创建临时工作目录
+          mkdir $TEMP_DIR
+          cd $TEMP_DIR
 
-          # 处理目标仓库存在的情况
-          if [ "${{ steps.check_repo.outputs.exists }}" = 'true' ]; then
-            echo "目标仓库已存在，强制重置历史记录"
-            git clone "$NEW_REPO_URL" "$CLONE_DIR"
-            cd "$CLONE_DIR"
-            # 清理工作区（保留.git）
-            find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-          else
-            echo "目标仓库不存在，初始化新仓库"
-            cd "$CLONE_DIR"
-            git init -b main
-          fi
+          # 初始化全新仓库
+          git init -b main
+          git remote add origin $NEW_REPO_URL
 
-          # 复制最新内容到工作区
-          cp -r "../$FOLDER_PATH"/* .
-          git add -A
-          git commit -m "Synced folder at $(date -u)"
-
-          # 强制推送重置目标仓库
-          git remote add origin "$NEW_REPO_URL"
+          # 清空目标仓库（创建空提交）
+          git commit --allow-empty -m "Initial empty commit"
           git push origin main --force
+
+          # 复制新内容
+          cp -r "../../$FOLDER_PATH"/* .
+          git add .
+          git commit -m "Complete folder sync at $(date -u)"
+          git push origin main
