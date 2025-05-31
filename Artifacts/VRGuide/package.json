@@ -1,0 +1,11 @@
+{
+  "name": "com.tsingpig.vrexplorer",
+  "displayName": "VRGuide",
+  "unity": "2019.3",
+  "version": "1.0.0",
+  "description": "This is for evalutation and comparison with VRExplorer",
+  "keywords": [
+    "test",
+    "VR"
+  ]
+}
