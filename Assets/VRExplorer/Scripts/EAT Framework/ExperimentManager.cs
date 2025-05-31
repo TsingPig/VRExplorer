@@ -61,12 +61,9 @@ namespace VRExplorer
         {
             var metricInfo = new RichText()
                 .Add("TimeCost: ").Add((Time.time - _timeStamp).ToString(), bold: true, color: Color.yellow)
-                .Add(", TriggeredStateCount: ", bold: true).Add(TriggeredStateCount.ToString(), bold: true, color: Color.yellow)
-                .Add(", StateCount: ", bold: true).Add(StateCount.ToString(), bold: true, color: Color.yellow)
                 .Add(", CoveredInteractableCount: ", bold: true).Add(CoveredInteractableCount.ToString(), bold: true, color: Color.yellow)
                 .Add(", InteractableCount: ", bold: true).Add(InteractableCount.ToString(), bold: true, color: Color.yellow)
-                .Add(", Interactable Coverage: ", bold: true).Add($"{CoveredInteractableCount * 100f / InteractableCount:F2}%", bold: true, color: Color.yellow)
-                .Add(", StateCount Coverage: ", bold: true).Add($"{TriggeredStateCount * 100f / StateCount:F2}%", bold: true, color: Color.yellow);
+                .Add(", Interactable Coverage: ", bold: true).Add($"{CoveredInteractableCount * 100f / InteractableCount:F2}%", bold: true, color: Color.yellow);
 
             Debug.Log(metricInfo);
 

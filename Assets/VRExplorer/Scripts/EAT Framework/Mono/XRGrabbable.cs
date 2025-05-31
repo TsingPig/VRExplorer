@@ -16,15 +16,15 @@ public class XRGrabbable : XRBase, IGrabbableEntity
     public bool usePhysicsOnRelease = false;
 
     /// <summary>
-    /// Kinematic Physics locks the object in place on the hand / grabber. PhysicsJoint allows collisions with the environment.
+    /// 物体处于抓取状态时，链接抓取点的物理模拟方式
     /// </summary>
-    [Tooltip("Kinematic Physics locks the object in place on the hand / grabber. Physics Joint and Velocity types allow collisions with the environment.")]
+    [Tooltip("物体处于抓取状态时，链接抓取点的物理模拟方式")]
     public GrabPhysics GrabPhysics = GrabPhysics.Kinematic;
 
     /// <summary>
-    /// Snap to a location or grab anywhere on the object
+    /// 启用时同步到抓取点的位置
     /// </summary>
-    [Tooltip("Snap to a location or grab anywhere on the object")]
+    [Tooltip("启用时同步到抓取点的位置")]
     public GrabType GrabMechanic = GrabType.Snap;
 
     public Transform destination = null;
