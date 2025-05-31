@@ -1,15 +1,13 @@
 name: Sync Folder
-
 on:
   push:
     paths:
-      - 'Assets/VRExplorer/**' # 监听目标目录的变动
-
+      - 'Assets/VRExplorer/**'
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Configure Git
@@ -17,11 +15,12 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Check if destination repository exists
+      - name: Check if new repository exists
         id: check_repo
         run: |
           NEW_REPO="VRExplorer_Release"
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
             https://api.github.com/repos/${{ github.repository_owner }}/$NEW_REPO)
           if [ "$RESPONSE" -eq 200 ]; then
@@ -30,35 +29,45 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create destination repository if not exists
+      - name: Create new repository if not exists
         if: steps.check_repo.outputs.exists == 'false'
         run: |
           NEW_REPO="VRExplorer_Release"
           curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
             -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
             https://api.github.com/user/repos \
-            -d '{"name":"'$NEW_REPO'", "private":false}'
+            -d '{"name":"'$NEW_REPO'", "auto_init":false, "private":false}'
 
-      - name: Sync folder contents to destination repository
+      - name: Sync folder contents to new repository
         run: |
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
+          CLONE_DIR="sync_workspace"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
 
-          # Clone the target repository
-          git clone --depth 1 $NEW_REPO_URL temp_repo
-          cd temp_repo
+          # 始终从空白目录开始
+          rm -rf "$CLONE_DIR"
+          mkdir -p "$CLONE_DIR"
 
-          # Remove all files except .git
-          find . -mindepth 1 -not -name '.git' -exec rm -rf {} +
+          # 处理目标仓库存在的情况
+          if [ "${{ steps.check_repo.outputs.exists }}" = 'true' ]; then
+            echo "目标仓库已存在，强制重置历史记录"
+            git clone "$NEW_REPO_URL" "$CLONE_DIR"
+            cd "$CLONE_DIR"
+            # 清理工作区（保留.git）
+            find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          else
+            echo "目标仓库不存在，初始化新仓库"
+            cd "$CLONE_DIR"
+            git init -b main
+          fi
 
-          # Copy new content
-          cp -r ../$FOLDER_PATH/* .
+          # 复制最新内容到工作区
+          cp -r "../$FOLDER_PATH"/* .
+          git add -A
+          git commit -m "Synced folder at $(date -u)"
 
-          # Commit and push
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Synced folder from source repo" || echo "Nothing to commit"
-          git push origin main
+          # 强制推送重置目标仓库
+          git remote add origin "$NEW_REPO_URL"
+          git push origin main --force
