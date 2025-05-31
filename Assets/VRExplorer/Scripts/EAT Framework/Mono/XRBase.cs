@@ -22,6 +22,5 @@ public class XRBase : MonoBehaviour, IBaseEntity
             transform.GetComponent<Rigidbody>().useGravity = false;
         }
         if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
-
     }
 }
