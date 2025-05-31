@@ -1,8 +1,10 @@
-name: Sync Folder
+name: Sync Folder to New Repo
+
 on:
   push:
     paths:
       - 'Assets/VRExplorer/**'
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -15,28 +17,26 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Prepare sync
+      - name: Prepare and sync folder
         run: |
+          set -e  # 脚本中出错即终止
+
           # 设置变量
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
-          TEMP_DIR="sync_temp_$(date +%s)"
 
-          # 创建临时工作目录
-          mkdir $TEMP_DIR
-          cd $TEMP_DIR
+          # 创建临时目录
+          TEMP_DIR="$(mktemp -d)"
+          echo "Using temp directory: $TEMP_DIR"
 
-          # 初始化全新仓库
+          # 拷贝目标文件夹内容到临时目录
+          cp -r "$FOLDER_PATH/"* "$TEMP_DIR"
+
+          # 初始化新 Git 仓库
+          cd "$TEMP_DIR"
           git init -b main
-          git remote add origin $NEW_REPO_URL
-
-          # 清空目标仓库（创建空提交）
-          git commit --allow-empty -m "Initial empty commit"
-          git push origin main --force
-
-          # 复制新内容
-          cp -r "../../$FOLDER_PATH"/* .
+          git remote add origin "$NEW_REPO_URL"
           git add .
-          git commit -m "Complete folder sync at $(date -u)"
-          git push origin main
+          git commit -m "Sync from $FOLDER_PATH at $(date -u)"
+          git push origin main --force
