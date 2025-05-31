@@ -2,8 +2,8 @@
   "name": "com.tsingpig.vrexplorer",
   "displayName": "VR Explorer",
   "unity": "2019.3",
-  "version": "1.5.0",
-  "description": "VRExplorer is a model-based testing approach leveraging NavMesh and finite state machines to explore VR environments and interact with virtual objects effectively.",
+  "version": "1.5.1",
+  "description": "VRExplorer is a novel model-based testing tool to achieve effective interactions with diverse virtual objects and the exploration of complex VR scenes.",
   "keywords": [
     "test",
     "VR"
