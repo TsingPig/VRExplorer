@@ -57,6 +57,8 @@ public class GameObjectConfigExporter : EditorWindow
             if(script == null) continue;
 
             Type type = script.GetType();
+            if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
+                continue;
             XmlElement scriptElement = xmlDoc.CreateElement("Script");
             scriptElement.SetAttribute("type", type.FullName);
             scriptElement.SetAttribute("enabled", script.enabled.ToString());
@@ -104,7 +106,7 @@ public class GameObjectConfigExporter : EditorWindow
                     if(script == null) continue;
 
                     Type type = script.GetType();
-                    if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                    if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
                     {
                         exportTargets.Add(go);
                         break;
