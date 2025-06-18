@@ -1,0 +1,12 @@
+<GameObject isPrefabAsset="False" guid="Scene:GlobalObjectId_V1-2-f1c864a4dca9bae4187d18af97c5bc7c-6005079763975938123-0" name="VRExplorerBox (3)" path="ItemRoot/VRExplorerBoxes/VRExplorerBox (3)">
+  <Script type="VRExplorer.XRGrabbable" enabled="True">
+    <Field name="usePhysicsOnRelease" type="System.Boolean">False</Field>
+    <Field name="GrabPhysics" type="BNG.GrabPhysics">Kinematic</Field>
+    <Field name="GrabMechanic" type="BNG.GrabType">Snap</Field>
+    <Field name="destination" type="UnityEngine.Transform">TransformRef(Scene:GlobalObjectId_V1-2-f1c864a4dca9bae4187d18af97c5bc7c-257319291-0)</Field>
+  </Script>
+  <Script type="VRExplorer.Mono.XRTransformable" enabled="True">
+    <Field name="triggeringTime" type="System.Single">0.5</Field>
+    <Field name="destination" type="UnityEngine.Transform">null</Field>
+  </Script>
+</GameObject>

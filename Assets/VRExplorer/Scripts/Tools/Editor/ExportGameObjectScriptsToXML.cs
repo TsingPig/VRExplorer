@@ -17,6 +17,8 @@ public class GameObjectConfigManager : EditorWindow
     private string exportFolder = "Assets/VRExplorerExports";
     private string importPath = "Assets/GameObjectConfig.xml";
     private string importFolder = "Assets/VRExplorerExports";
+    private bool exportPrefabAssets = true;
+    private bool importPrefabAssets = true;
     #endregion
 
     [MenuItem("Tools/GameObject Config Manager")]
@@ -29,7 +31,7 @@ public class GameObjectConfigManager : EditorWindow
     {
         DrawExportUI();
         DrawImportUI();
-        DrawCleanupUI(); // New cleanup section
+        DrawCleanupUI();
     }
 
     #region Cleanup Functionality
@@ -49,7 +51,7 @@ public class GameObjectConfigManager : EditorWindow
         }
     }
 
-    [MenuItem("Tools/Remove VRExplorer Scripts")] // Optional: Add to Unity menu
+    [MenuItem("Tools/Remove VRExplorer Scripts")]
     public static void RemoveVRExplorerScripts()
     {
         try
@@ -92,12 +94,27 @@ public class GameObjectConfigManager : EditorWindow
         targetObject = (GameObject)EditorGUILayout.ObjectField("Target GameObject", targetObject, typeof(GameObject), true);
         exportPath = EditorGUILayout.TextField("Export Path", exportPath);
 
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Export Options", EditorStyles.boldLabel);
+        exportPrefabAssets = EditorGUILayout.Toggle("Include Prefab Assets", exportPrefabAssets);
+
         if(GUILayout.Button("Export Single GameObject"))
         {
             if(targetObject != null)
-                ExportConfig(targetObject, exportPath);
+            {
+                if(PrefabUtility.IsPartOfPrefabAsset(targetObject) && exportPrefabAssets)
+                {
+                    ExportPrefabAssetConfig(targetObject, exportPath);
+                }
+                else
+                {
+                    ExportConfig(targetObject, exportPath);
+                }
+            }
             else
+            {
                 Debug.LogError("Please select a GameObject.");
+            }
         }
 
         GUILayout.Space(10);
@@ -113,6 +130,11 @@ public class GameObjectConfigManager : EditorWindow
         GUILayout.Space(20);
         GUILayout.Label("Import Configuration", EditorStyles.boldLabel);
         importPath = EditorGUILayout.TextField("Import File Path", importPath);
+
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Import Options", EditorStyles.boldLabel);
+        importPrefabAssets = EditorGUILayout.Toggle("Apply to Prefab Assets", importPrefabAssets);
+
         if(GUILayout.Button("Import Single Config"))
         {
             ImportConfig(importPath);
@@ -135,26 +157,31 @@ public class GameObjectConfigManager : EditorWindow
             XmlDocument xmlDoc = new XmlDocument();
             XmlElement root = xmlDoc.CreateElement("GameObject");
 
-            // 使用Unity内置的唯一标识系统
-            root.SetAttribute("guid", GetGameObjectUniqueId(obj));
-            root.SetAttribute("name", obj.name);
-            root.SetAttribute("path", GetGameObjectPath(obj));
-            xmlDoc.AppendChild(root);
+            // Identify if this is a prefab asset
+            bool isPrefabAsset = PrefabUtility.IsPartOfPrefabAsset(obj);
+            root.SetAttribute("isPrefabAsset", isPrefabAsset.ToString());
 
-            // 导出所有VRExplorer命名空间的组件
-            MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
-            foreach(var script in scripts)
+            if(isPrefabAsset)
             {
-                if(script == null) continue;
-
-                Type type = script.GetType();
-                if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
-                    continue;
-
-                ExportScriptData(xmlDoc, root, script, type);
+                string assetPath = AssetDatabase.GetAssetPath(obj);
+                string guid = AssetDatabase.AssetPathToGUID(assetPath);
+                root.SetAttribute("guid", guid);
+                root.SetAttribute("name", obj.name);
+                root.SetAttribute("path", assetPath);
+            }
+            else
+            {
+                root.SetAttribute("guid", GetGameObjectUniqueId(obj));
+                root.SetAttribute("name", obj.name);
+                root.SetAttribute("path", GetGameObjectPath(obj));
             }
 
-            // 确保目录存在
+            xmlDoc.AppendChild(root);
+
+            // Export all VRExplorer namespace components
+            ExportScriptsForGameObject(obj, xmlDoc, root);
+
+            // Ensure directory exists
             string dir = Path.GetDirectoryName(path);
             if(!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
@@ -165,6 +192,21 @@ public class GameObjectConfigManager : EditorWindow
         catch(Exception e)
         {
             Debug.LogError($"Export failed: {e.Message}\n{e.StackTrace}");
+        }
+    }
+
+    private void ExportScriptsForGameObject(GameObject obj, XmlDocument xmlDoc, XmlElement parent)
+    {
+        MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
+        foreach(var script in scripts)
+        {
+            if(script == null) continue;
+
+            Type type = script.GetType();
+            if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
+                continue;
+
+            ExportScriptData(xmlDoc, parent, script, type);
         }
     }
 
@@ -204,27 +246,35 @@ public class GameObjectConfigManager : EditorWindow
             if(!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            // 收集所有需要导出的GameObject（使用HashSet去重）
-            HashSet<GameObject> exportTargets = new HashSet<GameObject>();
-            GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            // 收集所有需要导出的GameObject
+            var exportTargets = new HashSet<GameObject>();
 
+            // 添加场景对象
+            GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
             foreach(GameObject root in allObjects)
             {
                 foreach(Transform child in root.GetComponentsInChildren<Transform>(true))
                 {
                     GameObject go = child.gameObject;
-                    MonoBehaviour[] scripts = go.GetComponents<MonoBehaviour>();
-
-                    foreach(var script in scripts)
+                    if(HasVRExplorerComponent(go))
                     {
-                        if(script == null) continue;
+                        exportTargets.Add(go);
+                    }
+                }
+            }
 
-                        Type type = script.GetType();
-                        if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
-                        {
-                            exportTargets.Add(go);
-                            break;
-                        }
+            // 添加预制体资源（如果启用）
+            if(exportPrefabAssets)
+            {
+                string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
+                foreach(string guid in prefabGuids)
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+                    if(prefab != null && HasVRExplorerComponent(prefab))
+                    {
+                        exportTargets.Add(prefab);
                     }
                 }
             }
@@ -233,9 +283,16 @@ public class GameObjectConfigManager : EditorWindow
             foreach(GameObject go in exportTargets)
             {
                 string safeName = go.name.Replace("/", "_").Replace("\\", "_");
-                string uniqueId = GetGameObjectUniqueId(go).Replace(":", "_");
-                string filePath = Path.Combine(folderPath, $"{safeName}_{uniqueId}.xml");
-                ExportConfig(go, filePath);
+                string filePath = Path.Combine(folderPath, $"{safeName}_{Guid.NewGuid()}.xml");
+
+                if(PrefabUtility.IsPartOfPrefabAsset(go))
+                {
+                    ExportPrefabAssetConfig(go, filePath);
+                }
+                else
+                {
+                    ExportConfig(go, filePath);
+                }
             }
 
             Debug.Log($"Successfully exported {exportTargets.Count} GameObjects to {folderPath}");
@@ -244,6 +301,46 @@ public class GameObjectConfigManager : EditorWindow
         catch(Exception e)
         {
             Debug.LogError($"Batch export failed: {e.Message}\n{e.StackTrace}");
+        }
+    }
+
+    private bool HasVRExplorerComponent(GameObject go)
+    {
+        MonoBehaviour[] scripts = go.GetComponents<MonoBehaviour>();
+        foreach(var script in scripts)
+        {
+            if(script == null) continue;
+            Type type = script.GetType();
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void ExportPrefabAssetConfig(GameObject prefabAsset, string path)
+    {
+        // 创建一个临时实例来导出配置
+        GameObject tempInstance = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
+
+        try
+        {
+            // 将临时实例放在一个临时父对象下，避免污染场景
+            GameObject tempParent = new GameObject("TempExportParent");
+            Undo.RegisterCreatedObjectUndo(tempParent, "Create Temp Parent");
+            tempInstance.transform.SetParent(tempParent.transform);
+
+            // 导出临时实例的配置
+            ExportConfig(tempInstance, path);
+        }
+        finally
+        {
+            // 确保临时对象被清理
+            if(tempInstance != null)
+            {
+                Undo.DestroyObjectImmediate(tempInstance.transform.parent.gameObject);
+            }
         }
     }
     #endregion
@@ -265,68 +362,60 @@ public class GameObjectConfigManager : EditorWindow
             XmlElement root = xmlDoc.DocumentElement;
             string guid = root.GetAttribute("guid");
             string originalPath = root.GetAttribute("path");
+            bool isPrefabAsset = bool.Parse(root.GetAttribute("isPrefabAsset"));
 
-            // 通过GUID查找现有对象
-            GameObject target = FindGameObjectByUniqueId(guid);
+            GameObject target = null;
 
-            // 如果找不到，尝试通过路径创建/查找（兼容旧版本）
-            if(target == null && !string.IsNullOrEmpty(originalPath))
+            // Handle prefab asset import
+            if(isPrefabAsset && importPrefabAssets)
             {
-                target = FindOrCreateGameObjectByPath(originalPath);
-            }
+                // Load prefab asset
+                target = AssetDatabase.LoadAssetAtPath<GameObject>(originalPath);
+                if(target == null)
+                {
+                    Debug.LogError($"Prefab asset not found at: {originalPath}");
+                    return;
+                }
 
-            if(target == null)
-            {
-                Debug.LogError($"Failed to locate or create target GameObject for {originalPath}");
+                // Create a temporary instance for editing
+                GameObject prefabInstance = PrefabUtility.InstantiatePrefab(target) as GameObject;
+                Undo.RegisterCreatedObjectUndo(prefabInstance, "Create Prefab Instance");
+
+                // Apply modifications to the instance
+                ApplyConfiguration(xmlDoc, root, prefabInstance);
+
+                // Apply changes back to prefab asset
+                PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
+                Undo.DestroyObjectImmediate(prefabInstance);
+
+                Debug.Log($"Successfully updated prefab asset: {target.name}");
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
                 return;
             }
-
-            // 移除所有现有的VRExplorer脚本（确保干净的状态）
-            RemoveExistingVRExplorerComponents(target);
-
-            // 应用所有脚本配置
-            foreach(XmlNode scriptNode in root.SelectNodes("Script"))
+            // Handle non-prefab objects
+            else if(!isPrefabAsset || !importPrefabAssets)
             {
-                XmlElement scriptElement = (XmlElement)scriptNode;
-                string typeName = scriptElement.GetAttribute("type");
-                bool enabled = bool.Parse(scriptElement.GetAttribute("enabled"));
+                // Find by GUID
+                target = FindGameObjectByUniqueId(guid);
 
-                Type type = Type.GetType(typeName);
-                if(type == null)
+                // If not found, try to create/load by path
+                if(target == null && !string.IsNullOrEmpty(originalPath))
                 {
-                    Debug.LogWarning($"Type not found: {typeName}");
-                    continue;
+                    target = FindOrCreateGameObjectByPath(originalPath);
                 }
 
-                // 添加组件
-                MonoBehaviour script = (MonoBehaviour)target.AddComponent(type);
-                script.enabled = enabled;
-
-                // 应用字段值
-                foreach(XmlNode fieldNode in scriptElement.SelectNodes("Field"))
+                if(target == null)
                 {
-                    XmlElement fieldElement = (XmlElement)fieldNode;
-                    string fieldName = fieldElement.GetAttribute("name");
-                    string fieldType = fieldElement.GetAttribute("type");
-                    string valueStr = fieldElement.InnerText;
-
-                    FieldInfo field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    if(field == null) continue;
-
-                    try
-                    {
-                        object value = DeserializeValue(valueStr, field.FieldType, target);
-                        field.SetValue(script, value);
-                    }
-                    catch(Exception e)
-                    {
-                        Debug.LogWarning($"Failed to set field {field.Name} in {type.Name}: {e.Message}");
-                    }
+                    Debug.LogError($"Failed to locate or create target GameObject for {originalPath}");
+                    return;
                 }
+
+                // Apply configuration to scene object
+                ApplyConfiguration(xmlDoc, root, target);
+                Debug.Log($"Successfully imported config to {target.name}");
+                EditorUtility.SetDirty(target);
             }
-
-            Debug.Log($"Successfully imported config to {target.name}");
-            EditorUtility.SetDirty(target);
         }
         catch(Exception e)
         {
@@ -334,18 +423,72 @@ public class GameObjectConfigManager : EditorWindow
         }
     }
 
+    private void ApplyConfiguration(XmlDocument xmlDoc, XmlElement root, GameObject target)
+    {
+        // Remove all existing VRExplorer scripts
+        RemoveExistingVRExplorerComponents(target);
+
+        // Apply all script configurations
+        foreach(XmlNode scriptNode in root.SelectNodes("Script"))
+        {
+            XmlElement scriptElement = (XmlElement)scriptNode;
+            string typeName = scriptElement.GetAttribute("type");
+            bool enabled = bool.Parse(scriptElement.GetAttribute("enabled"));
+
+            Type type = Type.GetType(typeName);
+            if(type == null)
+            {
+                Debug.LogWarning($"Type not found: {typeName}");
+                continue;
+            }
+
+            // Add component
+            MonoBehaviour script = (MonoBehaviour)target.AddComponent(type);
+            script.enabled = enabled;
+
+            // Apply field values
+            foreach(XmlNode fieldNode in scriptElement.SelectNodes("Field"))
+            {
+                XmlElement fieldElement = (XmlElement)fieldNode;
+                string fieldName = fieldElement.GetAttribute("name");
+                string fieldType = fieldElement.GetAttribute("type");
+                string valueStr = fieldElement.InnerText;
+
+                FieldInfo field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if(field == null) continue;
+
+                try
+                {
+                    object value = DeserializeValue(valueStr, field.FieldType, target);
+                    field.SetValue(script, value);
+                }
+                catch(Exception e)
+                {
+                    Debug.LogWarning($"Failed to set field {field.Name} in {type.Name}: {e.Message}");
+                }
+            }
+        }
+    }
+
     private void RemoveExistingVRExplorerComponents(GameObject target)
     {
         MonoBehaviour[] existingScripts = target.GetComponents<MonoBehaviour>();
+        List<MonoBehaviour> toDestroy = new List<MonoBehaviour>();
+
         foreach(var script in existingScripts)
         {
             if(script == null) continue;
-
             Type type = script.GetType();
             if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
             {
-                DestroyImmediate(script);
+                toDestroy.Add(script);
             }
+        }
+
+        // Destroy after iteration to avoid modification during iteration
+        foreach(var script in toDestroy)
+        {
+            DestroyImmediate(script, true);
         }
     }
 
@@ -366,6 +509,7 @@ public class GameObjectConfigManager : EditorWindow
             }
 
             Debug.Log($"Successfully imported {configFiles.Length} configs from {folderPath}");
+            AssetDatabase.Refresh();
         }
         catch(Exception e)
         {
@@ -379,18 +523,25 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(go == null) return null;
 
-        // 如果是预制体实例，使用预制体的Asset GUID
+        // Return asset GUID for prefab assets
+        if(PrefabUtility.IsPartOfPrefabAsset(go))
+        {
+            string assetPath = AssetDatabase.GetAssetPath(go);
+            return $"Asset:{AssetDatabase.AssetPathToGUID(assetPath)}";
+        }
+
+        // For prefab instances, use prefab asset GUID
         if(PrefabUtility.IsPartOfPrefabInstance(go))
         {
             string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
             if(!string.IsNullOrEmpty(assetPath))
             {
                 string guid = AssetDatabase.AssetPathToGUID(assetPath);
-                return $"Prefab:{guid}";
+                return $"Instance:{guid}";
             }
         }
 
-        // 普通场景对象，使用GlobalObjectId
+        // For regular scene objects, use GlobalObjectId
         GlobalObjectId globalId = GlobalObjectId.GetGlobalObjectIdSlow(go);
         return $"Scene:{globalId.ToString()}";
     }
@@ -399,17 +550,27 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(string.IsNullOrEmpty(uniqueId)) return null;
 
-        // 处理预制体引用
-        if(uniqueId.StartsWith("Prefab:"))
+        // Handle asset reference (prefab assets)
+        if(uniqueId.StartsWith("Asset:"))
         {
-            string guid = uniqueId.Substring(7);
+            string guid = uniqueId.Substring(6);
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            if(!string.IsNullOrEmpty(assetPath))
+            {
+                return AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            }
+        }
+        // Handle prefab instances
+        else if(uniqueId.StartsWith("Instance:"))
+        {
+            string guid = uniqueId.Substring(9);
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             if(!string.IsNullOrEmpty(assetPath))
             {
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 if(prefab != null)
                 {
-                    // 查找场景中已存在的实例
+                    // Find existing instances in the scene
                     GameObject[] instances = UnityEngine.Object.FindObjectsOfType<GameObject>();
                     foreach(GameObject instance in instances)
                     {
@@ -419,12 +580,12 @@ public class GameObjectConfigManager : EditorWindow
                         }
                     }
 
-                    // 如果没有找到，创建新实例
+                    // If not found, create a new instance
                     return PrefabUtility.InstantiatePrefab(prefab) as GameObject;
                 }
             }
         }
-        // 处理场景对象引用
+        // Handle scene objects
         else if(uniqueId.StartsWith("Scene:"))
         {
             string globalIdStr = uniqueId.Substring(6);
@@ -442,6 +603,13 @@ public class GameObjectConfigManager : EditorWindow
     #region Utility Functions
     private string GetGameObjectPath(GameObject go)
     {
+        // For prefab assets, return asset path
+        if(PrefabUtility.IsPartOfPrefabAsset(go))
+        {
+            return AssetDatabase.GetAssetPath(go);
+        }
+
+        // For scene objects, return hierarchy path
         if(go.transform.parent == null)
             return go.name;
 
@@ -452,6 +620,13 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(string.IsNullOrEmpty(path)) return null;
 
+        // Check if this is an asset path
+        if(path.StartsWith("Assets/") && AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
+        {
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        // Handle scene objects
         GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
         foreach(GameObject root in rootObjects)
@@ -461,7 +636,7 @@ public class GameObjectConfigManager : EditorWindow
             Transform found = root.transform.Find(path);
             if(found != null) return found.gameObject;
 
-            // 处理完整路径
+            // Handle full path
             string[] parts = path.Split('/');
             Transform current = root.transform;
 
@@ -482,14 +657,21 @@ public class GameObjectConfigManager : EditorWindow
         GameObject existing = FindGameObjectByPath(path);
         if(existing != null) return existing;
 
+        // If it's an asset path, just load it
+        if(path.StartsWith("Assets/") && File.Exists(path))
+        {
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        // Handle scene objects
         string[] parts = path.Split('/');
         if(parts.Length == 0) return null;
 
-        // 从根对象开始查找/创建
+        // Start from root
         GameObject current = null;
         GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
-        // 查找根对象
+        // Find root object
         foreach(GameObject root in rootObjects)
         {
             if(root.name == parts[0])
@@ -499,14 +681,14 @@ public class GameObjectConfigManager : EditorWindow
             }
         }
 
-        // 如果没有找到根对象，创建它
+        // If root not found, create it
         if(current == null)
         {
             current = new GameObject(parts[0]);
             Undo.RegisterCreatedObjectUndo(current, "Create GameObject");
         }
 
-        // 处理路径的其余部分
+        // Process remaining path
         for(int i = 1; i < parts.Length; i++)
         {
             Transform child = current.transform.Find(parts[i]);
@@ -532,11 +714,11 @@ public class GameObjectConfigManager : EditorWindow
 
         Type t = value.GetType();
 
-        // 基本类型
+        // Basic types
         if(t.IsPrimitive || t == typeof(string) || t.IsEnum)
             return value.ToString();
 
-        // Unity特有类型
+        // Unity-specific types
         if(t == typeof(Vector3))
         {
             Vector3 v = (Vector3)value;
@@ -560,7 +742,7 @@ public class GameObjectConfigManager : EditorWindow
             return ColorUtility.ToHtmlStringRGBA((Color)value);
         }
 
-        // 引用类型
+        // Reference types
         if(t == typeof(Transform))
         {
             Transform tf = (Transform)value;
@@ -577,7 +759,7 @@ public class GameObjectConfigManager : EditorWindow
             return $"GameObjectRef({GetGameObjectUniqueId(go)})";
         }
 
-        // 集合类型
+        // Collection types
         if(typeof(IList).IsAssignableFrom(t))
         {
             var list = value as IList;
@@ -611,29 +793,29 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(valueStr == "null") return null;
 
-        // 处理基本类型
+        // Handle basic types
         if(targetType == typeof(string)) return valueStr;
         if(targetType == typeof(int)) return int.Parse(valueStr);
         if(targetType == typeof(float)) return float.Parse(valueStr);
         if(targetType == typeof(bool)) return bool.Parse(valueStr);
         if(targetType.IsEnum) return Enum.Parse(targetType, valueStr);
 
-        // 处理Unity特有类型
+        // Handle Unity-specific types
         if(targetType == typeof(Vector3))
         {
-            string[] parts = valueStr.Trim('V', 'e', 'c', 't', 'o', 'r', '3', '(', ')').Split(',');
+            string[] parts = valueStr.Replace("Vector3(", "").Replace(")", "").Split(',');
             return new Vector3(float.Parse(parts[0]), float.Parse(parts[1]), float.Parse(parts[2]));
         }
 
         if(targetType == typeof(Vector2))
         {
-            string[] parts = valueStr.Trim('V', 'e', 'c', 't', 'o', 'r', '2', '(', ')').Split(',');
+            string[] parts = valueStr.Replace("Vector2(", "").Replace(")", "").Split(',');
             return new Vector2(float.Parse(parts[0]), float.Parse(parts[1]));
         }
 
         if(targetType == typeof(Quaternion))
         {
-            string[] parts = valueStr.Trim('Q', 'u', 'a', 't', 'e', 'r', 'n', 'i', 'o', 'n', '(', ')').Split(',');
+            string[] parts = valueStr.Replace("Quaternion(", "").Replace(")", "").Split(',');
             return new Quaternion(float.Parse(parts[0]), float.Parse(parts[1]), float.Parse(parts[2]), float.Parse(parts[3]));
         }
 
@@ -645,7 +827,7 @@ public class GameObjectConfigManager : EditorWindow
             return Color.white;
         }
 
-        // 处理GameObject引用
+        // Handle GameObject references
         if(targetType == typeof(GameObject))
         {
             if(valueStr.StartsWith("GameObjectRef("))
@@ -656,7 +838,7 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // 处理Transform引用
+        // Handle Transform references
         if(targetType == typeof(Transform))
         {
             if(valueStr.StartsWith("TransformRef("))
@@ -668,7 +850,7 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // 处理数组和列表
+        // Handle arrays and lists
         if(typeof(IList).IsAssignableFrom(targetType))
         {
             if(valueStr.StartsWith("List[") && valueStr.EndsWith("]"))
@@ -691,7 +873,7 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // 处理字典
+        // Handle dictionaries
         if(typeof(IDictionary).IsAssignableFrom(targetType))
         {
             if(valueStr.StartsWith("Dict[") && valueStr.EndsWith("]"))

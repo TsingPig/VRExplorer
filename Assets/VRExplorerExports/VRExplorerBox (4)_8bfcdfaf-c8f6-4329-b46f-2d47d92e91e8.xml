@@ -1,0 +1,6 @@
+<GameObject isPrefabAsset="False" guid="Scene:GlobalObjectId_V1-2-f1c864a4dca9bae4187d18af97c5bc7c-257319291-0" name="VRExplorerBox (4)" path="ItemRoot/VRExplorerBoxes/VRExplorerBox (4)">
+  <Script type="VRExplorer.Mono.XRTransformable" enabled="True">
+    <Field name="triggeringTime" type="System.Single">0.5</Field>
+    <Field name="destination" type="UnityEngine.Transform">null</Field>
+  </Script>
+</GameObject>
