@@ -2504,7 +2504,6 @@ GameObject:
   - component: {fileID: 257319296}
   - component: {fileID: 257319295}
   - component: {fileID: 257319294}
-  - component: {fileID: 257319293}
   m_Layer: 10
   m_Name: VRExplorerBox (4)
   m_TagString: Untagged
@@ -2530,22 +2529,6 @@ Transform:
   m_Father: {fileID: 1354046305}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &257319293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 257319291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  usePhysicsOnRelease: 0
-  GrabPhysics: 0
-  GrabMechanic: 0
-  destination: {fileID: 0}
 --- !u!65 &257319294
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12959,8 +12942,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6355174954153483858, guid: 220046a189ec53d4e9d8c2c88e544bff, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 220046a189ec53d4e9d8c2c88e544bff, type: 3}
+--- !u!1 &1980136980 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8080720548095950257, guid: 220046a189ec53d4e9d8c2c88e544bff,
+    type: 3}
+  m_PrefabInstance: {fileID: 1980136979}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1980136981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1980136980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957ff6b7ed039c24cbc257fae82183e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reportCoverageDuration: 5
+  exitAfterTesting: 1
+  leftHandController: {fileID: 0}
+  moveSpeed: 6
+  explorationEventFrequency: 0
+  randomInitPos: 0
+  drag: 1
+  explorationEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+  _areaDiameter: 7.5
+  _curTask:
+  - _name: 
+  _nextMono: {fileID: 0}
 --- !u!1001 &1981459079
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14184,7 +14200,7 @@ GameObject:
   - component: {fileID: 5448045530723159698}
   - component: {fileID: 9139517702383053900}
   - component: {fileID: 6005079763975938116}
-  - component: {fileID: 9139517702383053901}
+  - component: {fileID: 9139517702383053902}
   m_Layer: 10
   m_Name: VRExplorerBox (3)
   m_TagString: Untagged
@@ -14291,7 +14307,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &9139517702383053901
+--- !u!114 &9139517702383053902
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14300,10 +14316,106 @@ MonoBehaviour:
   m_GameObject: {fileID: 6005079763975938123}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e2f4617667341945b5a7756e14b62d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usePhysicsOnRelease: 0
-  GrabPhysics: 0
-  GrabMechanic: 0
-  destination: {fileID: 0}
+  m_InteractionManager: {fileID: 0}
+  m_Colliders: []
+  m_InteractionLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_InteractionLayers:
+    m_Bits: 1
+  m_DistanceCalculationMode: 1
+  m_SelectMode: 1
+  m_FocusMode: 1
+  m_CustomReticle: {fileID: 0}
+  m_AllowGazeInteraction: 0
+  m_AllowGazeSelect: 0
+  m_OverrideGazeTimeToSelect: 0
+  m_GazeTimeToSelect: 0.5
+  m_OverrideTimeToAutoDeselectGaze: 0
+  m_TimeToAutoDeselectGaze: 3
+  m_AllowGazeAssistance: 0
+  m_FirstHoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_LastHoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_HoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_HoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FirstSelectEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_LastSelectExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_SelectEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_SelectExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FirstFocusEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_LastFocusExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FocusEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FocusExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Activated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Deactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_StartingHoverFilters: []
+  m_StartingSelectFilters: []
+  m_StartingInteractionStrengthFilters: []
+  m_OnFirstHoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnLastHoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnHoverEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnHoverExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnSelectEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnSelectExited:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnSelectCanceled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TeleportationProvider: {fileID: 0}
+  m_MatchOrientation: 0
+  m_MatchDirectionalInput: 0
+  m_TeleportTrigger: 0
+  m_FilterSelectionByHitNormal: 0
+  m_UpNormalToleranceDegrees: 30
+  m_Teleporting:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TeleportAnchorTransform: {fileID: 6005079763975938113}

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using System.IO;
 using System.Xml;
 using System.Reflection;
@@ -8,169 +9,664 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameObjectConfigExporter : EditorWindow
+public class GameObjectConfigManager : EditorWindow
 {
+    #region UI Variables
     private GameObject targetObject;
     private string exportPath = "Assets/GameObjectConfig.xml";
+    private string exportFolder = "Assets/VRExplorerExports";
+    private string importPath = "Assets/GameObjectConfig.xml";
+    private string importFolder = "Assets/VRExplorerExports";
+    #endregion
 
-    [MenuItem("Tools/Export GameObject Config To XML")]
+    [MenuItem("Tools/GameObject Config Manager")]
     public static void ShowWindow()
     {
-        GetWindow<GameObjectConfigExporter>("Export Config");
+        GetWindow<GameObjectConfigManager>("Config Manager");
     }
 
     private void OnGUI()
     {
-        GUILayout.Label("Export GameObject Config", EditorStyles.boldLabel);
+        DrawExportUI();
+        DrawImportUI();
+    }
+
+    #region UI Drawing
+    private void DrawExportUI()
+    {
+        GUILayout.Label("Export Configuration", EditorStyles.boldLabel);
         targetObject = (GameObject)EditorGUILayout.ObjectField("Target GameObject", targetObject, typeof(GameObject), true);
         exportPath = EditorGUILayout.TextField("Export Path", exportPath);
 
-        if(GUILayout.Button("Export"))
+        if(GUILayout.Button("Export Single GameObject"))
         {
             if(targetObject != null)
                 ExportConfig(targetObject, exportPath);
             else
                 Debug.LogError("Please select a GameObject.");
         }
+
         GUILayout.Space(10);
-        GUILayout.Label("Batch Export (All with VRExplorer namespace)", EditorStyles.boldLabel);
-
-        string folderPath = EditorGUILayout.TextField("Export Folder", "Assets/VRExplorerExports");
-
-        if(GUILayout.Button("Export All VRExplorer GameObjects"))
+        exportFolder = EditorGUILayout.TextField("Export Folder", exportFolder);
+        if(GUILayout.Button("Batch Export VRExplorer Objects"))
         {
-            ExportAllVRExplorerObjects(folderPath);
+            ExportAllVRExplorerObjects(exportFolder);
         }
     }
 
+    private void DrawImportUI()
+    {
+        GUILayout.Space(20);
+        GUILayout.Label("Import Configuration", EditorStyles.boldLabel);
+        importPath = EditorGUILayout.TextField("Import File Path", importPath);
+        if(GUILayout.Button("Import Single Config"))
+        {
+            ImportConfig(importPath);
+        }
+
+        GUILayout.Space(10);
+        importFolder = EditorGUILayout.TextField("Import Folder", importFolder);
+        if(GUILayout.Button("Batch Import Configs"))
+        {
+            ImportAllConfigs(importFolder);
+        }
+    }
+    #endregion
+
+    #region Export Functions
     private void ExportConfig(GameObject obj, string path)
     {
-        XmlDocument xmlDoc = new XmlDocument();
-        XmlElement root = xmlDoc.CreateElement("GameObject");
-        root.SetAttribute("name", obj.name);
-        xmlDoc.AppendChild(root);
-
-        MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
-
-        foreach(var script in scripts)
+        try
         {
-            if(script == null) continue;
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement root = xmlDoc.CreateElement("GameObject");
 
-            Type type = script.GetType();
-            if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
-                continue;
-            XmlElement scriptElement = xmlDoc.CreateElement("Script");
-            scriptElement.SetAttribute("type", type.FullName);
-            scriptElement.SetAttribute("enabled", script.enabled.ToString());
+            // 使用Unity内置的唯一标识系统
+            root.SetAttribute("guid", GetGameObjectUniqueId(obj));
+            root.SetAttribute("name", obj.name);
+            root.SetAttribute("path", GetGameObjectPath(obj));
+            xmlDoc.AppendChild(root);
 
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            foreach(var field in fields)
+            // 导出所有VRExplorer命名空间的组件
+            MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
+            foreach(var script in scripts)
             {
-                // 只导出可序列化字段
-                if(field.IsPublic || field.GetCustomAttribute<SerializeField>() != null)
+                if(script == null) continue;
+
+                Type type = script.GetType();
+                if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
+                    continue;
+
+                ExportScriptData(xmlDoc, root, script, type);
+            }
+
+            // 确保目录存在
+            string dir = Path.GetDirectoryName(path);
+            if(!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            xmlDoc.Save(path);
+            Debug.Log($"Successfully exported config to {path}");
+            AssetDatabase.Refresh();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"Export failed: {e.Message}\n{e.StackTrace}");
+        }
+    }
+
+    private void ExportScriptData(XmlDocument xmlDoc, XmlElement parent, MonoBehaviour script, Type type)
+    {
+        XmlElement scriptElement = xmlDoc.CreateElement("Script");
+        scriptElement.SetAttribute("type", type.FullName);
+        scriptElement.SetAttribute("enabled", script.enabled.ToString());
+
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        foreach(var field in fields)
+        {
+            if(field.IsPublic || field.GetCustomAttribute<SerializeField>() != null)
+            {
+                try
                 {
                     object value = field.GetValue(script);
                     XmlElement fieldElement = xmlDoc.CreateElement("Field");
                     fieldElement.SetAttribute("name", field.Name);
                     fieldElement.SetAttribute("type", field.FieldType.FullName);
-                    fieldElement.InnerText = SerializeValue(value);
+                    fieldElement.InnerText = SerializeValue(value, script.gameObject);
                     scriptElement.AppendChild(fieldElement);
                 }
+                catch(Exception e)
+                {
+                    Debug.LogWarning($"Failed to serialize field {field.Name} in {type.Name}: {e.Message}");
+                }
             }
-
-            root.AppendChild(scriptElement);
         }
-
-        xmlDoc.Save(path);
-        Debug.Log($"Exported config to {path}");
-        AssetDatabase.Refresh();
+        parent.AppendChild(scriptElement);
     }
 
     private void ExportAllVRExplorerObjects(string folderPath)
     {
-        if(!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
-        List<GameObject> exportTargets = new List<GameObject>();
-
-        foreach(GameObject root in allObjects)
+        try
         {
-            GameObject[] children = root.GetComponentsInChildren<Transform>(true).Select(t => t.gameObject).ToArray();
-            foreach(GameObject go in children)
-            {
-                MonoBehaviour[] scripts = go.GetComponents<MonoBehaviour>();
-                foreach(var script in scripts)
-                {
-                    if(script == null) continue;
+            if(!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
 
-                    Type type = script.GetType();
-                    if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
+            // 收集所有需要导出的GameObject（使用HashSet去重）
+            HashSet<GameObject> exportTargets = new HashSet<GameObject>();
+            GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+
+            foreach(GameObject root in allObjects)
+            {
+                foreach(Transform child in root.GetComponentsInChildren<Transform>(true))
+                {
+                    GameObject go = child.gameObject;
+                    MonoBehaviour[] scripts = go.GetComponents<MonoBehaviour>();
+
+                    foreach(var script in scripts)
                     {
-                        exportTargets.Add(go);
-                        break;
+                        if(script == null) continue;
+
+                        Type type = script.GetType();
+                        if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                        {
+                            exportTargets.Add(go);
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        foreach(GameObject go in exportTargets)
+            // 导出所有目标对象
+            foreach(GameObject go in exportTargets)
+            {
+                string safeName = go.name.Replace("/", "_").Replace("\\", "_");
+                string uniqueId = GetGameObjectUniqueId(go).Replace(":", "_");
+                string filePath = Path.Combine(folderPath, $"{safeName}_{uniqueId}.xml");
+                ExportConfig(go, filePath);
+            }
+
+            Debug.Log($"Successfully exported {exportTargets.Count} GameObjects to {folderPath}");
+            AssetDatabase.Refresh();
+        }
+        catch(Exception e)
         {
-            string safeName = go.name.Replace("/", "_");  // 避免非法文件名
-            string filePath = Path.Combine(folderPath, $"{safeName}_{go.GetInstanceID()}.xml");
-            ExportConfig(go, filePath);
+            Debug.LogError($"Batch export failed: {e.Message}\n{e.StackTrace}");
+        }
+    }
+    #endregion
+
+    #region Import Functions
+    private void ImportConfig(string path)
+    {
+        if(!File.Exists(path))
+        {
+            Debug.LogError($"Config file not found: {path}");
+            return;
         }
 
-        Debug.Log($"Exported {exportTargets.Count} GameObjects to folder: {folderPath}");
-        AssetDatabase.Refresh();
+        try
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(path);
+
+            XmlElement root = xmlDoc.DocumentElement;
+            string guid = root.GetAttribute("guid");
+            string originalPath = root.GetAttribute("path");
+
+            // 通过GUID查找现有对象
+            GameObject target = FindGameObjectByUniqueId(guid);
+
+            // 如果找不到，尝试通过路径创建/查找（兼容旧版本）
+            if(target == null && !string.IsNullOrEmpty(originalPath))
+            {
+                target = FindOrCreateGameObjectByPath(originalPath);
+            }
+
+            if(target == null)
+            {
+                Debug.LogError($"Failed to locate or create target GameObject for {originalPath}");
+                return;
+            }
+
+            // 移除所有现有的VRExplorer脚本（确保干净的状态）
+            RemoveExistingVRExplorerComponents(target);
+
+            // 应用所有脚本配置
+            foreach(XmlNode scriptNode in root.SelectNodes("Script"))
+            {
+                XmlElement scriptElement = (XmlElement)scriptNode;
+                string typeName = scriptElement.GetAttribute("type");
+                bool enabled = bool.Parse(scriptElement.GetAttribute("enabled"));
+
+                Type type = Type.GetType(typeName);
+                if(type == null)
+                {
+                    Debug.LogWarning($"Type not found: {typeName}");
+                    continue;
+                }
+
+                // 添加组件
+                MonoBehaviour script = (MonoBehaviour)target.AddComponent(type);
+                script.enabled = enabled;
+
+                // 应用字段值
+                foreach(XmlNode fieldNode in scriptElement.SelectNodes("Field"))
+                {
+                    XmlElement fieldElement = (XmlElement)fieldNode;
+                    string fieldName = fieldElement.GetAttribute("name");
+                    string fieldType = fieldElement.GetAttribute("type");
+                    string valueStr = fieldElement.InnerText;
+
+                    FieldInfo field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if(field == null) continue;
+
+                    try
+                    {
+                        object value = DeserializeValue(valueStr, field.FieldType, target);
+                        field.SetValue(script, value);
+                    }
+                    catch(Exception e)
+                    {
+                        Debug.LogWarning($"Failed to set field {field.Name} in {type.Name}: {e.Message}");
+                    }
+                }
+            }
+
+            Debug.Log($"Successfully imported config to {target.name}");
+            EditorUtility.SetDirty(target);
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"Import failed: {e.Message}\n{e.StackTrace}");
+        }
     }
 
-    private string SerializeValue(object value)
+    private void RemoveExistingVRExplorerComponents(GameObject target)
     {
-        if(value == null)
-            return "None";
+        MonoBehaviour[] existingScripts = target.GetComponents<MonoBehaviour>();
+        foreach(var script in existingScripts)
+        {
+            if(script == null) continue;
+
+            Type type = script.GetType();
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            {
+                DestroyImmediate(script);
+            }
+        }
+    }
+
+    private void ImportAllConfigs(string folderPath)
+    {
+        if(!Directory.Exists(folderPath))
+        {
+            Debug.LogError($"Import folder not found: {folderPath}");
+            return;
+        }
+
+        try
+        {
+            string[] configFiles = Directory.GetFiles(folderPath, "*.xml");
+            foreach(string file in configFiles)
+            {
+                ImportConfig(file);
+            }
+
+            Debug.Log($"Successfully imported {configFiles.Length} configs from {folderPath}");
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"Batch import failed: {e.Message}\n{e.StackTrace}");
+        }
+    }
+    #endregion
+
+    #region GUID System (Unity Built-in)
+    private string GetGameObjectUniqueId(GameObject go)
+    {
+        if(go == null) return null;
+
+        // 如果是预制体实例，使用预制体的Asset GUID
+        if(PrefabUtility.IsPartOfPrefabInstance(go))
+        {
+            string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
+            if(!string.IsNullOrEmpty(assetPath))
+            {
+                string guid = AssetDatabase.AssetPathToGUID(assetPath);
+                return $"Prefab:{guid}";
+            }
+        }
+
+        // 普通场景对象，使用GlobalObjectId
+        GlobalObjectId globalId = GlobalObjectId.GetGlobalObjectIdSlow(go);
+        return $"Scene:{globalId.ToString()}";
+    }
+
+    private GameObject FindGameObjectByUniqueId(string uniqueId)
+    {
+        if(string.IsNullOrEmpty(uniqueId)) return null;
+
+        // 处理预制体引用
+        if(uniqueId.StartsWith("Prefab:"))
+        {
+            string guid = uniqueId.Substring(7);
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            if(!string.IsNullOrEmpty(assetPath))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if(prefab != null)
+                {
+                    // 查找场景中已存在的实例
+                    GameObject[] instances = UnityEngine.Object.FindObjectsOfType<GameObject>();
+                    foreach(GameObject instance in instances)
+                    {
+                        if(PrefabUtility.GetCorrespondingObjectFromSource(instance) == prefab)
+                        {
+                            return instance;
+                        }
+                    }
+
+                    // 如果没有找到，创建新实例
+                    return PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                }
+            }
+        }
+        // 处理场景对象引用
+        else if(uniqueId.StartsWith("Scene:"))
+        {
+            string globalIdStr = uniqueId.Substring(6);
+            GlobalObjectId globalId;
+            if(GlobalObjectId.TryParse(globalIdStr, out globalId))
+            {
+                return GlobalObjectId.GlobalObjectIdentifierToObjectSlow(globalId) as GameObject;
+            }
+        }
+
+        return null;
+    }
+    #endregion
+
+    #region Utility Functions
+    private string GetGameObjectPath(GameObject go)
+    {
+        if(go.transform.parent == null)
+            return go.name;
+
+        return GetGameObjectPath(go.transform.parent.gameObject) + "/" + go.name;
+    }
+
+    private GameObject FindGameObjectByPath(string path)
+    {
+        if(string.IsNullOrEmpty(path)) return null;
+
+        GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+
+        foreach(GameObject root in rootObjects)
+        {
+            if(path == root.name) return root;
+
+            Transform found = root.transform.Find(path);
+            if(found != null) return found.gameObject;
+
+            // 处理完整路径
+            string[] parts = path.Split('/');
+            Transform current = root.transform;
+
+            for(int i = 0; i < parts.Length; i++)
+            {
+                current = current.Find(parts[i]);
+                if(current == null) break;
+            }
+
+            if(current != null) return current.gameObject;
+        }
+
+        return null;
+    }
+
+    private GameObject FindOrCreateGameObjectByPath(string path)
+    {
+        GameObject existing = FindGameObjectByPath(path);
+        if(existing != null) return existing;
+
+        string[] parts = path.Split('/');
+        if(parts.Length == 0) return null;
+
+        // 从根对象开始查找/创建
+        GameObject current = null;
+        GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+
+        // 查找根对象
+        foreach(GameObject root in rootObjects)
+        {
+            if(root.name == parts[0])
+            {
+                current = root;
+                break;
+            }
+        }
+
+        // 如果没有找到根对象，创建它
+        if(current == null)
+        {
+            current = new GameObject(parts[0]);
+            Undo.RegisterCreatedObjectUndo(current, "Create GameObject");
+        }
+
+        // 处理路径的其余部分
+        for(int i = 1; i < parts.Length; i++)
+        {
+            Transform child = current.transform.Find(parts[i]);
+            if(child == null)
+            {
+                GameObject newChild = new GameObject(parts[i]);
+                Undo.RegisterCreatedObjectUndo(newChild, "Create GameObject");
+                newChild.transform.SetParent(current.transform);
+                current = newChild;
+            }
+            else
+            {
+                current = child.gameObject;
+            }
+        }
+
+        return current;
+    }
+
+    private string SerializeValue(object value, GameObject context)
+    {
+        if(value == null) return "null";
 
         Type t = value.GetType();
 
+        // 基本类型
         if(t.IsPrimitive || t == typeof(string) || t.IsEnum)
             return value.ToString();
 
+        // Unity特有类型
         if(t == typeof(Vector3))
-            return ((Vector3)value).ToString("F3");  // e.g., (1.0, 2.0, 3.0)
+        {
+            Vector3 v = (Vector3)value;
+            return $"Vector3({v.x:F3},{v.y:F3},{v.z:F3})";
+        }
 
         if(t == typeof(Vector2))
-            return ((Vector2)value).ToString("F3");
+        {
+            Vector2 v = (Vector2)value;
+            return $"Vector2({v.x:F3},{v.y:F3})";
+        }
+
+        if(t == typeof(Quaternion))
+        {
+            Quaternion q = (Quaternion)value;
+            return $"Quaternion({q.x:F3},{q.y:F3},{q.z:F3},{q.w:F3})";
+        }
 
         if(t == typeof(Color))
+        {
             return ColorUtility.ToHtmlStringRGBA((Color)value);
+        }
 
+        // 引用类型
         if(t == typeof(Transform))
         {
             Transform tf = (Transform)value;
-            return tf != null ? tf.name : "None";
+            if(tf == null) return "null";
+
+            return $"TransformRef({GetGameObjectUniqueId(tf.gameObject)})";
         }
 
         if(t == typeof(GameObject))
         {
             GameObject go = (GameObject)value;
-            return go != null ? go.name : "None";
+            if(go == null) return "null";
+
+            return $"GameObjectRef({GetGameObjectUniqueId(go)})";
         }
 
+        // 集合类型
         if(typeof(IList).IsAssignableFrom(t))
         {
             var list = value as IList;
-            if(list == null) return "None";
+            if(list == null) return "null";
 
             List<string> parts = new List<string>();
             foreach(var item in list)
             {
-                parts.Add(SerializeValue(item));
+                parts.Add(SerializeValue(item, context));
             }
-            return string.Join("|", parts);  // 用竖线分隔数组项
+            return $"List[{string.Join(";", parts)}]";
         }
 
-        return $"[Unsupported: {t.Name}]";
+        if(typeof(IDictionary).IsAssignableFrom(t))
+        {
+            var dict = value as IDictionary;
+            if(dict == null) return "null";
+
+            List<string> entries = new List<string>();
+            foreach(DictionaryEntry entry in dict)
+            {
+                entries.Add($"{SerializeValue(entry.Key, context)}:{SerializeValue(entry.Value, context)}");
+            }
+            return $"Dict[{string.Join(";", entries)}]";
+        }
+
+        return $"[Unsupported:{t.Name}]";
     }
 
+    private object DeserializeValue(string valueStr, Type targetType, GameObject context)
+    {
+        if(valueStr == "null") return null;
+
+        // 处理基本类型
+        if(targetType == typeof(string)) return valueStr;
+        if(targetType == typeof(int)) return int.Parse(valueStr);
+        if(targetType == typeof(float)) return float.Parse(valueStr);
+        if(targetType == typeof(bool)) return bool.Parse(valueStr);
+        if(targetType.IsEnum) return Enum.Parse(targetType, valueStr);
+
+        // 处理Unity特有类型
+        if(targetType == typeof(Vector3))
+        {
+            string[] parts = valueStr.Trim('V', 'e', 'c', 't', 'o', 'r', '3', '(', ')').Split(',');
+            return new Vector3(float.Parse(parts[0]), float.Parse(parts[1]), float.Parse(parts[2]));
+        }
+
+        if(targetType == typeof(Vector2))
+        {
+            string[] parts = valueStr.Trim('V', 'e', 'c', 't', 'o', 'r', '2', '(', ')').Split(',');
+            return new Vector2(float.Parse(parts[0]), float.Parse(parts[1]));
+        }
+
+        if(targetType == typeof(Quaternion))
+        {
+            string[] parts = valueStr.Trim('Q', 'u', 'a', 't', 'e', 'r', 'n', 'i', 'o', 'n', '(', ')').Split(',');
+            return new Quaternion(float.Parse(parts[0]), float.Parse(parts[1]), float.Parse(parts[2]), float.Parse(parts[3]));
+        }
+
+        if(targetType == typeof(Color))
+        {
+            Color color;
+            if(ColorUtility.TryParseHtmlString("#" + valueStr, out color))
+                return color;
+            return Color.white;
+        }
+
+        // 处理GameObject引用
+        if(targetType == typeof(GameObject))
+        {
+            if(valueStr.StartsWith("GameObjectRef("))
+            {
+                string guid = valueStr.Substring("GameObjectRef(".Length).TrimEnd(')');
+                return FindGameObjectByUniqueId(guid);
+            }
+            return null;
+        }
+
+        // 处理Transform引用
+        if(targetType == typeof(Transform))
+        {
+            if(valueStr.StartsWith("TransformRef("))
+            {
+                string guid = valueStr.Substring("TransformRef(".Length).TrimEnd(')');
+                GameObject go = FindGameObjectByUniqueId(guid);
+                return go != null ? go.transform : null;
+            }
+            return null;
+        }
+
+        // 处理数组和列表
+        if(typeof(IList).IsAssignableFrom(targetType))
+        {
+            if(valueStr.StartsWith("List[") && valueStr.EndsWith("]"))
+            {
+                string content = valueStr.Substring(5, valueStr.Length - 6);
+                string[] items = content.Split(';');
+
+                IList list = (IList)Activator.CreateInstance(targetType);
+                Type elementType = targetType.IsGenericType ?
+                    targetType.GetGenericArguments()[0] :
+                    targetType.GetElementType();
+
+                foreach(string item in items)
+                {
+                    object value = DeserializeValue(item, elementType, context);
+                    list.Add(value);
+                }
+                return list;
+            }
+            return null;
+        }
+
+        // 处理字典
+        if(typeof(IDictionary).IsAssignableFrom(targetType))
+        {
+            if(valueStr.StartsWith("Dict[") && valueStr.EndsWith("]"))
+            {
+                string content = valueStr.Substring(5, valueStr.Length - 6);
+                string[] entries = content.Split(';');
+
+                IDictionary dict = (IDictionary)Activator.CreateInstance(targetType);
+                Type[] genericArgs = targetType.GetGenericArguments();
+                Type keyType = genericArgs[0];
+                Type valueType = genericArgs[1];
+
+                foreach(string entry in entries)
+                {
+                    string[] parts = entry.Split(':');
+                    if(parts.Length == 2)
+                    {
+                        object key = DeserializeValue(parts[0], keyType, context);
+                        object value = DeserializeValue(parts[1], valueType, context);
+                        dict.Add(key, value);
+                    }
+                }
+                return dict;
+            }
+            return null;
+        }
+
+        Debug.LogWarning($"Unsupported type for deserialization: {targetType.Name}");
+        return null;
+    }
+    #endregion
 }
