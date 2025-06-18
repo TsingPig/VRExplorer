@@ -29,7 +29,61 @@ public class GameObjectConfigManager : EditorWindow
     {
         DrawExportUI();
         DrawImportUI();
+        DrawCleanupUI(); // New cleanup section
     }
+
+    #region Cleanup Functionality
+    private void DrawCleanupUI()
+    {
+        GUILayout.Space(20);
+        GUILayout.Label("Scene Cleanup", EditorStyles.boldLabel);
+
+        if(GUILayout.Button("Remove All VRExplorer Scripts"))
+        {
+            if(EditorUtility.DisplayDialog("Confirmation",
+                "This will permanently delete all scripts in the VRExplorer namespace. Continue?",
+                "Delete", "Cancel"))
+            {
+                RemoveVRExplorerScripts();
+            }
+        }
+    }
+
+    [MenuItem("Tools/Remove VRExplorer Scripts")] // Optional: Add to Unity menu
+    public static void RemoveVRExplorerScripts()
+    {
+        try
+        {
+            // Get all MonoBehaviours in the scene
+            var allScripts = UnityEngine.Object.FindObjectsOfType<MonoBehaviour>()
+                .Where(script => script != null)
+                .ToArray();
+
+            int deletedCount = 0;
+
+            foreach(var script in allScripts)
+            {
+                Type type = script.GetType();
+                if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                {
+                    // Record undo operation
+                    Undo.DestroyObjectImmediate(script);
+                    deletedCount++;
+                }
+            }
+
+            Debug.Log($"Removed {deletedCount} VRExplorer scripts");
+            EditorUtility.DisplayDialog("Complete",
+                $"Removed {deletedCount} VRExplorer scripts from the scene.", "OK");
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"Cleanup failed: {e.Message}");
+            EditorUtility.DisplayDialog("Error",
+                $"Failed to remove scripts: {e.Message}", "OK");
+        }
+    }
+    #endregion
 
     #region UI Drawing
     private void DrawExportUI()
