@@ -1,4 +1,4 @@
-<GameObject isPrefabAsset="False" guid="Instance:220046a189ec53d4e9d8c2c88e544bff" name="VRExplorer" path="TempExportParent/VRExplorer">
+<GameObject isPrefabAsset="True" guid="220046a189ec53d4e9d8c2c88e544bff" name="VRExplorer" path="Assets/VRExplorer/Prefabs/VRExplorer.prefab">
   <Script type="VRExplorer.VRExplorer" enabled="True">
     <Field name="leftHandController" type="BNG.HandController">[Unsupported:HandController]</Field>
     <Field name="moveSpeed" type="System.Single">6</Field>

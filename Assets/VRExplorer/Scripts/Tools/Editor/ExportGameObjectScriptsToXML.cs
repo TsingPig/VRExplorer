@@ -38,7 +38,7 @@ public class GameObjectConfigManager : EditorWindow
     private void DrawCleanupUI()
     {
         GUILayout.Space(20);
-        GUILayout.Label("Scene Cleanup", EditorStyles.boldLabel);
+        GUILayout.Label("Cleanup", EditorStyles.boldLabel);
 
         if(GUILayout.Button("Remove All VRExplorer Scripts"))
         {
@@ -56,27 +56,63 @@ public class GameObjectConfigManager : EditorWindow
     {
         try
         {
-            // Get all MonoBehaviours in the scene
-            var allScripts = UnityEngine.Object.FindObjectsOfType<MonoBehaviour>()
+            // Clean up scene objects
+            var sceneScripts = UnityEngine.Object.FindObjectsOfType<MonoBehaviour>()
                 .Where(script => script != null)
                 .ToArray();
 
-            int deletedCount = 0;
-
-            foreach(var script in allScripts)
+            int sceneDeletedCount = 0;
+            foreach(var script in sceneScripts)
             {
                 Type type = script.GetType();
                 if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
                 {
-                    // Record undo operation
                     Undo.DestroyObjectImmediate(script);
-                    deletedCount++;
+                    sceneDeletedCount++;
                 }
             }
 
-            Debug.Log($"Removed {deletedCount} VRExplorer scripts");
+            // Clean up prefab assets
+            int prefabDeletedCount = 0;
+            string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
+            foreach(string guid in prefabGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+                if(prefab != null)
+                {
+                    MonoBehaviour[] components = prefab.GetComponents<MonoBehaviour>();
+                    bool modified = false;
+
+                    // Remove components from back to front
+                    for(int i = components.Length - 1; i >= 0; i--)
+                    {
+                        var component = components[i];
+                        if(component == null) continue;
+
+                        Type type = component.GetType();
+                        if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                        {
+                            UnityEngine.Object.DestroyImmediate(component, true);
+                            prefabDeletedCount++;
+                            modified = true;
+                        }
+                    }
+
+                    if(modified)
+                    {
+                        EditorUtility.SetDirty(prefab);
+                    }
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log($"Removed {sceneDeletedCount} VRExplorer scripts from scene and {prefabDeletedCount} from prefabs");
             EditorUtility.DisplayDialog("Complete",
-                $"Removed {deletedCount} VRExplorer scripts from the scene.", "OK");
+                $"Removed {sceneDeletedCount} VRExplorer scripts from scene and {prefabDeletedCount} from prefabs", "OK");
         }
         catch(Exception e)
         {
@@ -102,14 +138,7 @@ public class GameObjectConfigManager : EditorWindow
         {
             if(targetObject != null)
             {
-                if(PrefabUtility.IsPartOfPrefabAsset(targetObject) && exportPrefabAssets)
-                {
-                    ExportPrefabAssetConfig(targetObject, exportPath);
-                }
-                else
-                {
-                    ExportConfig(targetObject, exportPath);
-                }
+                ExportConfig(targetObject, exportPath);
             }
             else
             {
@@ -157,7 +186,6 @@ public class GameObjectConfigManager : EditorWindow
             XmlDocument xmlDoc = new XmlDocument();
             XmlElement root = xmlDoc.CreateElement("GameObject");
 
-            // Identify if this is a prefab asset
             bool isPrefabAsset = PrefabUtility.IsPartOfPrefabAsset(obj);
             root.SetAttribute("isPrefabAsset", isPrefabAsset.ToString());
 
@@ -179,7 +207,17 @@ public class GameObjectConfigManager : EditorWindow
             xmlDoc.AppendChild(root);
 
             // Export all VRExplorer namespace components
-            ExportScriptsForGameObject(obj, xmlDoc, root);
+            MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
+            foreach(var script in scripts)
+            {
+                if(script == null) continue;
+
+                Type type = script.GetType();
+                if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
+                    continue;
+
+                ExportScriptData(xmlDoc, root, script, type);
+            }
 
             // Ensure directory exists
             string dir = Path.GetDirectoryName(path);
@@ -192,21 +230,6 @@ public class GameObjectConfigManager : EditorWindow
         catch(Exception e)
         {
             Debug.LogError($"Export failed: {e.Message}\n{e.StackTrace}");
-        }
-    }
-
-    private void ExportScriptsForGameObject(GameObject obj, XmlDocument xmlDoc, XmlElement parent)
-    {
-        MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
-        foreach(var script in scripts)
-        {
-            if(script == null) continue;
-
-            Type type = script.GetType();
-            if(type.Namespace == null || !type.Namespace.StartsWith("VRExplorer"))
-                continue;
-
-            ExportScriptData(xmlDoc, parent, script, type);
         }
     }
 
@@ -246,10 +269,9 @@ public class GameObjectConfigManager : EditorWindow
             if(!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            // 收集所有需要导出的GameObject
             var exportTargets = new HashSet<GameObject>();
 
-            // 添加场景对象
+            // Add scene objects
             GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
             foreach(GameObject root in allObjects)
             {
@@ -263,14 +285,14 @@ public class GameObjectConfigManager : EditorWindow
                 }
             }
 
-            // 添加预制体资源（如果启用）
+            // Add prefab assets if enabled
             if(exportPrefabAssets)
             {
                 string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
                 foreach(string guid in prefabGuids)
                 {
-                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
 
                     if(prefab != null && HasVRExplorerComponent(prefab))
                     {
@@ -279,20 +301,12 @@ public class GameObjectConfigManager : EditorWindow
                 }
             }
 
-            // 导出所有目标对象
+            // Export all targets
             foreach(GameObject go in exportTargets)
             {
                 string safeName = go.name.Replace("/", "_").Replace("\\", "_");
                 string filePath = Path.Combine(folderPath, $"{safeName}_{Guid.NewGuid()}.xml");
-
-                if(PrefabUtility.IsPartOfPrefabAsset(go))
-                {
-                    ExportPrefabAssetConfig(go, filePath);
-                }
-                else
-                {
-                    ExportConfig(go, filePath);
-                }
+                ExportConfig(go, filePath);
             }
 
             Debug.Log($"Successfully exported {exportTargets.Count} GameObjects to {folderPath}");
@@ -318,31 +332,6 @@ public class GameObjectConfigManager : EditorWindow
         }
         return false;
     }
-
-    private void ExportPrefabAssetConfig(GameObject prefabAsset, string path)
-    {
-        // 创建一个临时实例来导出配置
-        GameObject tempInstance = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
-
-        try
-        {
-            // 将临时实例放在一个临时父对象下，避免污染场景
-            GameObject tempParent = new GameObject("TempExportParent");
-            Undo.RegisterCreatedObjectUndo(tempParent, "Create Temp Parent");
-            tempInstance.transform.SetParent(tempParent.transform);
-
-            // 导出临时实例的配置
-            ExportConfig(tempInstance, path);
-        }
-        finally
-        {
-            // 确保临时对象被清理
-            if(tempInstance != null)
-            {
-                Undo.DestroyObjectImmediate(tempInstance.transform.parent.gameObject);
-            }
-        }
-    }
     #endregion
 
     #region Import Functions
@@ -366,10 +355,9 @@ public class GameObjectConfigManager : EditorWindow
 
             GameObject target = null;
 
-            // Handle prefab asset import
             if(isPrefabAsset && importPrefabAssets)
             {
-                // Load prefab asset
+                // Load prefab asset directly
                 target = AssetDatabase.LoadAssetAtPath<GameObject>(originalPath);
                 if(target == null)
                 {
@@ -377,29 +365,24 @@ public class GameObjectConfigManager : EditorWindow
                     return;
                 }
 
-                // Create a temporary instance for editing
-                GameObject prefabInstance = PrefabUtility.InstantiatePrefab(target) as GameObject;
-                Undo.RegisterCreatedObjectUndo(prefabInstance, "Create Prefab Instance");
+                // Remove existing VRExplorer components
+                RemoveComponentsFromPrefab(target);
 
-                // Apply modifications to the instance
-                ApplyConfiguration(xmlDoc, root, prefabInstance);
+                // Apply new configuration
+                ApplyConfigurationToPrefab(xmlDoc, root, target);
 
-                // Apply changes back to prefab asset
-                PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
-                Undo.DestroyObjectImmediate(prefabInstance);
-
-                Debug.Log($"Successfully updated prefab asset: {target.name}");
+                // Save changes
+                EditorUtility.SetDirty(target);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
+
+                Debug.Log($"Successfully updated prefab asset: {target.name}");
                 return;
             }
-            // Handle non-prefab objects
             else if(!isPrefabAsset || !importPrefabAssets)
             {
-                // Find by GUID
+                // Handle scene objects
                 target = FindGameObjectByUniqueId(guid);
-
-                // If not found, try to create/load by path
                 if(target == null && !string.IsNullOrEmpty(originalPath))
                 {
                     target = FindOrCreateGameObjectByPath(originalPath);
@@ -411,8 +394,12 @@ public class GameObjectConfigManager : EditorWindow
                     return;
                 }
 
-                // Apply configuration to scene object
+                // Remove existing VRExplorer components
+                RemoveExistingVRExplorerComponents(target);
+
+                // Apply configuration
                 ApplyConfiguration(xmlDoc, root, target);
+
                 Debug.Log($"Successfully imported config to {target.name}");
                 EditorUtility.SetDirty(target);
             }
@@ -423,12 +410,33 @@ public class GameObjectConfigManager : EditorWindow
         }
     }
 
-    private void ApplyConfiguration(XmlDocument xmlDoc, XmlElement root, GameObject target)
+    private void RemoveComponentsFromPrefab(GameObject prefab)
     {
-        // Remove all existing VRExplorer scripts
-        RemoveExistingVRExplorerComponents(target);
+        MonoBehaviour[] components = prefab.GetComponents<MonoBehaviour>();
+        bool modified = false;
 
-        // Apply all script configurations
+        // Remove from back to front
+        for(int i = components.Length - 1; i >= 0; i--)
+        {
+            var component = components[i];
+            if(component == null) continue;
+
+            Type type = component.GetType();
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            {
+                UnityEngine.Object.DestroyImmediate(component, true);
+                modified = true;
+            }
+        }
+
+        if(modified)
+        {
+            EditorUtility.SetDirty(prefab);
+        }
+    }
+
+    private void ApplyConfigurationToPrefab(XmlDocument xmlDoc, XmlElement root, GameObject prefab)
+    {
         foreach(XmlNode scriptNode in root.SelectNodes("Script"))
         {
             XmlElement scriptElement = (XmlElement)scriptNode;
@@ -442,8 +450,8 @@ public class GameObjectConfigManager : EditorWindow
                 continue;
             }
 
-            // Add component
-            MonoBehaviour script = (MonoBehaviour)target.AddComponent(type);
+            // Add component directly to prefab
+            MonoBehaviour script = (MonoBehaviour)prefab.AddComponent(type);
             script.enabled = enabled;
 
             // Apply field values
@@ -459,7 +467,7 @@ public class GameObjectConfigManager : EditorWindow
 
                 try
                 {
-                    object value = DeserializeValue(valueStr, field.FieldType, target);
+                    object value = DeserializeValue(valueStr, field.FieldType, prefab);
                     field.SetValue(script, value);
                 }
                 catch(Exception e)
@@ -485,10 +493,50 @@ public class GameObjectConfigManager : EditorWindow
             }
         }
 
-        // Destroy after iteration to avoid modification during iteration
         foreach(var script in toDestroy)
         {
-            DestroyImmediate(script, true);
+            DestroyImmediate(script);
+        }
+    }
+
+    private void ApplyConfiguration(XmlDocument xmlDoc, XmlElement root, GameObject target)
+    {
+        foreach(XmlNode scriptNode in root.SelectNodes("Script"))
+        {
+            XmlElement scriptElement = (XmlElement)scriptNode;
+            string typeName = scriptElement.GetAttribute("type");
+            bool enabled = bool.Parse(scriptElement.GetAttribute("enabled"));
+
+            Type type = Type.GetType(typeName);
+            if(type == null)
+            {
+                Debug.LogWarning($"Type not found: {typeName}");
+                continue;
+            }
+
+            MonoBehaviour script = (MonoBehaviour)target.AddComponent(type);
+            script.enabled = enabled;
+
+            foreach(XmlNode fieldNode in scriptElement.SelectNodes("Field"))
+            {
+                XmlElement fieldElement = (XmlElement)fieldNode;
+                string fieldName = fieldElement.GetAttribute("name");
+                string fieldType = fieldElement.GetAttribute("type");
+                string valueStr = fieldElement.InnerText;
+
+                FieldInfo field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if(field == null) continue;
+
+                try
+                {
+                    object value = DeserializeValue(valueStr, field.FieldType, target);
+                    field.SetValue(script, value);
+                }
+                catch(Exception e)
+                {
+                    Debug.LogWarning($"Failed to set field {field.Name} in {type.Name}: {e.Message}");
+                }
+            }
         }
     }
 
@@ -518,19 +566,17 @@ public class GameObjectConfigManager : EditorWindow
     }
     #endregion
 
-    #region GUID System (Unity Built-in)
+    #region GUID System
     private string GetGameObjectUniqueId(GameObject go)
     {
         if(go == null) return null;
 
-        // Return asset GUID for prefab assets
         if(PrefabUtility.IsPartOfPrefabAsset(go))
         {
             string assetPath = AssetDatabase.GetAssetPath(go);
             return $"Asset:{AssetDatabase.AssetPathToGUID(assetPath)}";
         }
 
-        // For prefab instances, use prefab asset GUID
         if(PrefabUtility.IsPartOfPrefabInstance(go))
         {
             string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
@@ -541,7 +587,6 @@ public class GameObjectConfigManager : EditorWindow
             }
         }
 
-        // For regular scene objects, use GlobalObjectId
         GlobalObjectId globalId = GlobalObjectId.GetGlobalObjectIdSlow(go);
         return $"Scene:{globalId.ToString()}";
     }
@@ -550,7 +595,6 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(string.IsNullOrEmpty(uniqueId)) return null;
 
-        // Handle asset reference (prefab assets)
         if(uniqueId.StartsWith("Asset:"))
         {
             string guid = uniqueId.Substring(6);
@@ -560,7 +604,6 @@ public class GameObjectConfigManager : EditorWindow
                 return AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
             }
         }
-        // Handle prefab instances
         else if(uniqueId.StartsWith("Instance:"))
         {
             string guid = uniqueId.Substring(9);
@@ -570,7 +613,6 @@ public class GameObjectConfigManager : EditorWindow
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 if(prefab != null)
                 {
-                    // Find existing instances in the scene
                     GameObject[] instances = UnityEngine.Object.FindObjectsOfType<GameObject>();
                     foreach(GameObject instance in instances)
                     {
@@ -580,12 +622,10 @@ public class GameObjectConfigManager : EditorWindow
                         }
                     }
 
-                    // If not found, create a new instance
                     return PrefabUtility.InstantiatePrefab(prefab) as GameObject;
                 }
             }
         }
-        // Handle scene objects
         else if(uniqueId.StartsWith("Scene:"))
         {
             string globalIdStr = uniqueId.Substring(6);
@@ -603,13 +643,11 @@ public class GameObjectConfigManager : EditorWindow
     #region Utility Functions
     private string GetGameObjectPath(GameObject go)
     {
-        // For prefab assets, return asset path
         if(PrefabUtility.IsPartOfPrefabAsset(go))
         {
             return AssetDatabase.GetAssetPath(go);
         }
 
-        // For scene objects, return hierarchy path
         if(go.transform.parent == null)
             return go.name;
 
@@ -620,13 +658,11 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(string.IsNullOrEmpty(path)) return null;
 
-        // Check if this is an asset path
         if(path.StartsWith("Assets/") && AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
         {
             return AssetDatabase.LoadAssetAtPath<GameObject>(path);
         }
 
-        // Handle scene objects
         GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
         foreach(GameObject root in rootObjects)
@@ -636,7 +672,6 @@ public class GameObjectConfigManager : EditorWindow
             Transform found = root.transform.Find(path);
             if(found != null) return found.gameObject;
 
-            // Handle full path
             string[] parts = path.Split('/');
             Transform current = root.transform;
 
@@ -657,21 +692,17 @@ public class GameObjectConfigManager : EditorWindow
         GameObject existing = FindGameObjectByPath(path);
         if(existing != null) return existing;
 
-        // If it's an asset path, just load it
         if(path.StartsWith("Assets/") && File.Exists(path))
         {
             return AssetDatabase.LoadAssetAtPath<GameObject>(path);
         }
 
-        // Handle scene objects
         string[] parts = path.Split('/');
         if(parts.Length == 0) return null;
 
-        // Start from root
         GameObject current = null;
         GameObject[] rootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
-        // Find root object
         foreach(GameObject root in rootObjects)
         {
             if(root.name == parts[0])
@@ -681,14 +712,12 @@ public class GameObjectConfigManager : EditorWindow
             }
         }
 
-        // If root not found, create it
         if(current == null)
         {
             current = new GameObject(parts[0]);
             Undo.RegisterCreatedObjectUndo(current, "Create GameObject");
         }
 
-        // Process remaining path
         for(int i = 1; i < parts.Length; i++)
         {
             Transform child = current.transform.Find(parts[i]);
@@ -714,11 +743,9 @@ public class GameObjectConfigManager : EditorWindow
 
         Type t = value.GetType();
 
-        // Basic types
         if(t.IsPrimitive || t == typeof(string) || t.IsEnum)
             return value.ToString();
 
-        // Unity-specific types
         if(t == typeof(Vector3))
         {
             Vector3 v = (Vector3)value;
@@ -742,7 +769,6 @@ public class GameObjectConfigManager : EditorWindow
             return ColorUtility.ToHtmlStringRGBA((Color)value);
         }
 
-        // Reference types
         if(t == typeof(Transform))
         {
             Transform tf = (Transform)value;
@@ -759,7 +785,6 @@ public class GameObjectConfigManager : EditorWindow
             return $"GameObjectRef({GetGameObjectUniqueId(go)})";
         }
 
-        // Collection types
         if(typeof(IList).IsAssignableFrom(t))
         {
             var list = value as IList;
@@ -793,14 +818,12 @@ public class GameObjectConfigManager : EditorWindow
     {
         if(valueStr == "null") return null;
 
-        // Handle basic types
         if(targetType == typeof(string)) return valueStr;
         if(targetType == typeof(int)) return int.Parse(valueStr);
         if(targetType == typeof(float)) return float.Parse(valueStr);
         if(targetType == typeof(bool)) return bool.Parse(valueStr);
         if(targetType.IsEnum) return Enum.Parse(targetType, valueStr);
 
-        // Handle Unity-specific types
         if(targetType == typeof(Vector3))
         {
             string[] parts = valueStr.Replace("Vector3(", "").Replace(")", "").Split(',');
@@ -827,7 +850,6 @@ public class GameObjectConfigManager : EditorWindow
             return Color.white;
         }
 
-        // Handle GameObject references
         if(targetType == typeof(GameObject))
         {
             if(valueStr.StartsWith("GameObjectRef("))
@@ -838,7 +860,6 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // Handle Transform references
         if(targetType == typeof(Transform))
         {
             if(valueStr.StartsWith("TransformRef("))
@@ -850,7 +871,6 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // Handle arrays and lists
         if(typeof(IList).IsAssignableFrom(targetType))
         {
             if(valueStr.StartsWith("List[") && valueStr.EndsWith("]"))
@@ -873,7 +893,6 @@ public class GameObjectConfigManager : EditorWindow
             return null;
         }
 
-        // Handle dictionaries
         if(typeof(IDictionary).IsAssignableFrom(targetType))
         {
             if(valueStr.StartsWith("Dict[") && valueStr.EndsWith("]"))

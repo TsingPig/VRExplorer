@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- 
+- `GameObjectConfigManager.cs` prefab import & export logic
 
 ## [1.5.5] - 2025-06-18
 
