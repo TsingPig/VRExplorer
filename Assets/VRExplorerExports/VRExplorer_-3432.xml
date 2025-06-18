@@ -1,0 +1,15 @@
+<GameObject name="VRExplorer">
+  <Script type="VRExplorer.VRExplorer" enabled="True">
+    <Field name="leftHandController" type="BNG.HandController">[Unsupported: HandController]</Field>
+    <Field name="moveSpeed" type="System.Single">6</Field>
+    <Field name="explorationEventFrequency" type="System.Single">0</Field>
+    <Field name="randomInitPos" type="System.Boolean">False</Field>
+    <Field name="drag" type="System.Boolean">True</Field>
+    <Field name="explorationEvents" type="System.Collections.Generic.List`1[[UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    </Field>
+    <Field name="_areaDiameter" type="System.Single">7.5</Field>
+    <Field name="_curTask" type="System.Collections.Generic.List`1[[VRExplorer.BaseAction, VRExplorer, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    </Field>
+    <Field name="_nextMono" type="UnityEngine.MonoBehaviour">None</Field>
+  </Script>
+</GameObject>

@@ -1,64 +1,65 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using VRExplorer;
-
-public class XRTransformable : XRBase, ITransformableEntity
+namespace VRExplorer.Mono
 {
-    public new string Name => Str.Transformable;
-
-    public float triggeringTime = 0.5f;
-
-    public Transform destination;
-
-    public Vector3 DeltaPosition => destination.position - transform.position;
-
-    public Vector3 DeltaRotation => new Vector3(0, 0, 0);
-
-    public Vector3 DeltaScale => new Vector3(0, 0, 0);
-
-    public float TriggeringTime => triggeringTime;
-
-    public void Triggerred()
+    public class XRTransformable : XRBase, ITransformableEntity
     {
-        var obj = EntityManager.Instance.vrexplorerMono.gameObject;
-        XRDirectInteractor interactor;
-        if(!obj.TryGetComponent(out interactor))
-        {
-            interactor = obj.AddComponent<XRDirectInteractor>();
-        }
-        if(!obj.GetComponent<ActionBasedController>())
-        {
-            obj.AddComponent<ActionBasedController>();
-        }
-        var e = new SelectExitEventArgs() { interactorObject = interactor };
-        var h = new HoverExitEventArgs() { interactorObject = interactor };
-        var a = new DeactivateEventArgs() { interactorObject = interactor };
-        _interactable.selectExited.Invoke(e);
-        _interactable.hoverExited.Invoke(h);
-        _interactable.lastSelectExited.Invoke(e);
-        _interactable.lastHoverExited.Invoke(h);
-        _interactable.deactivated.Invoke(a);
-    }
+        public new string Name => Str.Transformable;
 
-    public void Triggerring()
-    {
-        var obj = EntityManager.Instance.vrexplorerMono.gameObject;
-        XRDirectInteractor interactor;
-        if(!obj.TryGetComponent(out interactor))
+        public float triggeringTime = 0.5f;
+
+        public Transform destination;
+
+        public Vector3 DeltaPosition => destination.position - transform.position;
+
+        public Vector3 DeltaRotation => new Vector3(0, 0, 0);
+
+        public Vector3 DeltaScale => new Vector3(0, 0, 0);
+
+        public float TriggeringTime => triggeringTime;
+
+        public void Triggerred()
         {
-            interactor = obj.AddComponent<XRDirectInteractor>();
+            var obj = EntityManager.Instance.vrexplorerMono.gameObject;
+            XRDirectInteractor interactor;
+            if(!obj.TryGetComponent(out interactor))
+            {
+                interactor = obj.AddComponent<XRDirectInteractor>();
+            }
+            if(!obj.GetComponent<ActionBasedController>())
+            {
+                obj.AddComponent<ActionBasedController>();
+            }
+            var e = new SelectExitEventArgs() { interactorObject = interactor };
+            var h = new HoverExitEventArgs() { interactorObject = interactor };
+            var a = new DeactivateEventArgs() { interactorObject = interactor };
+            _interactable.selectExited.Invoke(e);
+            _interactable.hoverExited.Invoke(h);
+            _interactable.lastSelectExited.Invoke(e);
+            _interactable.lastHoverExited.Invoke(h);
+            _interactable.deactivated.Invoke(a);
         }
-        if(!obj.GetComponent<ActionBasedController>())
+
+        public void Triggerring()
         {
-            obj.AddComponent<ActionBasedController>();
+            var obj = EntityManager.Instance.vrexplorerMono.gameObject;
+            XRDirectInteractor interactor;
+            if(!obj.TryGetComponent(out interactor))
+            {
+                interactor = obj.AddComponent<XRDirectInteractor>();
+            }
+            if(!obj.GetComponent<ActionBasedController>())
+            {
+                obj.AddComponent<ActionBasedController>();
+            }
+            var e = new SelectEnterEventArgs() { interactorObject = interactor };
+            var h = new HoverEnterEventArgs() { interactorObject = interactor };
+            var a = new ActivateEventArgs() { interactorObject = interactor };
+            _interactable.selectEntered.Invoke(e);
+            _interactable.hoverEntered.Invoke(h);
+            _interactable.firstSelectEntered.Invoke(e);
+            _interactable.firstHoverEntered.Invoke(h);
+            _interactable.activated.Invoke(a);
         }
-        var e = new SelectEnterEventArgs() { interactorObject = interactor };
-        var h = new HoverEnterEventArgs() { interactorObject = interactor };
-        var a = new ActivateEventArgs() { interactorObject = interactor };
-        _interactable.selectEntered.Invoke(e);
-        _interactable.hoverEntered.Invoke(h);
-        _interactable.firstSelectEntered.Invoke(e);
-        _interactable.firstHoverEntered.Invoke(h);
-        _interactable.activated.Invoke(a);
     }
 }

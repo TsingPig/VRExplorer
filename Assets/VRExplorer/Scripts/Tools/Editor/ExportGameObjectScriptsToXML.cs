@@ -6,6 +6,7 @@ using System.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameObjectConfigExporter : EditorWindow
 {
@@ -30,6 +31,15 @@ public class GameObjectConfigExporter : EditorWindow
                 ExportConfig(targetObject, exportPath);
             else
                 Debug.LogError("Please select a GameObject.");
+        }
+        GUILayout.Space(10);
+        GUILayout.Label("Batch Export (All with VRExplorer namespace)", EditorStyles.boldLabel);
+
+        string folderPath = EditorGUILayout.TextField("Export Folder", "Assets/VRExplorerExports");
+
+        if(GUILayout.Button("Export All VRExplorer GameObjects"))
+        {
+            ExportAllVRExplorerObjects(folderPath);
         }
     }
 
@@ -72,6 +82,45 @@ public class GameObjectConfigExporter : EditorWindow
 
         xmlDoc.Save(path);
         Debug.Log($"Exported config to {path}");
+        AssetDatabase.Refresh();
+    }
+
+    private void ExportAllVRExplorerObjects(string folderPath)
+    {
+        if(!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+
+        GameObject[] allObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+        List<GameObject> exportTargets = new List<GameObject>();
+
+        foreach(GameObject root in allObjects)
+        {
+            GameObject[] children = root.GetComponentsInChildren<Transform>(true).Select(t => t.gameObject).ToArray();
+            foreach(GameObject go in children)
+            {
+                MonoBehaviour[] scripts = go.GetComponents<MonoBehaviour>();
+                foreach(var script in scripts)
+                {
+                    if(script == null) continue;
+
+                    Type type = script.GetType();
+                    if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                    {
+                        exportTargets.Add(go);
+                        break;
+                    }
+                }
+            }
+        }
+
+        foreach(GameObject go in exportTargets)
+        {
+            string safeName = go.name.Replace("/", "_");  // 避免非法文件名
+            string filePath = Path.Combine(folderPath, $"{safeName}_{go.GetInstanceID()}.xml");
+            ExportConfig(go, filePath);
+        }
+
+        Debug.Log($"Exported {exportTargets.Count} GameObjects to folder: {folderPath}");
         AssetDatabase.Refresh();
     }
 

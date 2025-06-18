@@ -1,26 +1,28 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using VRExplorer;
 
-public class XRBase : MonoBehaviour, IBaseEntity
+namespace VRExplorer
 {
-    public string Name => "Base";
-
-    protected XRBaseInteractable _interactable;
-    protected XRBaseInteractor _interactor;
-
-    private void Awake()
+    public class XRBase : MonoBehaviour, IBaseEntity
     {
-        EntityManager.Instance.RegisterEntity(this);
-    }
+        public string Name => "Base";
 
-    protected void Start()
-    {
-        if(_interactable == null)
+        protected XRBaseInteractable _interactable;
+        protected XRBaseInteractor _interactor;
+
+        private void Awake()
         {
-            _interactable = gameObject.AddComponent<XRGrabInteractable>();
-            transform.GetComponent<Rigidbody>().useGravity = false;
+            EntityManager.Instance.RegisterEntity(this);
         }
-        if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
+
+        protected void Start()
+        {
+            if(_interactable == null)
+            {
+                _interactable = gameObject.AddComponent<XRGrabInteractable>();
+                transform.GetComponent<Rigidbody>().useGravity = false;
+            }
+            if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
+        }
     }
 }

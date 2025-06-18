@@ -1,0 +1,8 @@
+<GameObject name="VRExplorerBox (3)">
+  <Script type="VRExplorer.XRGrabbable" enabled="True">
+    <Field name="usePhysicsOnRelease" type="System.Boolean">False</Field>
+    <Field name="GrabPhysics" type="BNG.GrabPhysics">PhysicsJoint</Field>
+    <Field name="GrabMechanic" type="BNG.GrabType">Snap</Field>
+    <Field name="destination" type="UnityEngine.Transform">None</Field>
+  </Script>
+</GameObject>
