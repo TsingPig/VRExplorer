@@ -65,7 +65,7 @@ public class GameObjectConfigManager : EditorWindow
             foreach(var script in sceneScripts)
             {
                 Type type = script.GetType();
-                if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
                 {
                     Undo.DestroyObjectImmediate(script);
                     sceneDeletedCount++;
@@ -92,7 +92,7 @@ public class GameObjectConfigManager : EditorWindow
                         if(component == null) continue;
 
                         Type type = component.GetType();
-                        if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+                        if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
                         {
                             UnityEngine.Object.DestroyImmediate(component, true);
                             prefabDeletedCount++;
@@ -325,7 +325,7 @@ public class GameObjectConfigManager : EditorWindow
         {
             if(script == null) continue;
             Type type = script.GetType();
-            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
             {
                 return true;
             }
@@ -422,7 +422,7 @@ public class GameObjectConfigManager : EditorWindow
             if(component == null) continue;
 
             Type type = component.GetType();
-            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
             {
                 UnityEngine.Object.DestroyImmediate(component, true);
                 modified = true;
@@ -487,7 +487,7 @@ public class GameObjectConfigManager : EditorWindow
         {
             if(script == null) continue;
             Type type = script.GetType();
-            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer"))
+            if(type.Namespace != null && type.Namespace.StartsWith("VRExplorer") && type.Name != "VRExplorer")
             {
                 toDestroy.Add(script);
             }

@@ -1,10 +1,4 @@
 <GameObject isPrefabAsset="True" guid="9b375a9a652b05a40aa62f86ba5bfa42" name="VRExplorerBox (3)" path="Assets/Prefabs/VRExplorerBox (3).prefab">
-  <Script type="VRExplorer.XRGrabbable" enabled="True">
-    <Field name="usePhysicsOnRelease" type="System.Boolean">False</Field>
-    <Field name="GrabPhysics" type="BNG.GrabPhysics">Kinematic</Field>
-    <Field name="GrabMechanic" type="BNG.GrabType">Snap</Field>
-    <Field name="destination" type="UnityEngine.Transform">null</Field>
-  </Script>
   <Script type="VRExplorer.Mono.XRTriggerable" enabled="True">
     <Field name="triggerringEvents" type="System.Collections.Generic.List`1[[UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">List[]</Field>
     <Field name="triggerredEvents" type="System.Collections.Generic.List`1[[UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">List[]</Field>
