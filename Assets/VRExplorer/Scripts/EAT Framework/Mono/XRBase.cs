@@ -17,6 +17,7 @@ namespace VRExplorer.Mono
 
         protected void Start()
         {
+            _interactable = transform.GetComponent<XRBaseInteractable>();
             if(_interactable == null)
             {
                 _interactable = gameObject.AddComponent<XRGrabInteractable>();
