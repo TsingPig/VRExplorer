@@ -2505,6 +2505,7 @@ GameObject:
   - component: {fileID: 257319295}
   - component: {fileID: 257319294}
   - component: {fileID: 257319297}
+  - component: {fileID: 257319298}
   m_Layer: 10
   m_Name: VRExplorerBox (4)
   m_TagString: Untagged
@@ -2692,6 +2693,22 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &257319298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257319291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usePhysicsOnRelease: 0
+  GrabPhysics: 1
+  GrabMechanic: 0
+  destination: {fileID: 0}
 --- !u!1001 &260161009
 PrefabInstance:
   m_ObjectHideFlags: 0

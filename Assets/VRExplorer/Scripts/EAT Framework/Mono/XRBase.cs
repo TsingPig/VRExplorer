@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VRExplorer
+namespace VRExplorer.Mono
 {
     public class XRBase : MonoBehaviour, IBaseEntity
     {

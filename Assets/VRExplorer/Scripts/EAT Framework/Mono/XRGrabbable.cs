@@ -1,7 +1,7 @@
 using BNG;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-namespace VRExplorer
+namespace VRExplorer.Mono
 {
     public class XRGrabbable : XRBase, IGrabbableEntity
     {
