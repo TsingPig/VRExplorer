@@ -1,6 +1,6 @@
 # VRExplorer
 
- A Model-based Approach for Automated Virtual Reality Scene Exploration and Testing ([TsingPig/VRExplorer_Release (github.com)](https://github.com/TsingPig/VRExplorer_Release))
+ A Model-based Approach for Automated Virtual Reality Scene Exploration and Testing
 
 ## Configuration
 
