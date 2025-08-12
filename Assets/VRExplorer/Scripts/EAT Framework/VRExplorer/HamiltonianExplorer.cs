@@ -1,9 +1,18 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace VRExplorer
 {
     public class HamiltonianExplorer : BaseExplorer
     {
+        protected override bool TestFinished => throw new System.NotImplementedException();
+
+        protected override Task AutonomousEventInvocation()
+        {
+            throw new System.NotImplementedException();
+        }
+
         //private float[,] distanceMatrix;
         //private List<int> hamiltonianPath;
         //private int curGrabbableIndex = 0;
@@ -120,6 +129,16 @@ namespace VRExplorer
         //    curGrabbableIndex += 1;
         //}
         protected override void GetNextMono(out MonoBehaviour mono)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override Task SceneExplore()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override List<BaseAction> TaskGenerator(MonoBehaviour mono)
         {
             throw new System.NotImplementedException();
         }
