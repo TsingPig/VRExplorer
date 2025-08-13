@@ -21,7 +21,7 @@ namespace VRExplorer.Mono
             if(_interactable == null)
             {
                 _interactable = gameObject.AddComponent<XRGrabInteractable>();
-                transform.GetComponent<Rigidbody>().useGravity = false;
+                //transform.GetComponent<Rigidbody>().useGravity = false;
             }
             if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
         }

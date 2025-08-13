@@ -9,33 +9,16 @@ using VRExplorer.Mono;
 
 namespace VRExplorer
 {
-   
-
-
-    // Supporting classes for JSON deserialization
-    [System.Serializable]
-    public class TaskList
-    {
-        public List<TaskUnit> taskUnit;
-    }
-
-    [System.Serializable]
-    public class TaskUnit
-    {
-        public List<ActionUnit> actionUnits;
-    }
-
-    [System.Serializable]
-    public class ActionUnit
-    {
-        public string type; // "Grab", "Move", "Drop", etc.
-        public string objectA;
-        public string objectB;
-    }
-
-
     public class VREscaper : BaseExplorer
     {
+        private int _index = 0;
+        private List<MonoBehaviour> _monos = new List<MonoBehaviour>();
+
+        /// <summary>
+        /// 通过 GUID 获取物体
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         public static GameObject FindGameObjectByGuid(string guid)
         {
             if(string.IsNullOrEmpty(guid)) return null;
@@ -60,6 +43,12 @@ namespace VRExplorer
 
             return null;
         }
+
+        /// <summary>
+        /// 获取 Object GUID
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
         public static string GetObjectGuid(GameObject go)
         {
             if(go == null) return null;
@@ -83,94 +72,118 @@ namespace VRExplorer
             }
         }
 
-        public TaskList taskList = new TaskList();
+        protected override bool TestFinished => _index >= _monos.Count;
 
-        protected override bool TestFinished => throw new NotImplementedException();
-
-        public static void ImportTestPlan(string filePath = Str.TestPlanPath)
+        private static TaskList GetTaskListFromJson(string filePath = Str.TestPlanPath)
         {
             if(!File.Exists(filePath))
             {
                 Debug.LogError($"Test plan file not found at: {filePath}");
-                return;
+                return null;
             }
 
             try
             {
                 string jsonContent = File.ReadAllText(filePath);
-                var taskList = JsonUtility.FromJson<TaskList>(jsonContent);
-
+                TaskList taskList = JsonUtility.FromJson<TaskList>(jsonContent);
                 if(taskList == null)
                 {
                     Debug.LogError("Failed to parse test plan JSON");
-                    return;
                 }
-
-                foreach(var taskUnit in taskList.taskUnit)
-                {
-                    foreach(var action in taskUnit.actionUnits)
-                    {
-                        if(action.type == "Grab")
-                        {
-                            // Handle grab action with two GUIDs
-                            GameObject objA = FindGameObjectByGuid(action.objectA);
-                            GameObject objB = FindGameObjectByGuid(action.objectB);
-                            XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
-                            if(grabbable == null)
-                            {
-                                grabbable = objA.AddComponent<XRGrabbable>();
-                                Debug.Log($"Added XRGrabbable component to {objA.name}");
-                            }
-                            else
-                            {
-                                Debug.Log($"{objA.name} already has XRGrabbable component");
-                            }
-
-                            // Set destination to objectB
-                            grabbable.destination = objB.transform;
-                            Debug.Log($"Set {objA.name}'s destination to {objB.name}");
-
-                            // Mark as dirty and save if it's a prefab
-                            if(PrefabUtility.IsPartOfPrefabAsset(objA))
-                            {
-                                EditorUtility.SetDirty(objA);
-                                AssetDatabase.SaveAssets();
-                            }
-
-                        }
-                        // Add other action type handlers as needed
-                    }
-                }
-
+                return taskList;
             }
             catch(Exception e)
             {
                 Debug.LogError($"Failed to import test plan: {e.Message}\n{e.StackTrace}");
             }
+            return null;
         }
+
+        public static void ImportTestPlan(string filePath = Str.TestPlanPath)
+        {
+            TaskList tasklist = GetTaskListFromJson(filePath);
+            foreach(var taskUnit in tasklist.taskUnit)
+            {
+                foreach(var action in taskUnit.actionUnits)
+                {
+                    if(action.type == "Grab")
+                    {
+                        // Handle grab action with two GUIDs
+                        GameObject objA = FindGameObjectByGuid(action.objectA);
+                        GameObject objB = FindGameObjectByGuid(action.objectB);
+                        XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
+                        if(grabbable == null)
+                        {
+                            grabbable = objA.AddComponent<XRGrabbable>();
+                            Debug.Log($"Added XRGrabbable component to {objA.name}");
+                        }
+                        else
+                        {
+                            Debug.Log($"{objA.name} already has XRGrabbable component");
+                        }
+
+                        // Set destination to objectB
+                        grabbable.destination = objB.transform;
+                        Debug.Log($"Set {objA.name}'s destination to {objB.name}");
+
+                        // Mark as dirty and save if it's a prefab
+                        if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                        {
+                            EditorUtility.SetDirty(objA);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+                    // Add other action type handlers as needed
+                }
+            }
+        }
+
+        private new void Awake()
+        {
+            base.Awake();
+            var taskList = GetTaskListFromJson();  // 初始化_taskList
+            foreach(var taskUnit in taskList.taskUnit)
+            {
+                foreach(var action in taskUnit.actionUnits)
+                {
+                    GameObject objA = FindGameObjectByGuid(action.objectA);
+                    _monos.Add(objA.GetComponent<MonoBehaviour>());
+                }
+            }
+        }
+
         protected override void GetNextMono(out MonoBehaviour nextMono)
         {
-
-            nextMono = EntityManager.Instance.monoState.Keys
-                .Where(mono => mono != null && !mono.Equals(null))
-                .Where(mono => EntityManager.Instance.monoState[mono] == false)
-                .OrderBy(mono => Vector3.Distance(transform.position, mono.transform.position))
-                .FirstOrDefault();
+            nextMono = _monos[_index++];
         }
 
-        protected override List<BaseAction> TaskGenerator(MonoBehaviour mono)
+        protected override async Task SceneExplore()
         {
-            throw new NotImplementedException();
+            if(!TestFinished)
+            {
+                await TaskExecutation();
+            }
         }
+    }
 
-        protected override Task AutonomousEventInvocation()
-        {
-            throw new NotImplementedException();
-        }
+    // Supporting classes for JSON deserialization
+    [System.Serializable]
+    public class TaskList
+    {
+        public List<TaskUnit> taskUnit;
+    }
 
-        protected override Task SceneExplore()
-        {
-            throw new NotImplementedException();
-        }
+    [System.Serializable]
+    public class TaskUnit
+    {
+        public List<ActionUnit> actionUnits;
+    }
+
+    [System.Serializable]
+    public class ActionUnit
+    {
+        public string type; // "Grab", "Move", "Drop", etc.
+        public string objectA;
+        public string objectB;
     }
 }

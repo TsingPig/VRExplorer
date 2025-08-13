@@ -8,11 +8,6 @@ namespace VRExplorer
     {
         protected override bool TestFinished => throw new System.NotImplementedException();
 
-        protected override Task AutonomousEventInvocation()
-        {
-            throw new System.NotImplementedException();
-        }
-
         //private float[,] distanceMatrix;
         //private List<int> hamiltonianPath;
         //private int curGrabbableIndex = 0;
@@ -138,9 +133,6 @@ namespace VRExplorer
             throw new System.NotImplementedException();
         }
 
-        protected override List<BaseAction> TaskGenerator(MonoBehaviour mono)
-        {
-            throw new System.NotImplementedException();
-        }
+
     }
 }
