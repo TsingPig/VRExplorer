@@ -3,31 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using VRExplorer;
 
-public class VRExplorerBox : MonoBehaviour, IGrabbableEntity
-{
-    private void OnGrabbed()
+public class VRExplorerBox : MonoBehaviour { 
+    public void OnGrabbed()
     {
         Debug.Log("(Custom) Grabbed");
     }
 
-    #region Entity Region
-
-    [ExcludeFromCodeCoverage] public string Name => Str.Grabbable;
-
-    [ExcludeFromCodeCoverage] public Grabbable Grabbable => GetComponent<Grabbable>();
-
-    public Transform Destination => null;
-
-    [ExcludeFromCodeCoverage]
-    void IGrabbableEntity.OnGrabbed()
-    {
-        OnGrabbed();
-    }
-
-    [ExcludeFromCodeCoverage]
-    public void OnReleased()
-    {
-    }
-
-    #endregion Entity Region
 }
