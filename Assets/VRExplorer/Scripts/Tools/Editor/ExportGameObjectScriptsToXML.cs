@@ -21,7 +21,7 @@ public class GameObjectConfigManager : EditorWindow
     private bool importPrefabAssets = true;
     #endregion
 
-    [MenuItem("Tools/GameObject Config Manager")]
+    [MenuItem("Tools/VR Explorer/GameObject Config Manager")]
     public static void ShowWindow()
     {
         GetWindow<GameObjectConfigManager>("Config Manager");
@@ -51,7 +51,7 @@ public class GameObjectConfigManager : EditorWindow
         }
     }
 
-    [MenuItem("Tools/Remove VRExplorer Scripts")]
+    [MenuItem("Tools/VR Explorer/Remove VRExplorer Scripts")]
     public static void RemoveVRExplorerScripts()
     {
         try

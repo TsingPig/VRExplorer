@@ -6,10 +6,10 @@ namespace VRExplorer
 {
     public class TestPlanImporterWindow : EditorWindow
     {
-        private string filePath = "Assets/TestPlan.json";
-        private GameObject selectedObject;  // 新增：用于选择场景中的物体
+        private string filePath = Str.TestPlanPath;
+        private GameObject selectedObject;  // 用于选择场景中的物体
 
-        [MenuItem("VR Explorer/Import Test Plan")]
+        [MenuItem("Tools/VR Explorer/Import Test Plan")]
         public static void ShowWindow()
         {
             GetWindow<TestPlanImporterWindow>("Test Plan Importer");
@@ -19,10 +19,10 @@ namespace VRExplorer
         {
             GUILayout.Label("Test Plan Importer", EditorStyles.boldLabel);
 
-            // 新增：物体选择器
+            //物体选择器
             selectedObject = (GameObject)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(GameObject), true);
 
-            // 新增：打印GUID按钮
+            // 打印GUID按钮
             if(GUILayout.Button("Print Object GUID") && selectedObject != null)
             {
                 string guid = VREscaper.GetObjectGuid(selectedObject);
@@ -33,7 +33,7 @@ namespace VRExplorer
 
             GUILayout.Space(20);
 
-            // 原有的文件路径选择
+            // TestPlan文件路径选择
             GUILayout.BeginHorizontal();
             filePath = EditorGUILayout.TextField("Test Plan Path", filePath);
             if(GUILayout.Button("Browse", GUILayout.Width(80)))
@@ -42,7 +42,7 @@ namespace VRExplorer
             }
             GUILayout.EndHorizontal();
 
-            // 原有的导入按钮
+            // 导入按钮
             if(GUILayout.Button("Import Test Plan"))
             {
                 VREscaper.ImportTestPlan(filePath);

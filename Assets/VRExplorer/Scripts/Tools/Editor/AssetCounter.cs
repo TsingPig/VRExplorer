@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class AssetCounter : MonoBehaviour
 {
-    [MenuItem("Tools/Count Project Files %#&c")] // Shift + Ctrl + Alt + C
+    [MenuItem("Tools/VR Explorer/Count Project Files %#&c")] // Shift + Ctrl + Alt + C
     public static void CountAllAssets()
     {
         CountActiveGameObjectsInScene();
