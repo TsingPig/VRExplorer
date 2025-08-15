@@ -4,6 +4,13 @@ on:
   push:
     paths:
       - 'Assets/VRExplorer/**'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync even if no changes detected'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   sync:
@@ -11,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 确保获取完整历史记录
 
       - name: Configure Git
         run: |
@@ -19,24 +28,36 @@ jobs:
 
       - name: Prepare and sync folder
         run: |
-          set -e  # 脚本中出错即终止
+          set -euo pipefail  # 严格模式：错误、未定义变量、管道失败时终止
 
-          # 设置变量
+          # 配置变量
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
 
-          # 创建临时目录
+          # 如果是手动触发且未启用 force_sync，检查是否有实际更改
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_sync }}" = "false" ]; then
+            echo "::notice::Manual trigger detected, checking folder changes..."
+            if git diff --quiet HEAD^ -- "$FOLDER_PATH"; then
+              echo "::warning::No changes detected in $FOLDER_PATH, skipping sync."
+              exit 0
+            fi
+          fi
+
+          # 创建临时目录并复制内容
           TEMP_DIR="$(mktemp -d)"
-          echo "Using temp directory: $TEMP_DIR"
+          echo "::group::Copying files to temp directory"
+          cp -rv "$FOLDER_PATH/"* "$TEMP_DIR"
+          echo "::endgroup::"
 
-          # 拷贝目标文件夹内容到临时目录
-          cp -r "$FOLDER_PATH/"* "$TEMP_DIR"
-
-          # 初始化新 Git 仓库
+          # 同步到新仓库
           cd "$TEMP_DIR"
           git init -b main
           git remote add origin "$NEW_REPO_URL"
           git add .
-          git commit -m "Sync from $FOLDER_PATH at $(date -u)"
+          git commit -m "Sync from $FOLDER_PATH (Source: ${{ github.repository }}@${{ github.sha }})"
           git push origin main --force
+          echo "::notice::Successfully synced to $NEW_REPO_URL"
+
+          # 清理临时目录
+          rm -rf "$TEMP_DIR"
