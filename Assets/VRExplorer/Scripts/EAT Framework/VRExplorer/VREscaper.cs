@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VRExplorer.Mono;
 
 namespace VRExplorer
@@ -13,6 +15,8 @@ namespace VRExplorer
     {
         private int _index = 0;
         private List<MonoBehaviour> _monos = new List<MonoBehaviour>();
+        
+        public bool useFileID = true;
 
         /// <summary>
         /// 通过 GUID 获取物体
@@ -45,6 +49,111 @@ namespace VRExplorer
         }
 
         /// <summary>
+        /// 通过 YAML 序列化时的 FileID 查找 GameObject
+        /// 仅在 Editor 下可用
+        /// </summary>
+        public static GameObject FindGameObjectByFileID(long fileId)
+        {
+#if UNITY_EDITOR
+            // 获取当前打开的场景
+            var scene = EditorSceneManager.GetActiveScene();
+            if(!scene.isLoaded)
+            {
+                Debug.LogError("没有加载场景");
+                return null;
+            }
+
+            // 遍历场景中所有根对象
+            foreach(var rootObj in scene.GetRootGameObjects())
+            {
+                var result = SearchInChildren(rootObj.transform, fileId);
+                if(result != null)
+                    return result;
+            }
+#endif
+            return null;
+        }
+
+#if UNITY_EDITOR
+        private static GameObject SearchInChildren(Transform parent, long fileId)
+        {
+            // 用 GlobalObjectId 生成 ID
+            GlobalObjectId gid = GlobalObjectId.GetGlobalObjectIdSlow(parent.gameObject);
+
+            if((long)gid.targetObjectId == (long)fileId)
+            {
+                return parent.gameObject;
+            }
+
+            foreach(Transform child in parent)
+            {
+                var result = SearchInChildren(child, fileId);
+                if(result != null)
+                    return result;
+            }
+            return null;
+        }
+#endif
+
+        private static GameObject FindGameObject(string id, bool useFileID)
+        {
+            if(useFileID)
+            {
+                if(long.TryParse(id, out long fileID))
+                {
+                    return FindGameObjectByFileID(fileID);
+                }
+                else
+                {
+                    Debug.LogError($"Invalid FileID: {id}");
+                    return null;
+                }
+            }
+            else
+            {
+                return FindGameObjectByGuid(id);
+            }
+        }
+
+
+        /// <summary>
+        /// 获得场景物体 Fild ID (从 Yaml中解析）
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public static long GetSceneObjectFileID(GameObject go)
+        {
+            if(go == null) return 0;
+
+            var scenePath = go.scene.path;
+            if(string.IsNullOrEmpty(scenePath))
+            {
+                Debug.LogError("Scene not saved to disk!");
+                return 0;
+            }
+
+            var lines = System.IO.File.ReadAllLines(scenePath);
+            for(int i = 0; i < lines.Length; i++)
+            {
+                if(lines[i].Contains("m_Name: " + go.name))
+                {
+                    // 往上查找 "--- !u!1 &<fileID>"
+                    for(int j = i; j >= 0; j--)
+                    {
+                        if(lines[j].StartsWith("--- !u!1 &"))
+                        {
+                            string fileIDStr = lines[j].Substring("--- !u!1 &".Length);
+                            if(long.TryParse(fileIDStr, out long fileID))
+                                return fileID;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
         /// 获取 Object GUID
         /// </summary>
         /// <param name="go"></param>
@@ -71,6 +180,9 @@ namespace VRExplorer
                 return go.GetInstanceID().ToString();
             }
         }
+
+
+
 
         protected override bool TestFinished => _index >= _monos.Count;
 
@@ -99,7 +211,7 @@ namespace VRExplorer
             return null;
         }
 
-        public static void ImportTestPlan(string filePath = Str.TestPlanPath)
+        public static void ImportTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
             TaskList tasklist = GetTaskListFromJson(filePath);
             foreach(var taskUnit in tasklist.taskUnit)
@@ -109,8 +221,8 @@ namespace VRExplorer
                     if(action.type == "Grab")
                     {
                         // Handle grab action with two GUIDs
-                        GameObject objA = FindGameObjectByGuid(action.objectA);
-                        GameObject objB = FindGameObjectByGuid(action.objectB);
+                        GameObject objA = FindGameObject(action.objectA, useFileID);
+                        GameObject objB = FindGameObject(action.objectB, useFileID);
                         XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
                         if(grabbable == null)
                         {
@@ -138,15 +250,47 @@ namespace VRExplorer
             }
         }
 
-        private new void Awake()
+        public static void RemoveTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
-            base.Awake();
+            TaskList tasklist = GetTaskListFromJson(filePath);
+            foreach(var taskUnit in tasklist.taskUnit)
+            {
+                foreach(var action in taskUnit.actionUnits)
+                {
+                    if(action.type == "Grab")
+                    {
+                        GameObject objA = FindGameObject(action.objectA, useFileID);
+                        if(objA != null)
+                        {
+                            // 直接移除XRGrabbable组件
+                            XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
+                            if(grabbable != null)
+                            {
+                                UnityEngine.Object.DestroyImmediate(grabbable, true);
+                                Debug.Log($"Removed XRGrabbable component from {objA.name}");
+
+                                if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                                {
+                                    EditorUtility.SetDirty(objA);
+                                    AssetDatabase.SaveAssets();
+                                }
+                            }
+                        }
+                    }
+                    // 可以添加其他action类型的移除逻辑
+                }
+            }
+        }
+
+        private new void Start()
+        {
+            base.Start();
             var taskList = GetTaskListFromJson();  // 初始化_taskList
             foreach(var taskUnit in taskList.taskUnit)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
-                    GameObject objA = FindGameObjectByGuid(action.objectA);
+                    GameObject objA = FindGameObject(action.objectA, useFileID);
                     _monos.Add(objA.GetComponent<MonoBehaviour>());
                 }
             }

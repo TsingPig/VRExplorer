@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditor.SceneManagement;
 using System;
+using VRExplorer.Mono;
 
 namespace VRExplorer
 {
@@ -37,7 +38,7 @@ namespace VRExplorer
             {
                 try
                 {
-                    long fileId = GetSceneObjectFileID(selectedObject);
+                    long fileId = VREscaper.GetSceneObjectFileID(selectedObject);
                     if(fileId != 0)
                     {
                         Debug.Log($"FileID for {selectedObject.name}: {fileId}");
@@ -54,7 +55,7 @@ namespace VRExplorer
                     Debug.LogError($"Failed to get FileID: {e.Message}");
                 }
             }
-            GUILayout.Space(20);
+            GUILayout.Space(30);
 
             // TestPlan文件路径选择
             GUILayout.BeginHorizontal();
@@ -63,6 +64,7 @@ namespace VRExplorer
             {
                 filePath = EditorUtility.OpenFilePanel("Select Test Plan", "Assets", "json");
             }
+
             GUILayout.EndHorizontal();
 
             // 导入按钮
@@ -70,40 +72,22 @@ namespace VRExplorer
             {
                 VREscaper.ImportTestPlan(filePath);
             }
-        }
 
-        private long GetSceneObjectFileID(GameObject go)
-        {
-            if(go == null) return 0;
 
-            var scenePath = go.scene.path;
-            if(string.IsNullOrEmpty(scenePath))
+            if(GUILayout.Button("Remove Test Plan"))
             {
-                Debug.LogError("Scene not saved to disk!");
-                return 0;
-            }
-
-            var lines = System.IO.File.ReadAllLines(scenePath);
-            for(int i = 0; i < lines.Length; i++)
-            {
-                if(lines[i].Contains("m_Name: " + go.name))
+                if(EditorUtility.DisplayDialog("Remove Test Plan",
+                   "This will remove all components added by the test plan. Continue?",
+                   "Yes", "No"))
                 {
-                    // 往上查找 "--- !u!1 &<fileID>"
-                    for(int j = i; j >= 0; j--)
-                    {
-                        if(lines[j].StartsWith("--- !u!1 &"))
-                        {
-                            string fileIDStr = lines[j].Substring("--- !u!1 &".Length);
-                            if(long.TryParse(fileIDStr, out long fileID))
-                                return fileID;
-                        }
-                    }
+                    VREscaper.RemoveTestPlan(filePath);
                 }
             }
 
-            return 0;
         }
 
+
+        
     }
 }
 #endif

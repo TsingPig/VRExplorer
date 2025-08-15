@@ -981,7 +981,6 @@ GameObject:
   - component: {fileID: 64330980}
   - component: {fileID: 64330979}
   - component: {fileID: 64330978}
-  - component: {fileID: 64330982}
   - component: {fileID: 64330983}
   m_Layer: 10
   m_Name: VRExplorerBox (6)
@@ -1170,22 +1169,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 64330974}
   m_Mesh: {fileID: -253136206964297999, guid: 307712b64e304ee4f80c53dc6d13c1d6, type: 3}
---- !u!114 &64330982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 64330974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  usePhysicsOnRelease: 0
-  GrabPhysics: 1
-  GrabMechanic: 0
-  destination: {fileID: 257319292}
 --- !u!54 &64330983
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13188,7 +13171,6 @@ GameObject:
   - component: {fileID: 1875767446}
   - component: {fileID: 1875767445}
   - component: {fileID: 1875767444}
-  - component: {fileID: 1875767448}
   - component: {fileID: 1875767449}
   m_Layer: 10
   m_Name: VRExplorerBox (5)
@@ -13377,22 +13359,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1875767441}
   m_Mesh: {fileID: -253136206964297999, guid: 307712b64e304ee4f80c53dc6d13c1d6, type: 3}
---- !u!114 &1875767448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875767441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  usePhysicsOnRelease: 0
-  GrabPhysics: 1
-  GrabMechanic: 0
-  destination: {fileID: 257319292}
 --- !u!54 &1875767449
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -57102,6 +57068,7 @@ MonoBehaviour:
   _areaDiameter: 7.5
   _curTask: []
   _nextMono: {fileID: 0}
+  useFileID: 1
 --- !u!1 &8083849491614380536
 GameObject:
   m_ObjectHideFlags: 0
