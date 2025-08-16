@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -126,26 +127,45 @@ namespace VRExplorer
             if(go == null) return 0;
 
             var scenePath = go.scene.path;
+
+            // 处理 Prefab 资源（go 不在任何场景里）
             if(string.IsNullOrEmpty(scenePath))
             {
-                Debug.LogError("Scene not saved to disk!");
+#if UNITY_EDITOR
+                var prefabPath = AssetDatabase.GetAssetPath(go);
+                if(!string.IsNullOrEmpty(prefabPath) && File.Exists(prefabPath))
+                {
+                    var lines = File.ReadAllLines(prefabPath);
+                    for(int i = 0; i < lines.Length; i++)
+                    {
+                        if(lines[i].Contains("m_Name: " + go.name))
+                        {
+                            // 往上查找 "--- !u!1 &<fileID>"
+                            for(int j = i; j >= 0; j--)
+                            {
+                                var match = Regex.Match(lines[j], @"--- !u!1 &(\d+)");
+                                if(match.Success && long.TryParse(match.Groups[1].Value, out long fileID))
+                                    return fileID;
+                            }
+                        }
+                    }
+                }
+#endif
+                Debug.LogError("Prefab not saved or cannot find prefab file!");
                 return 0;
             }
 
-            var lines = System.IO.File.ReadAllLines(scenePath);
-            for(int i = 0; i < lines.Length; i++)
+            // 处理场景对象（维持你原本的逻辑，只是正则替换 Substring）
+            var sceneLines = File.ReadAllLines(scenePath);
+            for(int i = 0; i < sceneLines.Length; i++)
             {
-                if(lines[i].Contains("m_Name: " + go.name))
+                if(sceneLines[i].Contains("m_Name: " + go.name))
                 {
-                    // 往上查找 "--- !u!1 &<fileID>"
                     for(int j = i; j >= 0; j--)
                     {
-                        if(lines[j].StartsWith("--- !u!1 &"))
-                        {
-                            string fileIDStr = lines[j].Substring("--- !u!1 &".Length);
-                            if(long.TryParse(fileIDStr, out long fileID))
-                                return fileID;
-                        }
+                        var match = Regex.Match(sceneLines[j], @"--- !u!1 &(\d+)");
+                        if(match.Success && long.TryParse(match.Groups[1].Value, out long fileID))
+                            return fileID;
                     }
                 }
             }
