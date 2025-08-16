@@ -128,34 +128,20 @@ namespace VRExplorer
 
             var scenePath = go.scene.path;
 
-            // 处理 Prefab 资源（go 不在任何场景里）
+            // 1. prefab asset 资源里的 GameObject
             if(string.IsNullOrEmpty(scenePath))
-            {
-#if UNITY_EDITOR
-                var prefabPath = AssetDatabase.GetAssetPath(go);
-                if(!string.IsNullOrEmpty(prefabPath) && File.Exists(prefabPath))
-                {
-                    var lines = File.ReadAllLines(prefabPath);
-                    for(int i = 0; i < lines.Length; i++)
-                    {
-                        if(lines[i].Contains("m_Name: " + go.name))
-                        {
-                            // 往上查找 "--- !u!1 &<fileID>"
-                            for(int j = i; j >= 0; j--)
-                            {
-                                var match = Regex.Match(lines[j], @"--- !u!1 &(\d+)");
-                                if(match.Success && long.TryParse(match.Groups[1].Value, out long fileID))
-                                    return fileID;
-                            }
-                        }
-                    }
-                }
-#endif
-                Debug.LogError("Prefab not saved or cannot find prefab file!");
-                return 0;
-            }
+                return GetPrefabObjectFileID(go);
 
-            // 处理场景对象（维持你原本的逻辑，只是正则替换 Substring）
+            // 2. prefab instance 在场景里
+            if(PrefabUtility.IsPartOfPrefabInstance(go))
+                return GetPrefabInstanceFileID(go, scenePath);
+
+            // 3. 普通场景对象（你原来的逻辑）
+            return GetSceneYamlFileID(go, scenePath);
+        }
+
+        private static long GetSceneYamlFileID(GameObject go, string scenePath)
+        {
             var sceneLines = File.ReadAllLines(scenePath);
             for(int i = 0; i < sceneLines.Length; i++)
             {
@@ -169,9 +155,98 @@ namespace VRExplorer
                     }
                 }
             }
-
             return 0;
         }
+
+        private static long GetPrefabObjectFileID(GameObject go)
+        {
+#if UNITY_EDITOR
+            var prefabPath = AssetDatabase.GetAssetPath(go);
+            if(!string.IsNullOrEmpty(prefabPath) && File.Exists(prefabPath))
+            {
+                var lines = File.ReadAllLines(prefabPath);
+                for(int i = 0; i < lines.Length; i++)
+                {
+                    if(lines[i].Contains("m_Name: " + go.name))
+                    {
+                        for(int j = i; j >= 0; j--)
+                        {
+                            var match = Regex.Match(lines[j], @"--- !u!1 &(\d+)");
+                            if(match.Success && long.TryParse(match.Groups[1].Value, out long fileID))
+                                return fileID;
+                        }
+                    }
+                }
+            }
+#endif
+            return 0;
+        }
+
+        private static long GetPrefabInstanceFileID(GameObject go, string scenePath)
+        {
+#if UNITY_EDITOR
+            var sceneLines = File.ReadAllLines(scenePath);
+
+            // Step1: 找到 PrefabInstance 节点
+            for(int i = 0; i < sceneLines.Length; i++)
+            {
+                if(sceneLines[i].StartsWith("--- !u!1001 &")) // PrefabInstance
+                {
+                    string prefabInstanceId = sceneLines[i].Substring("--- !u!1001 &".Length);
+
+                    string guid = null;
+
+                    // Step2: 读取 SourcePrefab 的 guid
+                    for(int j = i + 1; j < sceneLines.Length; j++)
+                    {
+                        if(sceneLines[j].Contains("m_SourcePrefab:"))
+                        {
+                            var match = Regex.Match(sceneLines[j], @"guid: ([0-9a-fA-F]+)");
+                            if(match.Success)
+                            {
+                                guid = match.Groups[1].Value;
+                                break;
+                            }
+                        }
+
+                        // PrefabInstance 结束
+                        if(sceneLines[j].StartsWith("--- !u!"))
+                            break;
+                    }
+
+                    if(string.IsNullOrEmpty(guid))
+                        continue;
+
+                    // Step3: 用 guid 找到 prefab 路径
+                    string prefabPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if(!File.Exists(prefabPath))
+                        continue;
+
+                    // Step4: 在 prefab 文件里查找 GameObject 的 FileID
+                    var prefabLines = File.ReadAllLines(prefabPath);
+                    for(int k = 0; k < prefabLines.Length; k++)
+                    {
+                        if(prefabLines[k].Contains("m_Name: " + go.name))
+                        {
+                            for(int j = k; j >= 0; j--)
+                            {
+                                var match = Regex.Match(prefabLines[j], @"--- !u!1 &(\d+)");
+                                if(match.Success && long.TryParse(match.Groups[1].Value, out long fileID))
+                                {
+                                    return fileID;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+#endif
+
+            Debug.LogError("Cannot resolve prefab instance FileID for: " + go.name);
+            return 0;
+        }
+
+
 
         /// <summary>
         /// 获取 Object GUID
