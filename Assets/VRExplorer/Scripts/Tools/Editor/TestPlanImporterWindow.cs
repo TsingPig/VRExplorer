@@ -38,7 +38,7 @@ namespace VRExplorer
             {
                 try
                 {
-                    long fileId = VREscaper.GetSceneObjectFileID(selectedObject);
+                    long fileId = VREscaper.GetObjectFileID(selectedObject);
                     if(fileId != 0)
                     {
                         Debug.Log($"FileID for {selectedObject.name}: {fileId}");
