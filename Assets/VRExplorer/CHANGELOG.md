@@ -2,9 +2,14 @@
 
 
 
-## [1.5.7] - 2025-08-02
+## [1.6.3] - 2025-08-19
 
-- 
+### Added  
+
+***VREscaper*** feature: 
+
+- Supports importing JSON (.json) format Test Plans  &  Automates test execution  
+-  Uses FileID-based GameObject Finding System (FileIdResolver.cs & TestPlanImporterWindow.cs)
 
 ## [1.5.6] - 2025-06-18
 
