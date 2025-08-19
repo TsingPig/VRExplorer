@@ -105,7 +105,7 @@ namespace VRExplorer
                         GameObject g = go;
                         while(GetObjectFileID(g.transform.parent.gameObject) == fileId)
                         {
-                            g = go.transform.parent.gameObject;
+                            g = g.transform.parent.gameObject;
                         }
                         return g;
                     }
