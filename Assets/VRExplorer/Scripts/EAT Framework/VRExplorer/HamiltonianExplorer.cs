@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -132,7 +131,5 @@ namespace VRExplorer
         {
             throw new System.NotImplementedException();
         }
-
-
     }
 }

@@ -34,7 +34,7 @@ namespace VRExplorer
         /// 基于条件分支实现了PFSM
         /// </summary>
         /// <returns></returns>
-        protected override async Task SceneExplore() 
+        protected override async Task SceneExplore()
         {
             bool explorationEventsCompleted = (_autonomousEventsExecuted >= autonomousEvents.Count);
             bool monoTasksCompleted = EntityManager.Instance.monoState.Values.All(value => value);

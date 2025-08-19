@@ -1,17 +1,17 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
-using System.IO;
-using System.Xml;
-using System.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Xml;
+using UnityEditor;
+using UnityEngine;
 
 public class GameObjectConfigManager : EditorWindow
 {
     #region UI Variables
+
     private GameObject targetObject;
     private string exportPath = "Assets/GameObjectConfig.xml";
     private string exportFolder = "Assets/VRExplorerExports";
@@ -19,7 +19,8 @@ public class GameObjectConfigManager : EditorWindow
     private string importFolder = "Assets/VRExplorerExports";
     private bool exportPrefabAssets = true;
     private bool importPrefabAssets = true;
-    #endregion
+
+    #endregion UI Variables
 
     [MenuItem("Tools/VR Explorer/GameObject Config Manager")]
     public static void ShowWindow()
@@ -35,6 +36,7 @@ public class GameObjectConfigManager : EditorWindow
     }
 
     #region Cleanup Functionality
+
     private void DrawCleanupUI()
     {
         GUILayout.Space(20);
@@ -121,9 +123,11 @@ public class GameObjectConfigManager : EditorWindow
                 $"Failed to remove scripts: {e.Message}", "OK");
         }
     }
-    #endregion
+
+    #endregion Cleanup Functionality
 
     #region UI Drawing
+
     private void DrawExportUI()
     {
         GUILayout.Label("Export Configuration", EditorStyles.boldLabel);
@@ -176,9 +180,11 @@ public class GameObjectConfigManager : EditorWindow
             ImportAllConfigs(importFolder);
         }
     }
-    #endregion
+
+    #endregion UI Drawing
 
     #region Export Functions
+
     private void ExportConfig(GameObject obj, string path)
     {
         try
@@ -332,9 +338,11 @@ public class GameObjectConfigManager : EditorWindow
         }
         return false;
     }
-    #endregion
+
+    #endregion Export Functions
 
     #region Import Functions
+
     private void ImportConfig(string path)
     {
         if(!File.Exists(path))
@@ -564,9 +572,11 @@ public class GameObjectConfigManager : EditorWindow
             Debug.LogError($"Batch import failed: {e.Message}\n{e.StackTrace}");
         }
     }
-    #endregion
+
+    #endregion Import Functions
 
     #region GUID System
+
     private string GetGameObjectUniqueId(GameObject go)
     {
         if(go == null) return null;
@@ -638,9 +648,11 @@ public class GameObjectConfigManager : EditorWindow
 
         return null;
     }
-    #endregion
+
+    #endregion GUID System
 
     #region Utility Functions
+
     private string GetGameObjectPath(GameObject go)
     {
         if(PrefabUtility.IsPartOfPrefabAsset(go))
@@ -923,5 +935,6 @@ public class GameObjectConfigManager : EditorWindow
         Debug.LogWarning($"Unsupported type for deserialization: {targetType.Name}");
         return null;
     }
-    #endregion
+
+    #endregion Utility Functions
 }

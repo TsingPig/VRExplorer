@@ -6,6 +6,7 @@ namespace VRExplorer.Mono
     public class XRBase : MonoBehaviour, IBaseEntity
     {
         public string Name => "Base";
+
         public bool useGravity = false;
         protected XRBaseInteractable _interactable;
         protected XRBaseInteractor _interactor;

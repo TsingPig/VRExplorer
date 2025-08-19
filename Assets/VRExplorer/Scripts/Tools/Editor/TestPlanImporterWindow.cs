@@ -1,16 +1,18 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.SceneManagement;
 using System;
-using VRExplorer.Mono;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace VRExplorer
 {
     public class TestPlanImporterWindow : EditorWindow
     {
         private string filePath = Str.TestPlanPath;
-        private GameObject selectedObject;  // ÓÃÓÚÑ¡Ôñ³¡¾°ÖĞµÄÎïÌå
+        private GameObject selectedObject;  // ç”¨äºé€‰æ‹©åœºæ™¯ä¸­çš„ç‰©ä½“
 
         [MenuItem("Tools/VR Explorer/Import Test Plan")]
         public static void ShowWindow()
@@ -22,15 +24,15 @@ namespace VRExplorer
         {
             GUILayout.Label("Test Plan Importer", EditorStyles.boldLabel);
 
-            // ÎïÌåÑ¡ÔñÆ÷
+            // ç‰©ä½“é€‰æ‹©å™¨
             selectedObject = (GameObject)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(GameObject), true);
 
-            // ´òÓ¡GUID°´Å¥
+            // æ‰“å°GUIDæŒ‰é’®
             if(GUILayout.Button("Print Object GUID") && selectedObject != null)
             {
-                string guid = VREscaper.GetObjectGuid(selectedObject);
+                string guid = FileIdResolver.GetObjectGuid(selectedObject);
                 Debug.Log($"GUID for {selectedObject.name}: {guid}");
-                EditorGUIUtility.systemCopyBuffer = guid;  // ¸´ÖÆµ½¼ôÌù°å
+                EditorGUIUtility.systemCopyBuffer = guid;  // å¤åˆ¶åˆ°å‰ªè´´æ¿
                 ShowNotification(new GUIContent($"GUID copied to clipboard: {guid}"));
             }
 
@@ -38,7 +40,7 @@ namespace VRExplorer
             {
                 try
                 {
-                    long fileId = VREscaper.GetObjectFileID(selectedObject);
+                    long fileId = FileIdResolver.GetObjectFileID(selectedObject);
                     if(fileId != 0)
                     {
                         Debug.Log($"FileID for {selectedObject.name}: {fileId}");
@@ -55,24 +57,24 @@ namespace VRExplorer
                     Debug.LogError($"Failed to get FileID: {e.Message}");
                 }
             }
+
             GUILayout.Space(30);
 
-            // TestPlanÎÄ¼şÂ·¾¶Ñ¡Ôñ
+            // TestPlanæ–‡ä»¶è·¯å¾„é€‰æ‹©
             GUILayout.BeginHorizontal();
             filePath = EditorGUILayout.TextField("Test Plan Path", filePath);
             if(GUILayout.Button("Browse", GUILayout.Width(80)))
             {
                 filePath = EditorUtility.OpenFilePanel("Select Test Plan", "Assets", "json");
             }
-
             GUILayout.EndHorizontal();
 
-            // µ¼Èë°´Å¥
+
+            // å¯¼å…¥æŒ‰é’®
             if(GUILayout.Button("Import Test Plan"))
             {
                 VREscaper.ImportTestPlan(filePath);
             }
-
 
             if(GUILayout.Button("Remove Test Plan"))
             {
@@ -83,11 +85,8 @@ namespace VRExplorer
                     VREscaper.RemoveTestPlan(filePath);
                 }
             }
-
         }
-
-
-        
     }
+
 }
 #endif

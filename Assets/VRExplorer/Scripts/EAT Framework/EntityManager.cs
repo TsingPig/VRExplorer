@@ -9,9 +9,6 @@ namespace VRExplorer
 {
     public class EntityManager : Singleton<EntityManager>
     {
-
-        
-
         /// <summary>
         /// VRExplorerµÄMonoÖ¸Õë
         /// </summary>
