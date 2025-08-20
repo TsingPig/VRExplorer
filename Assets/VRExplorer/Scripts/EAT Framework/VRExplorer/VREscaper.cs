@@ -8,6 +8,8 @@ using VRExplorer.Mono;
 
 namespace VRExplorer
 {
+ 
+
     public class VREscaper : BaseExplorer
     {
         private int _index = 0;
@@ -16,6 +18,18 @@ namespace VRExplorer
         public bool useFileID = true;
 
         protected override bool TestFinished => _index >= _monos.Count;
+
+        private static FileIdManagerMono GetOrCreateManager()
+        {
+            FileIdManagerMono manager = GameObject.FindObjectOfType<FileIdManagerMono>();
+            if(manager == null)
+            {
+                GameObject go = new GameObject("FileIdManager");
+                manager = go.AddComponent<FileIdManagerMono>();
+                Debug.Log("Created FileIdManager in scene");
+            }
+            return manager;
+        }
 
         private static TaskList GetTaskListFromJson(string filePath = Str.TestPlanPath)
         {
@@ -45,15 +59,26 @@ namespace VRExplorer
         public static void ImportTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
             TaskList tasklist = GetTaskListFromJson(filePath);
+
+            // 获取场景的FileIdManager
+            FileIdManagerMono manager = GetOrCreateManager();
+            manager.Clear();
+
             foreach(var taskUnit in tasklist.taskUnit)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
+                    GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
+                    GameObject objB = FileIdResolver.FindGameObject(action.objectB, useFileID);
+
+                    if(objA != null)
+                        manager.Add(action.objectA, objA);
+                    if(objB != null)
+                        manager.Add(action.objectB, objB);
+
                     if(action.type == "Grab")
                     {
                         // Handle grab action with two GUIDs
-                        GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
-                        GameObject objB = FileIdResolver.FindGameObject(action.objectB, useFileID);
                         XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
                         if(grabbable == null)
                         {
@@ -83,6 +108,10 @@ namespace VRExplorer
 
         public static void RemoveTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
+            // 移除场景的FileIdManager
+            FileIdManagerMono manager = FindObjectOfType<FileIdManagerMono>();
+            DestroyImmediate(manager.gameObject);
+
             TaskList tasklist = GetTaskListFromJson(filePath);
             foreach(var taskUnit in tasklist.taskUnit)
             {
@@ -98,7 +127,6 @@ namespace VRExplorer
                             Debug.Log(objA.name);
                             if(grabbable != null)
                             {
-
                                 UnityEngine.Object.DestroyImmediate(grabbable, true);
                                 Debug.Log($"Removed XRGrabbable component from {objA.name}");
 
@@ -119,11 +147,12 @@ namespace VRExplorer
         {
             base.Start();
             var taskList = GetTaskListFromJson();  // 初始化_taskList
+
             foreach(var taskUnit in taskList.taskUnit)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
-                    GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
+                    GameObject objA = FindObjectOfType<FileIdManagerMono>().GetObject(action.objectA);
                     _monos.Add(objA.GetComponent<MonoBehaviour>());
                 }
             }

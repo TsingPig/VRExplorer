@@ -2,6 +2,12 @@
 
 
 
+## [1.6.4] - 2025-08-20
+
+### Fixed 
+
+- FileId consistency for prefab instance GameObjects across scenes.
+
 ## [1.6.3] - 2025-08-19
 
 ### Added  

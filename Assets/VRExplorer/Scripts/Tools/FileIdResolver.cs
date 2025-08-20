@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Policy;
 
 namespace VRExplorer
 {
@@ -15,6 +16,7 @@ namespace VRExplorer
     /// </summary>
     public static class FileIdResolver
     {
+
         public static long GetObjectFileID(GameObject go)
         {
             if(go == null)
@@ -126,14 +128,15 @@ namespace VRExplorer
                 {
                     long prefabFileId = GetObjectFileID(prefab);
                     if(prefabFileId == fileId)
+                    {
                         return prefab;
+                    }
                 }
             }
 
             Debug.LogWarning($"Cannot find GameObject with FileID: {fileId}");
             return null;
         }
-
 
         /// <summary>
         /// 通过 GUID 获取物体
