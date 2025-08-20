@@ -1,12 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using UnityEditor.SceneManagement;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Security.Policy;
 
 namespace VRExplorer
 {
