@@ -1,0 +1,244 @@
+{
+  "Classical Software GUI Interactions": {
+    "gameObjects": [
+      "Canvas",
+      "Button",
+      "EventSystem",
+      "InputField",
+      "Dropdown",
+      "Scrollbar",
+      "ScrollView",
+      "Toggle"
+    ],
+    "scripts": [
+      "UnityEngine.UI.Button",
+      "UnityEngine.UI.Toggle",
+      "UnityEngine.UI.InputField",
+      "UnityEngine.UI.Dropdown",
+      "UnityEngine.UI.ScrollRect",
+      "UnityEngine.UI.Scrollbar",
+      "UnityEngine.EventSystems.EventSystem",
+      "UnityEngine.UIElements.VisualElement",
+      "UnityEngine.UIElements.Button",
+      "UnityEngine.UIElements.Toggle"
+    ]
+  },
+  "Walk/Rotate/Jump": {
+    "gameObjects": [],
+    "scripts": [
+      "CharacterController",
+      "NavMeshAgent",
+      "Rigidbody.MovePosition",
+      "Rigidbody.MoveRotation",
+      "CharacterController",
+      "Rigidbody.AddForce",
+      "PlayerJump",
+      "JumpBehaviour"
+    ]
+  },
+  "Shoot/Fire/Attack": {
+    "gameObjects": [],
+    "scripts": [
+      "Shoot",
+      "Fire",
+      "Attack",
+      "Weapon",
+      "Projectile",
+      "GunController"
+    ]
+  },
+  "Inventory": {
+    "gameObjects": [],
+    "scripts": [
+      "Inventory",
+      "InventorySystem",
+      "ItemSlot",
+      "InventoryManager"
+    ]
+  },
+  "Dialogue": {
+    "gameObjects": [],
+    "scripts": [
+      "Dialogue",
+      "Conversation",
+      "DialogueManager",
+      "DialogueSystem"
+    ]
+  },
+  "Grab/Release/Throw/Place": {
+    "gameObjects": [
+      "Cube",
+      "Sphere",
+      "Cylinder",
+      "Capsule",
+      "Box",
+      "Crate",
+      "Ball",
+      "Gun",
+      "Weapon",
+      "Sword",
+      "Shield",
+      "Bow",
+      "Arrow",
+      "Key",
+      "DoorHandle",
+      "Lever",
+      "Knob",
+      "Bottle",
+      "Cup",
+      "Mug",
+      "Plate",
+      "Book",
+      "Remote",
+      "Controller",
+      "Tool",
+      "Wrench",
+      "Hammer"
+    ],
+    "scripts": [
+      "XRGrabInteractable",
+      "Grabbable",
+      "OVRGrabbable",
+      "VRTK_InteractableObject"
+    ]
+  },
+  "Trigger/Pull/Press Button/Switch/Level...": {
+    "gameObjects": [
+      "Button",
+      "PushButton",
+      "PressButton",
+      "Trigger",
+      "Switch",
+      "Lever",
+      "Handle",
+      "Knob",
+      "Keypad",
+      "Console",
+      "ControlPanel",
+      "PanelButton",
+      "DoorButton",
+      "ElevatorButton",
+      "StartButton",
+      "ResetButton",
+      "PowerSwitch",
+      "LightSwitch",
+      "RedButton",
+      "GreenButton",
+      "BlueButton",
+      "InteractButton"
+    ],
+    "scripts": [
+      "XRPushButton",
+      "XRLever",
+      "XRKnob",
+      "VRTK_InteractableButton",
+      "VRTK_Lever",
+      "OVRButton",
+      "OVRInputModule"
+    ]
+  },
+  "Socket": {
+    "gameObjects": [],
+    "scripts": [
+      "XRSocketInteractor",
+      "VRTK_SnapDropZone"
+    ]
+  },
+  "Teleport/Locomotion": {
+    "gameObjects": [
+      "TeleportAnchor",
+      "TeleportArea",
+      "TeleportPoint",
+      "TeleportPad",
+      "TeleportMarker",
+      "TeleportLocation",
+      "Portal",
+      "WarpPoint",
+      "WarpZone",
+      "LocomotionArea",
+      "LocomotionZone",
+      "MovePoint",
+      "NavPoint",
+      "Waypoint",
+      "SpawnPoint",
+      "ExitPoint",
+      "Doorway",
+      "Gate",
+      "Platform",
+      "Elevator",
+      "Lift"
+    ],
+    "scripts": [
+      "TeleportationProvider",
+      "TeleportationAnchor",
+      "TeleportationArea",
+      "LocomotionSystem",
+      "ActionBasedContinuousMoveProvider",
+      "ActionBasedContinuousTurnProvider",
+      "VRTK_BasicTeleport",
+      "OVRTeleport",
+      "SteamVR_Teleporter"
+    ]
+  },
+  "Ray Interactor / XR GUI Interaction": {
+    "gameObjects": [
+      "XRRayInteractor",
+      "XRPointer",
+      "VRPointer",
+      "LaserPointer",
+      "UILaser",
+      "XRCanvas",
+      "WorldSpaceCanvas",
+      "VRMenuCanvas",
+      "InteractionCanvas",
+      "TeleportPointer",
+      "UIRay",
+      "CanvasRaycaster",
+      "OVRPointer",
+      "VRTK_Pointer",
+      "EventSystem",
+      "VRUICanvas",
+      "HUDCanvas",
+      "SettingsCanvas",
+      "MainMenuCanvas",
+      "PauseMenuCanvas"
+    ],
+    "scripts": [
+      "XRRayInteractor",
+      "XRUIInputModule",
+      "OVRInputModule",
+      "VRTK_UICanvas"
+    ]
+  },
+  "Hand Gesture Interaction": {
+    "gameObjects": [
+      "XRHand",
+      "LeftHand",
+      "RightHand",
+      "HandModel",
+      "HandMesh",
+      "OVRHand",
+      "OVRSkeleton",
+      "HandAnchor",
+      "PalmAnchor",
+      "FingerAnchor",
+      "IndexFinger",
+      "ThumbFinger",
+      "HandTracking",
+      "GestureRecognizer",
+      "GestureController",
+      "FingerRig",
+      "HandRig",
+      "HandController",
+      "LeapHand",
+      "LeapPalm"
+    ],
+    "scripts": [
+      "XRHand",
+      "XRHandSubsystem",
+      "HandGesture",
+      "OVRHand",
+      "OVRSkeleton"
+    ]
+  }
+}

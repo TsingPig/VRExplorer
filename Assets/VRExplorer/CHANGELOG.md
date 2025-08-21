@@ -1,27 +1,26 @@
 # Changelog
 
+## [1.6.5] - 2025-08-21
 
+### Added  
 
-## [1.6.4] - 2025-08-20
+- ***VREscaper*** prefab
+- Interaction Counter for counting different types of interaction in dataset projects
+
+***VREscaper*** feature: 
+
+- Supports importing JSON (.json) format Test Plans  &  Automates test execution  
+- Uses FileID-based GameObject Finding System (FileIdResolver.cs & TestPlanImporterWindow.cs)
 
 ### Fixed 
 
 - FileId consistency for prefab instance GameObjects across scenes.
 
-## [1.6.3] - 2025-08-19
-
-### Added  
-
-***VREscaper*** feature: 
-
-- Supports importing JSON (.json) format Test Plans  &  Automates test execution  
--  Uses FileID-based GameObject Finding System (FileIdResolver.cs & TestPlanImporterWindow.cs)
-
 ## [1.5.6] - 2025-06-18
 
 ### Fixed
 
-- `GameObjectConfigManager.cs` prefab import & export logic
+- GameObjectConfigManager prefab import & export logic
 
 ## [1.5.5] - 2025-06-18
 
