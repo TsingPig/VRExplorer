@@ -60,6 +60,10 @@ namespace VRExplorer
             }
         }
 
+        /// <summary>
+        /// 基于距离选择最近的交互对象
+        /// </summary>
+        /// <param name="nextMono"></param>
         protected override void GetNextMono(out MonoBehaviour nextMono)
         {
             nextMono = EntityManager.Instance.monoState.Keys
@@ -69,6 +73,10 @@ namespace VRExplorer
                 .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Autonomous Event (如释放技能等无交互对象的事件)的调用
+        /// </summary>
+        /// <returns></returns>
         protected async Task AutonomousEventInvocation()
         {
             _curTask = BaseTask();
@@ -89,7 +97,6 @@ namespace VRExplorer
         {
             List<BaseAction> task = new List<BaseAction>()
            {
-               new MoveAction(_navMeshAgent, moveSpeed, GetRandomTwitchTarget(transform.position)),
                new BaseAction(_nextAutonomousEvent.Invoke)
            };
             return task;

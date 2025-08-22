@@ -15,6 +15,9 @@
 ### Fixed 
 
 - FileId consistency for prefab instance GameObjects across scenes.
+- fix: VREscaper prefab path & remove random move from BaseTask.
+
+
 
 ## [1.5.6] - 2025-06-18
 
