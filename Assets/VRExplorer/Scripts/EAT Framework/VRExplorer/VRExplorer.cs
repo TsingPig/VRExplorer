@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -13,7 +15,9 @@ namespace VRExplorer
         private int _autonomousEventIndex = 0;
         private int _autonomousEventsExecuted = 0;
 
-        public float autonomousEventFrequency;
+        [Range(0f, 1f)] public float autonomousEventFrequency;
+        [Range(0f, 3.0f)] public float autonomousEventInterval = 0.75f;
+
         public List<UnityEvent> autonomousEvents = new List<UnityEvent>();
 
         protected override bool TestFinished => (_autonomousEventsExecuted >= autonomousEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value);
@@ -73,6 +77,14 @@ namespace VRExplorer
                 .FirstOrDefault();
         }
 
+        protected override void ResetExploration()
+        {
+            EntityManager.Instance.ResetAllEntites();
+            ResetMonoPos();
+            _autonomousEventIndex = 0;
+            _autonomousEventsExecuted = 0;
+        }
+
         /// <summary>
         /// Autonomous Event (如释放技能等无交互对象的事件)的调用
         /// </summary>
@@ -86,8 +98,10 @@ namespace VRExplorer
             foreach(var action in _curTask)
             {
                 await action.Execute();
+                await Task.Delay(TimeSpan.FromSeconds(autonomousEventInterval));
             }
         }
+
 
         /// <summary>
         /// 用于执行 AutonomousEvent 的Task

@@ -1,21 +1,21 @@
 # Changelog
 
-## [1.6.5] - 2025-08-21
+## [1.6.6] - 2025-08-22
 
-### Added  
+### Added
+- **VREscaper** prefab.
+- Interaction Counter for tracking different types of interactions in dataset projects.
+- **VREscaper** feature set:
+  - Support for importing JSON (.json) format Test Plans and automated test execution.  
+  - FileID-based GameObject Finding System (`FileIdResolver.cs` & `TestPlanImporterWindow.cs`).
 
-- ***VREscaper*** prefab
-- Interaction Counter for counting different types of interaction in dataset projects
+### Changed
+- Added configurable `autonomousEventInterval` parameter (with Inspector slider) to control autonomous event execution delay; Adding `ResetExploration()` in `BaseExplorer` allows repeatable task executaion
 
-***VREscaper*** feature: 
-
-- Supports importing JSON (.json) format Test Plans  &  Automates test execution  
-- Uses FileID-based GameObject Finding System (FileIdResolver.cs & TestPlanImporterWindow.cs)
-
-### Fixed 
-
-- FileId consistency for prefab instance GameObjects across scenes.
-- fix: VREscaper prefab path & remove random move from BaseTask.
+### Fixed
+- FileID consistency for prefab instance GameObjects across scenes.
+- Correct VREscaper prefab path.
+- Removed random movement behavior from `BaseTask`.
 
 
 

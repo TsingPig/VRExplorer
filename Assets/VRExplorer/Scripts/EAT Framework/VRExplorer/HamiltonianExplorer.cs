@@ -127,6 +127,11 @@ namespace VRExplorer
             throw new System.NotImplementedException();
         }
 
+        protected override void ResetExploration()
+        {
+            throw new System.NotImplementedException();
+        }
+
         protected override Task SceneExplore()
         {
             throw new System.NotImplementedException();

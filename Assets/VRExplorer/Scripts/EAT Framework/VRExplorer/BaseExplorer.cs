@@ -152,10 +152,19 @@ namespace VRExplorer
                 {
                     await Task.Yield();
                 }
-                if(exitAfterTesting && TestFinished)
+                if(TestFinished)
                 {
                     //ExperimentManager.Instance.ExperimentFinish();
-                    UnityEditor.EditorApplication.isPlaying = false;
+                    if(exitAfterTesting)
+                    {
+                        UnityEditor.EditorApplication.isPlaying = false;
+                    }
+                    else
+                    {
+                        // 实验结束后 不选择退出，重置所有状态循环实验
+                        ResetExploration();
+                    }
+
                 }
             }
         }
@@ -214,6 +223,11 @@ namespace VRExplorer
         /// </summary>
         /// <param name="mono"></param>
         protected abstract void GetNextMono(out MonoBehaviour mono);
+
+        /// <summary>
+        /// 重新开始试验
+        /// </summary>
+        protected abstract void ResetExploration();
 
         #endregion 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
 

@@ -170,6 +170,10 @@ namespace VRExplorer
                 await TaskExecutation();
             }
         }
+
+        protected override void ResetExploration()
+        {
+        }
     }
 
     // Supporting classes for JSON deserialization

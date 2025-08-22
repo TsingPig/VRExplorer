@@ -141,5 +141,26 @@ namespace VRExplorer
             Debug.LogError($"{mono} GetEntity result is null");
             return null;
         }
+
+        /// <summary>
+        /// 重新实验的入口
+        /// </summary>
+        public void ResetAllEntites()
+        {
+            // 清空所有实体的状态集合
+            foreach(var entity in entityStates.Keys.ToList())
+            {
+                entityStates[entity].Clear();
+            }
+
+            // 将所有mono的探索状态置为false
+            foreach(var mono in monoState.Keys.ToList())
+            {
+                monoState[mono] = false;
+            }
+
+            Debug.Log($"{Str.DebugTag}All Entities Reset");
+        }
+
     }
 }
