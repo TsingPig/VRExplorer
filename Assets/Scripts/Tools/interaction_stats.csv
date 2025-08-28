@@ -1,4 +1,4 @@
-Project,Classical Software GUI Interactions,Walk/Rotate/Jump,Shoot/Fire/Attack,Inventory,Dialogue,Grab/Release/Throw/Place,Trigger/Pull/Press Button/Switch/Level...,Socket,Teleport/Locomotion,Ray Interactor / XR GUI Interaction,Hand Gesture Interaction
+Project,Classical Software GUI Interactions,Walk/Rotate/Jump,Shoot/Fire/Attack,Inventory,Dialogue,Grab/Release/Throw/Place,Trigger/Pull/Press Button/Switch,Socket,Teleport/Locomotion,Ray Interactor / XR GUI Interaction,Hand Gesture Interaction
 0x0B-unity-vr_room,3,0,0,0,0,3,2,0,2,1,2
 5A-Prototype-VR,51,28,12,0,6,57,11,0,7,23,22
 6-Unity-VR-FactoryFrenzy,15,21,8,0,0,30,9,2,15,7,2
@@ -41,7 +41,6 @@ MRIExperience,60,4,0,0,1,20,11,0,4,26,20
 neanderthal-tools,1,2,28,0,0,8,2,0,8,0,0
 Orb-Odyssey,42,7,3,5,0,33,24,0,14,31,0
 PaperVision,16,7,7,0,0,12,26,8,9,6,8
-Parkinson-App-Virtual-Reality,53,7,4,0,0,14,23,8,6,23,2
 PirateRushVR,58,5,72,0,0,15,12,0,7,24,2
 plane-waver,12,9,3,0,0,15,7,0,3,4,6
 project-god-hammer,10,0,31,0,0,27,4,3,5,4,14
@@ -81,7 +80,6 @@ VR-Unity-Template,13,6,0,0,0,18,9,0,7,8,32
 VR-Workshop,0,0,0,0,0,5,0,0,0,0,2
 VRCAD,52,2,0,0,0,6,9,0,3,24,4
 VRcade,52,6,13,0,0,5,7,0,4,23,5
-VRChess,9,6,2,0,0,7,4,0,0,2,0
 VREscapeDungeon,56,8,16,0,0,28,11,0,22,24,9
 VRHackaton_UnityGame,71,32,19,0,1,121,25,0,4,24,78
 VRMod,11,4,48,0,0,30,12,0,14,5,14
@@ -92,5 +90,15 @@ wheelchair-sim,7,0,0,0,0,8,0,0,1,5,10
 wind-turbine-vr,11,10,1,0,0,52,8,0,8,6,4
 XRToolkitMVP,11,4,1,0,0,11,8,1,3,7,8
 ymiyp-vr,13,4,8,0,0,21,14,0,11,7,25
-0,84,73,62,5,7,89,79,15,77,83,75
-,2059,633,921,79,17,1785,843,70,505,872,812
+Edutainment-Escape-Room,14,4,10,0,0,21,7,5,10,10,6
+EscapeGameVR,52,4,5,0,0,23,42,0,6,22,8
+escapeVr,15,3,6,0,0,22,16,0,8,3,0
+Parkinson-App-Virtual-Reality,53,7,4,0,0,14,23,8,6,23,2
+VGuns-Unity-VR,68,6,14,0,0,14,13,0,9,26,4
+VR-Adventure,2,0,0,0,0,1,3,0,1,1,4
+VR-Basics,4,0,9,0,0,12,13,0,11,3,8
+VR-Room,3,0,13,0,0,7,4,0,7,2,4
+VRChess,9,6,4,0,0,7,4,0,0,2,0
+unity-vr-maze-master,1,0,1,0,0,3,1,0,1,0,0
+UnityVR-master,3,0,3,0,0,1,0,0,0,1,0
+UnityCityView-master,46,0,1,0,0,3,3,0,0,17,0

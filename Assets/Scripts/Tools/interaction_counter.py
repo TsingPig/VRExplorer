@@ -43,7 +43,7 @@ def scan_project(project_path):
 
     return project_stats
 
-def main(projects_root, output_csv="interaction_stats.csv"):
+def main(projects_root, output_csv="interaction_stats2.csv"):
     results = []
 
     for project in os.listdir(projects_root):
@@ -66,4 +66,4 @@ def main(projects_root, output_csv="interaction_stats.csv"):
     print(f"统计完成，结果已保存到 {output_csv}")
 
 if __name__ == "__main__":
-    main("D:\--UnityProject\VR\VRExplorer_projects_dataset")  # 这里换成你 100+ 项目的父目录
+    main("D:\--UnityProject\VR\subjects1_for_analysis/UnityCityView-master")
