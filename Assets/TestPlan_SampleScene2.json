@@ -1,23 +1,73 @@
-  {
-    "taskUnits": [
-      {
-        "actionUnits": [
-          {
-            "type": "Trigger",
-            "source_object_fileID": "1448458900",
-            "triggerring_events": [
-              {
-                "methodCallUnits": [
-                  {
-                    "script_fileID": "1448458903",
-                    "method_name": "Reload",
-                    "parameter_fileID": []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+{
+  "taskUnits": [
+    {
+      "actionUnits": [
+        {
+          "type": "Trigger",
+          "triggerring_time": 1.5,
+          "source_object_fileID": 1448458900,
+          "triggerring_events": [
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                }
+              ]
+            },
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Fire",
+                  "parameter_fileID": []
+                }
+              ]
+            }
+          ],
+          "triggerred_events": [
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                },
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actionUnits": [
+        {
+          "type": "Transform",
+          "source_object_fileID": 1760679936,
+          "delta_position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "delta_rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "delta_scale": {
+            "x": 1.5,
+            "y": 1.5,
+            "z": 1.5
+          },
+          "triggerring_time": 3
+        }
+      ]
+    }
+  ]
+}

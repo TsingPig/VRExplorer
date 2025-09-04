@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using VRExplorer.JSON;
@@ -16,117 +17,63 @@ namespace VRExplorer
     public static class FileIdResolver
     {
 
+
+
         /// <summary>
         /// 根据 eventUnit 创建 UnityEvent 并绑定所有 methodCallUnit
         /// </summary>
         public static UnityEvent CreateUnityEvent(eventUnit e, bool useFileID = true)
         {
-            // FileIdManager 确保存在
             var manager = UnityEngine.Object.FindAnyObjectByType<FileIdManagerMono>();
-
             UnityEvent evt = new UnityEvent();
-
             if(e.methodCallUnits == null) return evt;
-
-            List<Action> callGroup = new List<Action>();
-
 
             foreach(var methodCallUnit in e.methodCallUnits)
             {
-                if(string.IsNullOrEmpty(methodCallUnit.script) || string.IsNullOrEmpty(methodCallUnit.methodName)) continue;
-
+                if(string.IsNullOrEmpty(methodCallUnit.script) || string.IsNullOrEmpty(methodCallUnit.methodName))
+                    continue;
 
                 MonoBehaviour mono = FindMonoByFileID(methodCallUnit.script);
                 if(mono == null)
                 {
                     Debug.LogError($"{methodCallUnit}'s script is null");
+                    continue;
                 }
-                
+
                 manager.AddMono(methodCallUnit.script, mono);
 
-                // 通过反射找到方法
-                MethodInfo method = mono.GetType().GetMethod(methodCallUnit.methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo method = mono.GetType().GetMethod(methodCallUnit.methodName,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+
                 if(method == null)
                 {
                     Debug.LogWarning($"Method {methodCallUnit.methodName} not found on {mono.name}");
                     continue;
                 }
 
-                // 封装一个 Action
-                Action call = () =>
+
+                // 方法无参数
+                if(method.GetParameters().Length == 0)
                 {
-                    try
-                    {
-                        if(methodCallUnit.parameters == null || methodCallUnit.parameters.Count == 0)
-                        {
-                            method.Invoke(mono, null);
-                        }
-                        else
-                        {
-                            List<object> paramValues = new List<object>();
-                            ParameterInfo[] paramInfos = method.GetParameters();
-
-                            for(int i = 0; i < methodCallUnit.parameters.Count; i++)
-                            {
-                                string rawParam = methodCallUnit.parameters[i];
-                                Type expectedType = paramInfos.Length > i ? paramInfos[i].ParameterType : typeof(string);
-
-                                object parsedValue = rawParam; // 默认 string
-
-                                try
-                                {
-                                    if(expectedType == typeof(GameObject) || expectedType.IsSubclassOf(typeof(Component)))
-                                    {
-                                        GameObject obj = FindGameObject(rawParam, useFileID: true);
-                                        if(manager != null) manager.Add(rawParam, obj);
-                                        if(obj != null)
-                                        {
-                                            parsedValue = (expectedType == typeof(GameObject))
-                                                ? (object)obj
-                                                : obj.GetComponent(expectedType);
-                                        }
-                                    }
-                                    else if(expectedType == typeof(int))
-                                        parsedValue = int.Parse(rawParam);
-                                    else if(expectedType == typeof(float))
-                                        parsedValue = float.Parse(rawParam);
-                                    else if(expectedType == typeof(bool))
-                                        parsedValue = bool.Parse(rawParam);
-                                    else if(expectedType.IsEnum)
-                                        parsedValue = Enum.Parse(expectedType, rawParam);
-                                }
-                                catch(Exception ex)
-                                {
-                                    Debug.LogError($"Failed to parse parameter '{rawParam}' as {expectedType}: {ex.Message}");
-                                }
-
-                                paramValues.Add(parsedValue);
-                            }
-
-                            method.Invoke(mono, paramValues.ToArray());
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        Debug.LogError($"Invoke method {methodCallUnit.methodName} on {mono.name} failed: {ex}");
-                    }
-                };
-
-                callGroup.Add(call);
-            }
-
-            // 只绑定一次，把所有 call 丢到同一个 element
-            if(callGroup.Count > 0)
-            {
-                evt.AddListener(() =>
+#if UNITY_EDITOR
+                    // 创建 UnityAction
+                    UnityAction action = System.Delegate.CreateDelegate(typeof(UnityAction), mono, method) as UnityAction;
+                    if(action != null)
+                        UnityEventTools.AddPersistentListener(evt, action);
+                    else
+                        Debug.LogWarning($"Cannot create UnityAction for method {method.Name}");
+#endif
+                }
+                else
                 {
-                    foreach(var call in callGroup)
-                        call();
-                });
+                    // 目前无法解决将带有参数的方法加入到event的问题
+                }
             }
 
             return evt;
         }
+
 
         /// <summary>
         /// 绑定一组 eventUnit 到目标 UnityEvent 列表

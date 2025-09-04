@@ -4,7 +4,7 @@
       "actionUnits": [
         {
           "type": "Grab",
-          "source_object_fileID": "64330974",
+          "source_object_fileID": 64330974,
           "target_position": {
             "x": 0,
             "y": 0,
@@ -13,8 +13,8 @@
         },
         {
           "type": "Grab",
-          "source_object_fileID": "1875767441",
-          "target_object_fileID": "64330974"
+          "source_object_fileID": 1875767441,
+          "target_object_fileID": 64330974
         }
       ]
     },
@@ -22,8 +22,8 @@
       "actionUnits": [
         {
           "type": "Grab",
-          "source_object_fileID": "2076594680",
-          "target_object_fileID": "64330974",
+          "source_object_fileID": 2076594680,
+          "target_object_fileID": 64330974,
           "source_object_name": "VRExplorerBox (6)"
         }
       ]

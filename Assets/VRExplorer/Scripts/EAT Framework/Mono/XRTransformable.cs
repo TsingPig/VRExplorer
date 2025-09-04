@@ -7,17 +7,18 @@ namespace VRExplorer.Mono
     {
         public new string Name => Str.Transformable;
 
-        public float triggeringTime = 0.5f;
+        public float triggerringTime = 0.5f;
+        public Vector3 deltaRotation;
+        public Vector3 deltaScale;
+        public Vector3 deltaPosition;
 
-        public Transform destination;
+        public Vector3 DeltaPosition => deltaPosition;
 
-        public Vector3 DeltaPosition => destination.position - transform.position;
+        public Vector3 DeltaRotation => deltaRotation;
 
-        public Vector3 DeltaRotation => new Vector3(0, 0, 0);
+        public Vector3 DeltaScale => deltaScale;
 
-        public Vector3 DeltaScale => new Vector3(0, 0, 0);
-
-        public float TriggeringTime => triggeringTime;
+        public float TriggeringTime => triggerringTime;
 
         public void Triggerred()
         {

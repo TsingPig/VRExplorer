@@ -73,6 +73,7 @@ namespace VRExplorer
             // 导入按钮
             if(GUILayout.Button("Import Test Plan"))
             {
+                VRAgent.RemoveTestPlan(filePath);
                 VRAgent.ImportTestPlan(filePath);
             }
 

@@ -5,10 +5,9 @@ using VRExplorer;
 
 public class VRExplorerGun : MonoBehaviour
 {
-    public void Fire(GameObject target)
+    public void Fire()
     {
         Debug.Log("Gun Fired");
-        DestroyImmediate(target);
     }
 
     public void Reload()

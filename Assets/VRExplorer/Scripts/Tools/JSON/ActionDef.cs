@@ -20,8 +20,19 @@ namespace VRExplorer.JSON
 
     public class TriggerActionUnit: ActionUnit
     {
+        [JsonProperty("triggerring_time")] public float? trigerringTime;
         [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
         [JsonProperty("triggerred_events")] public List<eventUnit> triggerredEvents;
+    }
+
+    /// <summary>
+    /// TransformActionUnit 用于描述物体的平移/旋转/缩放操作
+    /// </summary>
+    public class TransformActionUnit : TriggerActionUnit
+    {
+        [JsonProperty("delta_position")] public Vector3 deltaPosition;
+        [JsonProperty("delta_rotation")] public Vector3 deltaRotation;
+        [JsonProperty("delta_scale")] public Vector3 deltaScale;
     }
 
 

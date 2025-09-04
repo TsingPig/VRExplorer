@@ -28,20 +28,34 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 
 # Test Plan Interfaces Definition
 
-**从C#实现层面来讲，**
+## Top-Level Structure
 
 - 一个测试计划 (Test Plan) 即等于一个 TaskList类对象，即一个**“任务列表”**。
-
 - 一个任务列表，包含一个或者多个 taskUnit，即**“任务单元”**。
 - 一个任务单元，包含一个或者多个 actionUnit，即**“动作单元”**，这是执行某个动作的最小单元，比如抓取、触发。
+- 除此以外，某些动作单元可能包含一个或者多个**“事件列表”**，当然有可能没有事件列表。
+- 每一个事件列表包含**0个**、1个或者多个的 eventUnit，即**“事件单元”**。
+- 每一个事件单元，包含**0个**、1个或者多个methodCallUnit，即**“回调函数单元”**，它是对应执行到具体函数的最小单元
+- Note:
+    - Json格式中允许出现格式规范中的额外字段，但是不允许缺少必要字段。
+    - 一个事件列表内的多个事件单元宏观上顺序执行；同一个事件单元 里面的多个 回调函数单元在帧内部顺序执行，在宏观上并发；
 
-> 定义代码实现：
->
+**C#定义代码**
+
 > ```c#
 > [Serializable] public class TaskList { [JsonProperty("taskUnits")] public List<TaskUnit> taskUnits; }
 > [Serializable] public class TaskUnit { [JsonProperty("actionUnits")] public List<ActionUnit> actionUnits; }
-> [JsonConverter(typeof(ActionUnitConverter))] // 支持JSON多态
+> [Serializable] public class eventUnit { [JsonProperty("methodCallUnits")] public List<methodCallUnit> methodCallUnits; }
 > 
+> [Serializable]
+> public class methodCallUnit
+> {
+>     [JsonProperty("script_fileID")] public string script;
+>     [JsonProperty("method_name")] public string methodName;
+>     [JsonProperty("parameter_fileID")] public List<string>? parameters;
+> }
+> 
+> [JsonConverter(typeof(ActionUnitConverter))] // 支持JSON多态
 > public class ActionUnit
 > {
 >     public string type; 
@@ -50,18 +64,18 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 > 
 > public class GrabActionUnit : ActionUnit
 > {
->     [JsonProperty("target_object_fileID")] public string objectB;
+>     [JsonProperty("target_object_fileID")] public string? objectB;
+>     [JsonProperty("target_position")] public Vector3? targetPosition;
+> }
+> 
+> public class TriggerActionUnit: ActionUnit
+> {
+>     [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
+>     [JsonProperty("triggerred_events")] public List<eventUnit> triggerredEvents;
 > }
 > ```
 
-**从 Json格式来讲**，
-
-- taskUnits 字段包含一个列表，对应多个任务；
-- 每个任务有一个 actionUnits字段，包含一个列表，对应多个动作。
-
-> **Notes**:
->
-> - Json格式中允许出现格式规范中的额外字段，但是不允许缺少必要字段。
+**JSON format structure**
 
 ```json
 {
@@ -88,81 +102,7 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 
 ```
 
-例如，下面这种写法包含一个任务，这个任务包含两个 Grab动作。当然也可以写成另一种形式（包含两个任务，每一个任务包含一个动作）。
 
-```json
-{
-  "taskUnits": [
-    {
-      "actionUnits": [
-        {
-          "type": "Grab",
-          "source_object_fileID": "2076594680",  
-          "target_object_fileID": "64330974"
-        },
-        {
-          "type": "Grab",
-          "source_object_fileID": "1875767441",
-          "target_object_fileID": "64330974"
-        }
-      ]
-    }
-  ]
-}
-```
-
-另一种格式 （实际上这两种写法等效，只不过在 JSON 组织的逻辑上可读性不一样。更建议写成后者。
-
-```json
-{
-  "taskUnits": [
-    {
-      "actionUnits": [
-        {
-          "type": "Grab",
-          "source_object_fileID": "2076594680",  
-          "target_object_fileID": "64330974"
-        }
-      ]
-    },
-    {
-      "actionUnits": [
-        {
-          "type": "Grab",
-          "source_object_fileID": "1875767441",
-          "target_object_fileID": "64330974"
-        }
-      ]
-    }
-  ]
-}
-```
-
-
-
-## Top-Level Structure
-
-```json
-{
-  "taskUnit": [
-    {
-      "actionUnits": [
-        {  }, 
-        {  }
-      ]
-    },
-    {
-      "actionUnits": [
-        {  }
-      ]
-    }
-  ]
-}
-```
-
-- **taskUnit**: Contains a list of taskUnits. One taskUnit is a logical testing unit, usually composing 
-
-    red list of interactions to perform within that task.
 
 ## Interaction Interfaces Definition
 
@@ -180,7 +120,7 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 }
 ```
 
-**Example:**
+**Example1**
 
 ```json
 {
@@ -198,6 +138,60 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 > - Typically used when the agent directly manipulates a specific object.
 
 ------
+
+**Example2**
+
+下面这种写法包含一个任务，这个任务包含两个 Grab动作。当然也可以写成另一种形式（包含两个任务，每一个任务包含一个动作）。
+
+```json
+{
+  "taskUnits": [
+    {
+      "actionUnits": [
+        {
+          "type": "Grab",
+          "source_object_fileID": 2076594680,  
+          "target_object_fileID": 64330974
+        },
+        {
+          "type": "Grab",
+          "source_object_fileID": 1875767441,
+          "target_object_fileID": 64330974
+        }
+      ]
+    }
+  ]
+}
+```
+
+另一种格式 （实际上这两种写法等效，只不过在 JSON 组织的逻辑上可读性不一样。更建议写成后者。
+
+```json
+{
+  "taskUnits": [
+    {
+      "actionUnits": [
+        {
+          "type": "Grab",
+          "source_object_fileID": 2076594680,  
+          "target_object_fileID": 64330974
+        }
+      ]
+    },
+    {
+      "actionUnits": [
+        {
+          "type": "Grab",
+          "source_object_fileID": 1875767441,
+          "target_object_fileID": 64330974
+        }
+      ]
+    }
+  ]
+}
+```
+
+
 
 #### Grab2 — Grab Object to Position
 
@@ -238,53 +232,206 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 
 ###  Trigger Definition
 
-用于描述 **事件触发条件** 以及 **触发后执行的方法**。
+用于描述触发某个物体的过程中需要调用的函数链、触发完成后需要调用的函数链。
 
 ```json
 {
   "type": "Trigger",
-  "source_object_name": "<string>",       // Name of the source object
-  "source_object_fileID": <long>,         // FileID of the source object in the Unity scene file
-  "method": "<string>",                    // Unity 生命周期或事件方法 (e.g., OnTriggerEnter, Update)
-  "condition": "<string>"                  // 触发条件说明（可包含脚本ID、GUID、序列化配置、调用预期行为）
+  "source_object_name": "<string>",       // 触发事件的源对象名称
+  "triggerring_time": <float>, 			  // 触发的持续时间
+  "source_object_fileID": <long>,         // Unity 场景文件中源对象的 FileID
+  "condition": "<string>",                // 触发条件说明（可包含脚本ID、GUID、序列化配置、调用预期行为）
+  "triggerring_events": [                 // Trigger过程中的事件列表
+    // 0个或者若干个事件单元
+    {
+      "methodCallUnits": [                // 一个事件单元，包含0个或者多个methodCallUnit
+        {
+          "script_fileID": <long>,     // 目标脚本的 FileID
+          "method_name": "<string>",     // 要调用的方法名
+          "parameter_fileID": []         // 方法参数的 FileID 列表
+        }
+      ]
+    }
+  ],
+  "triggerred_events": [                  //  Trigger完成后的事件列表
+    	// 0个或者若干个事件单元
+  ]
+}
+
+```
+
+> **Note**:
+>
+> - 目前还无法绑定有参数的函数，parameter_fileID必须为空。
+> - condition 和 source_object_name 为非必要选项
+> - triggerring_events 和 triggerred_events 可为空，但一般需要包含触发事件
+
+**Example**
+
+下面的例子中包含了一个Trigger任务，其中triggerring_events 包含两个 eventUnit，每个eventUnit包含一个methodCallUnit；triggerred_events包含一个eventUnit，它拥有两个methodCallUnit。
+
+Triggerring过程中的事件：换弹 -> 开火
+
+Triggerred完成后的事件：换弹 + 换弹（同时）
+
+```json
+{
+  "taskUnits": [
+    {
+      "actionUnits": [
+        {
+          "type": "Trigger",
+          "triggerring_time": 1.5,
+          "source_object_fileID": 1448458900,
+          "triggerring_events": [
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                }
+              ]
+            },
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Fire",
+                  "parameter_fileID": []
+                }
+              ]
+            }
+          ],
+          "triggerred_events": [
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                },
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Reload",
+                  "parameter_fileID": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-- **使用场景**: 碰撞检测、进入区域触发、脚本生命周期回调。
-- **验证点**: 确认条件触发的时机与次数，绑定方法是否被调用，副作用是否符合预期。
+
 
 ### Transform Definition
 
-用于描述对象在 **位置 / 旋转 / 缩放 / 物理约束** 上的变化。
+在设定上，Transform沿用Trigger的设计，包含一切Trigger的功能。额外增加了用于描述 **物体的平移、旋转、缩放变换操作**的字段。其中所有字段皆为偏移量，例如让物体的 Y轴变成1.1x，偏移量的y设定为 0.1。
+
+> **Note**:
+>
+> - 目前还无法绑定有参数的函数，parameter_fileID必须为空。
+> - condition 和 source_object_name 为非必要选项
+> - triggerring_events 和 triggerred_events 一般为空
 
 ```json
 {
   "type": "Transform",
-  "source_object_name": "<string>",        // 发生变化的对象
-  "transform_type": "<string>",            // 变化类别 (e.g., Translate, Rotate, Scale, Constraint)
-  "parameters": {                          // 参数配置
-    "duration": "<int>",                   // 持续帧数或时间
-    "expected_state": "<string>"           // 变化后的预期状态 (e.g., RigidbodyConstraints.FreezeAll)
-  }
+  "source_object_name": "<string>",        // 目标对象名称
+  "source_object_fileID": <long>,          // Unity 场景中对象的 FileID
+  "target_position": {                     // 位置delta量
+    "x": <float>,
+    "y": <float>,
+    "z": <float>
+  },
+  "target_rotation": {                     // 旋转delta量
+    "x": <float>,
+    "y": <float>,
+    "z": <float>
+  },
+  "target_scale": {                        // 缩放delta量
+    "x": <float>,
+    "y": <float>,
+    "z": <float>
+  },
+  "triggerring_events": [                 // Trigger过程中的事件列表
+        // 0个或者若干个事件单元
+        {
+          "methodCallUnits": [                // 一个事件单元，包含0个或者多个methodCallUnit
+            {
+              "script_fileID": <long>,     // 目标脚本的 FileID
+              "method_name": "<string>",     // 要调用的方法名
+              "parameter_fileID": []         // 方法参数的 FileID 列表
+            }
+          ]
+        }
+      ],
+  "triggerred_events": [                  //  Trigger完成后的事件列表
+            // 0个或者若干个事件单元
+      ],
+  "trigger_time": <float>                  // 动作持续时间
 }
+
 ```
 
-- **使用场景**: 物体吸附（Snap）、旋转动画、冻结物理状态。
-- **验证点**: 确认变化是否持续正确时间，变化后对象状态是否与预期一致。
+**Example**
+
+能够在3秒内让对应的物体变成原来的 1.5倍大
+
+```json
+{
+      "actionUnits": [
+        {
+          "type": "Transform",
+          "source_object_fileID": 1760679936,
+          "delta_position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "delta_rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "delta_scale": {
+            "x": 1.5,
+            "y": 1.5,
+            "z": 1.5
+          },
+          "triggerring_time": 3
+        }
+      ]
+    }
+```
+
+
 
 # Changelog
 
-## [1.7.1] - 2025-09-04
+## [1.7.2] - 2025-09-04
 
 ### Added
 
 - JSON scripts (ActionUnitConverter, ActionDef, TaskDef for optimize structure of JSON format in test plan)
 
 - TagInitializer for tag the object that instantiated for temporary usage
+- TriggerActionUnit for Test Plan
 
 ### Feature
 
-- supported `target_position ` for GrabActionUnit
+- supported `target_position ` for GrabActionUnit, `triggerring_time` for TriggerActionUnit
+- **Trigger Action/ Transform Action** supported initailly in Test Plan Json;  (supporting Event List)
+- GetObjectFileID supporting Object parameter 
+
+### Fixed 
+
+- prefab can't be identified when it is on the top-level of the scene
+- XRTriggerable: Triggerred Events Execution problem
 
 ## [1.6.6] - 2025-08-22
 

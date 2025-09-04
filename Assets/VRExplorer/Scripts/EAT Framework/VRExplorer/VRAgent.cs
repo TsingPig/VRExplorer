@@ -8,6 +8,7 @@ using UnityEngine;
 using VRExplorer.Mono;
 using VRExplorer.JSON;
 using BNG;
+using Microsoft.SqlServer.Server;
 
 namespace VRExplorer
 {
@@ -144,7 +145,7 @@ namespace VRExplorer
                         if(triggerAction == null) continue;
 
                         XRTriggerable triggerable = objA.GetComponent<XRTriggerable>() ?? objA.AddComponent<XRTriggerable>();
-
+                        if(triggerAction.trigerringTime != null) triggerable.triggeringTime = (float)triggerAction.trigerringTime;
                         FileIdResolver.BindEventList(triggerAction.triggerringEvents, triggerable.triggerringEvents);
                         FileIdResolver.BindEventList(triggerAction.triggerredEvents, triggerable.triggerredEvents);
 
@@ -154,6 +155,34 @@ namespace VRExplorer
                             AssetDatabase.SaveAssets();
                         }
                     }
+                    else if(action.type == "Transform")
+                    {
+                        TransformActionUnit transformAction = action as TransformActionUnit;
+                        if(transformAction == null) continue;
+
+                        XRTransformable transformable = objA.GetComponent<XRTransformable>();
+                        if(transformable == null)
+                        {
+                            transformable = objA.AddComponent<XRTransformable>();
+                            Debug.Log($"Added XRTransformable component to {objA.name}");
+                        }
+
+                        // 设置变换参数
+                        if(transformAction.trigerringTime != null) transformable.triggerringTime = (float)transformAction.trigerringTime;
+                        transformable.deltaPosition = transformAction.deltaPosition;
+                        transformable.deltaRotation = transformAction.deltaRotation;
+                        transformable.deltaScale = transformAction.deltaScale;
+
+                        if(transformAction.trigerringTime != null)
+                            transformable.triggerringTime = (float)transformAction.trigerringTime;
+
+                        if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                        {
+                            EditorUtility.SetDirty(objA);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+
                 }
             }
         }
@@ -205,6 +234,22 @@ namespace VRExplorer
 
                         }
                     }
+                    else if(action.type == "Transform")
+                    {
+                        XRTransformable transformable = objA.GetComponent<XRTransformable>();
+                        if(transformable != null)
+                        {
+                            UnityEngine.Object.DestroyImmediate(transformable, true);
+                            Debug.Log($"Removed XRTransformable from {objA.name}");
+                        }
+
+                        if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                        {
+                            EditorUtility.SetDirty(objA);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+
 
                     if(PrefabUtility.IsPartOfPrefabAsset(objA))
                     {

@@ -107,7 +107,7 @@ namespace VRExplorer.Mono
                     Debug.Log(except.ToString());
                 }
             }
-            foreach(var eve in triggerredEvents)
+            foreach(var eve in triggerringEvents)
             {
                 try
                 {

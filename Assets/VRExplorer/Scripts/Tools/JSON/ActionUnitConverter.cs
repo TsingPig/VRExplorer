@@ -29,6 +29,10 @@ namespace VRExplorer.JSON
                 action = new TriggerActionUnit();
                 break;
 
+                case "Transform":
+                action = new TransformActionUnit();
+                break;
+
                 default:
                 action = new ActionUnit();
                 break;

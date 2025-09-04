@@ -1,7 +1,7 @@
 {
   "name": "com.henrylab.vrexplorer",
   "displayName": "VRExplorer",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "unity": "2021.3",
   "description": "VRExplorer is a novel model-based testing tool to achieve effective interactions with diverse virtual objects and the exploration of complex VR scenes.",
   "keywords": [
