@@ -114,7 +114,7 @@ def main(root_path):
         result = analyze_project(project_path)
         results.append(result)
 
-    csv_file = os.path.join(root_path, 'unity_projects_summary.csv')
+    csv_file = os.path.join(root_path, 'unity_projects_summary3.csv')
     with open(csv_file, 'w', newline='', encoding='utf-8') as f:
         fieldnames = ['Project', 'UnityVersion', 'CSharpScripts', 'CSharpLines', 'NonMetaFiles', 'Prefabs', 'Scenes', 'GameObjects']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
