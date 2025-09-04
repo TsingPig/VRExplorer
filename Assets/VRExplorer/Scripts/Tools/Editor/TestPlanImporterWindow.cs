@@ -73,7 +73,7 @@ namespace VRExplorer
             // 导入按钮
             if(GUILayout.Button("Import Test Plan"))
             {
-                VREscaper.ImportTestPlan(filePath);
+                VRAgent.ImportTestPlan(filePath);
             }
 
             if(GUILayout.Button("Remove Test Plan"))
@@ -82,7 +82,7 @@ namespace VRExplorer
                    "This will remove all components added by the test plan. Continue?",
                    "Yes", "No"))
                 {
-                    VREscaper.RemoveTestPlan(filePath);
+                    VRAgent.RemoveTestPlan(filePath);
                 }
             }
         }

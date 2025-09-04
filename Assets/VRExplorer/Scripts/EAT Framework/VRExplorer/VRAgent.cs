@@ -7,10 +7,11 @@ using UnityEditor;
 using UnityEngine;
 using VRExplorer.Mono;
 using VRExplorer.JSON;
+using BNG;
 
 namespace VRExplorer
 {
-    public class VREscaper : BaseExplorer
+    public class VRAgent : BaseExplorer
     {
         private int _index = 0;
         private List<MonoBehaviour> _monos = new List<MonoBehaviour>();
@@ -77,11 +78,6 @@ namespace VRExplorer
 
                     if(action.type == "Grab")
                     {
-                        GameObject objB = FileIdResolver.FindGameObject((action as GrabActionUnit).objectB, useFileID);
-                        if(objB != null)
-                            manager.Add((action as GrabActionUnit).objectB, objB);
-
-                        // Handle grab action with two GUIDs
                         XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
                         if(grabbable == null)
                         {
@@ -93,9 +89,46 @@ namespace VRExplorer
                             Debug.Log($"{objA.name} already has XRGrabbable component");
                         }
 
-                        // Set destination to objectB
-                        grabbable.destination = objB.transform;
-                        Debug.Log($"Set {objA.name}'s destination to {objB.name}");
+                        GrabActionUnit grabAction = action as GrabActionUnit;
+
+                        if(grabAction.objectB != null)
+                        {
+                            // Handle grab action with two GUIDs
+                            GameObject objB = FileIdResolver.FindGameObject(grabAction.objectB, useFileID);
+
+                            if(objB != null)
+                                manager.Add(grabAction.objectB, objB);
+
+                            // Set destination to objectB
+                            grabbable.destination = objB.transform;
+                            Debug.Log($"Set {objA.name}'s destination to {objB.name}");
+                        }
+                        else if(grabAction.targetPosition != null)// 使用 Vector3作为 target
+                        {
+                            Vector3 targetPos = (Vector3)grabAction.targetPosition;
+
+                            // 先查找场景中是否已有临时目标
+                            GameObject targetObj = GameObject.Find($"{objA.name}_TargetPosition");
+                            if(targetObj == null)
+                            {
+                                targetObj = new GameObject($"{objA.name}_TargetPosition_{Str.TempTargetTag}");
+                                targetObj.transform.position = targetPos;
+
+                                // 给临时目标加标记，方便后续删除
+                                targetObj.tag = Str.TempTargetTag;
+                            }
+                            else
+                            {
+                                targetObj.transform.position = targetPos; // 更新位置
+                            }
+
+                            grabbable.destination = targetObj.transform;
+                            Debug.Log($"Set {objA.name}'s destination to position {targetPos}");
+                        }
+                        else
+                        {
+                            Debug.LogError("Lacking of Destination");
+                        }
 
                         // Mark as dirty and save if it's a prefab
                         if(PrefabUtility.IsPartOfPrefabAsset(objA))
@@ -104,13 +137,19 @@ namespace VRExplorer
                             AssetDatabase.SaveAssets();
                         }
                     }
-                    // Add other action type handlers as needed
                 }
             }
         }
 
         public static void RemoveTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
+            // 移除临时物体
+            var tempTargets = GameObject.FindGameObjectsWithTag(Str.TempTargetTag);
+            foreach(var t in tempTargets)
+            {
+                DestroyImmediate(t);
+            }
+
             // 移除场景的FileIdManager
             FileIdManagerMono manager = FindObjectOfType<FileIdManagerMono>();
             DestroyImmediate(manager.gameObject);

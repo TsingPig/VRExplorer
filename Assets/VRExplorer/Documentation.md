@@ -1,4 +1,32 @@
-# Interfaces Definition
+# VRExplorer Guidance
+
+ A Model-based Approach for Automated Virtual Reality Scene Exploration and Testing ([TsingPig/VRExplorer_Release (github.com)](https://github.com/TsingPig/VRExplorer_Release))
+
+## Configuration
+
+- Unity → Package Manager → Add package from git URL https://github.com/TsingPig/VRExplorer_Release.git
+
+- Manually set terrain objects (e.g., walls and floors) to Navigation Static.
+- Bake the NavMesh.
+- Add the VRExplorer agent prefab to the Package/Prefab Folder for the under-test scenes.
+- Attach predefined scripts in Package/Scripts/EAT Framework/Mono Folder, or select and implement interfaces. 
+
+
+
+# VRAgent Guidance
+
+LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction / Dataset Analysis.
+
+## Configuration
+
+- 1). The same as VRExplorer Configuration
+- 2). **Test Plan Generation:** LLM + RAG / Manual Setting
+- 3). **Test Plan Import Import**: Tools -> VRExplorer -> Import Test Plan -> Browse ->  Import Test Plan
+- 4). Test Plan Checking: 检查是否在测试的场景中生成 FileIdManager，并且检查ID配置是否正确完整。
+
+
+
+# Test Plan Interfaces Definition
 
 **从C#实现层面来讲，**
 
@@ -7,35 +35,60 @@
 - 一个任务列表，包含一个或者多个 taskUnit，即**“任务单元”**。
 - 一个任务单元，包含一个或者多个 actionUnit，即**“动作单元”**，这是执行某个动作的最小单元，比如抓取、触发。
 
-```c#
-// Supporting classes for JSON deserialization
-[System.Serializable]
-public class TaskList
+> 定义代码实现：
+>
+> ```c#
+> [Serializable] public class TaskList { [JsonProperty("taskUnits")] public List<TaskUnit> taskUnits; }
+> [Serializable] public class TaskUnit { [JsonProperty("actionUnits")] public List<ActionUnit> actionUnits; }
+> [JsonConverter(typeof(ActionUnitConverter))] // 支持JSON多态
+> 
+> public class ActionUnit
+> {
+>     public string type; 
+>     [JsonProperty("source_object_fileID")] public string objectA;
+> }
+> 
+> public class GrabActionUnit : ActionUnit
+> {
+>     [JsonProperty("target_object_fileID")] public string objectB;
+> }
+> ```
+
+**从 Json格式来讲**，
+
+- taskUnits 字段包含一个列表，对应多个任务；
+- 每个任务有一个 actionUnits字段，包含一个列表，对应多个动作。
+
+> **Notes**:
+>
+> - Json格式中允许出现格式规范中的额外字段，但是不允许缺少必要字段。
+
+```json
 {
-    public List<TaskUnit> taskUnits;
+  "taskUnits": [
+      { 	  // Task1
+      "actionUnits": [
+        {
+         	// Task1-Action1
+        },
+        {
+			// Task1-Action2
+        }
+      ]
+    },
+    {		// Task2
+      "actionUnits": [
+        {
+			// Task2-Action1
+        }
+      ]
+    }    
+  ]
 }
 
-[System.Serializable]
-public class TaskUnit
-{
-    public List<ActionUnit> actionUnits;
-}
-
-[System.Serializable]
-public class ActionUnit
-{
-    public string type; // "Grab", "Move", "Drop", etc.
-    public string objectA;
-}
-
-[System.Serializable]
-public class GrabActionUnit: ActionUnit
-{
-    public string objectB;
-}
 ```
 
-从 Json格式来讲，
+例如，下面这种写法包含一个任务，这个任务包含两个 Grab动作。当然也可以写成另一种形式（包含两个任务，每一个任务包含一个动作）。
 
 ```json
 {
@@ -44,24 +97,45 @@ public class GrabActionUnit: ActionUnit
       "actionUnits": [
         {
           "type": "Grab",
-          "objectA": "194480315",
-          "objectB": "855068735"
+          "source_object_fileID": "2076594680",  
+          "target_object_fileID": "64330974"
         },
         {
           "type": "Grab",
-          "objectA": "863577851",
-          "objectB": "896816000"
-        },
-        {
-          "type": "Grab",
-          "objectA": "284893529",
-          "objectB": "559748133"
+          "source_object_fileID": "1875767441",
+          "target_object_fileID": "64330974"
         }
       ]
     }
   ]
 }
+```
 
+另一种格式 （实际上这两种写法等效，只不过在 JSON 组织的逻辑上可读性不一样。更建议写成后者。
+
+```json
+{
+  "taskUnits": [
+    {
+      "actionUnits": [
+        {
+          "type": "Grab",
+          "source_object_fileID": "2076594680",  
+          "target_object_fileID": "64330974"
+        }
+      ]
+    },
+    {
+      "actionUnits": [
+        {
+          "type": "Grab",
+          "source_object_fileID": "1875767441",
+          "target_object_fileID": "64330974"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 
@@ -90,11 +164,9 @@ public class GrabActionUnit: ActionUnit
 
     red list of interactions to perform within that task.
 
-## Interaction
+## Interaction Interfaces Definition
 
 ### Grab Definition
-
-Describes an **agent-to-object interaction** where the agent grabs, releases, moves, throws, or carries an object.
 
 #### Grab1 — Grab Object to Object
 
@@ -122,14 +194,14 @@ Describes an **agent-to-object interaction** where the agent grabs, releases, mo
 
 > **Notes**:
 >
+> - 其中 source_object_name 和 target_object_name为非必要字段
 > - Typically used when the agent directly manipulates a specific object.
-> - Verification should ensure that the grab action succeeds and the target object responds as expected (e.g., becomes attached, follows agent movement, etc.).
 
 ------
 
 #### Grab2 — Grab Object to Position
 
-```
+```json
 {
   "type": "Grab",
   "source_object_name": "<string>",       // Name of the agent or object initiating the grab
@@ -159,9 +231,10 @@ Describes an **agent-to-object interaction** where the agent grabs, releases, mo
 
 > **Notes**:
 >
-> - Useful for testing object relocation or drop mechanics.
+> - 其中 source_object_name 为非必要字段
 > - The grab action does not require a second object; instead, the destination is a spatial position.
-> - Verification includes confirming the object is released or placed at the correct coordinates.
+
+
 
 ###  Trigger Definition
 
@@ -200,11 +273,17 @@ Describes an **agent-to-object interaction** where the agent grabs, releases, mo
 
 # Changelog
 
-## [1.7.0] - 2025-09-04
+## [1.7.1] - 2025-09-04
 
 ### Added
 
 - JSON scripts (ActionUnitConverter, ActionDef, TaskDef for optimize structure of JSON format in test plan)
+
+- TagInitializer for tag the object that instantiated for temporary usage
+
+### Feature
+
+- supported `target_position ` for GrabActionUnit
 
 ## [1.6.6] - 2025-08-22
 
