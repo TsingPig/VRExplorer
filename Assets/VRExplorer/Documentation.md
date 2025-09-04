@@ -50,28 +50,38 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 > [Serializable]
 > public class methodCallUnit
 > {
->     [JsonProperty("script_fileID")] public string script;
->     [JsonProperty("method_name")] public string methodName;
->     [JsonProperty("parameter_fileID")] public List<string>? parameters;
+>  [JsonProperty("script_fileID")] public string script;
+>  [JsonProperty("method_name")] public string methodName;
+>  [JsonProperty("parameter_fileID")] public List<string>? parameters;
 > }
 > 
 > [JsonConverter(typeof(ActionUnitConverter))] // 支持JSON多态
 > public class ActionUnit
 > {
->     public string type; 
->     [JsonProperty("source_object_fileID")] public string objectA;
+>  public string type; 
+>  [JsonProperty("source_object_fileID")] public string objectA;
 > }
 > 
 > public class GrabActionUnit : ActionUnit
 > {
->     [JsonProperty("target_object_fileID")] public string? objectB;
->     [JsonProperty("target_position")] public Vector3? targetPosition;
+>  [JsonProperty("target_object_fileID")] public string? objectB;
+>  [JsonProperty("target_position")] public Vector3? targetPosition;
 > }
 > 
 > public class TriggerActionUnit: ActionUnit
 > {
->     [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
->     [JsonProperty("triggerred_events")] public List<eventUnit> triggerredEvents;
+>  [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
+>  [JsonProperty("triggerred_events")] public List<eventUnit> triggerredEvents;
+> }
+> 
+> /// <summary>
+> /// TransformActionUnit 用于描述物体的平移/旋转/缩放操作
+> /// </summary>
+> public class TransformActionUnit : TriggerActionUnit
+> {
+>     [JsonProperty("delta_position")] public Vector3 deltaPosition;
+>     [JsonProperty("delta_rotation")] public Vector3 deltaRotation;
+>     [JsonProperty("delta_scale")] public Vector3 deltaScale;
 > }
 > ```
 
