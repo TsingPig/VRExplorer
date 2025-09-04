@@ -1,16 +1,16 @@
 {
-  "taskUnit": [
+  "taskUnits": [
     {
       "actionUnits": [
         {
           "type": "Grab",
-          "objectA": "2076594680",  
-          "objectB": "64330974"
+          "source_object_fileID": "2076594680",  
+          "target_object_fileID": "64330974"
         },
         {
           "type": "Grab",
-          "objectA": "1875767441",
-          "objectB": "64330974"
+          "source_object_fileID": "1875767441",
+          "target_object_fileID": "64330974"
         }
       ]
     }

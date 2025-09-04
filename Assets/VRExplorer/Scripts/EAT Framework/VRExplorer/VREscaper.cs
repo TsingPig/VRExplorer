@@ -1,15 +1,15 @@
 using System;
+using Unity.Plastic.Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using VRExplorer.Mono;
+using VRExplorer.JSON;
 
 namespace VRExplorer
 {
- 
-
     public class VREscaper : BaseExplorer
     {
         private int _index = 0;
@@ -42,7 +42,8 @@ namespace VRExplorer
             try
             {
                 string jsonContent = File.ReadAllText(filePath);
-                TaskList taskList = JsonUtility.FromJson<TaskList>(jsonContent);
+                // TaskList taskList = JsonUtility.FromJson<TaskList>(jsonContent);  不支持多态
+                TaskList taskList = JsonConvert.DeserializeObject<TaskList>(jsonContent);
                 if(taskList == null)
                 {
                     Debug.LogError("Failed to parse test plan JSON");
@@ -64,20 +65,22 @@ namespace VRExplorer
             FileIdManagerMono manager = GetOrCreateManager();
             manager.Clear();
 
-            foreach(var taskUnit in tasklist.taskUnit)
+            foreach(var taskUnit in tasklist.taskUnits)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
                     GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
-                    GameObject objB = FileIdResolver.FindGameObject(action.objectB, useFileID);
 
                     if(objA != null)
                         manager.Add(action.objectA, objA);
-                    if(objB != null)
-                        manager.Add(action.objectB, objB);
+
 
                     if(action.type == "Grab")
                     {
+                        GameObject objB = FileIdResolver.FindGameObject((action as GrabActionUnit).objectB, useFileID);
+                        if(objB != null)
+                            manager.Add((action as GrabActionUnit).objectB, objB);
+
                         // Handle grab action with two GUIDs
                         XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
                         if(grabbable == null)
@@ -113,7 +116,7 @@ namespace VRExplorer
             DestroyImmediate(manager.gameObject);
 
             TaskList tasklist = GetTaskListFromJson(filePath);
-            foreach(var taskUnit in tasklist.taskUnit)
+            foreach(var taskUnit in tasklist.taskUnits)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
@@ -148,7 +151,7 @@ namespace VRExplorer
             base.Start();
             var taskList = GetTaskListFromJson();  // 初始化_taskList
 
-            foreach(var taskUnit in taskList.taskUnit)
+            foreach(var taskUnit in taskList.taskUnits)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
@@ -176,24 +179,6 @@ namespace VRExplorer
         }
     }
 
-    // Supporting classes for JSON deserialization
-    [System.Serializable]
-    public class TaskList
-    {
-        public List<TaskUnit> taskUnit;
-    }
 
-    [System.Serializable]
-    public class TaskUnit
-    {
-        public List<ActionUnit> actionUnits;
-    }
 
-    [System.Serializable]
-    public class ActionUnit
-    {
-        public string type; // "Grab", "Move", "Drop", etc.
-        public string objectA;
-        public string objectB;
-    }
 }

@@ -200,6 +200,12 @@ Describes an **agent-to-object interaction** where the agent grabs, releases, mo
 
 # Changelog
 
+## [1.7.0] - 2025-09-04
+
+### Added
+
+- JSON scripts (ActionUnitConverter, ActionDef, TaskDef for optimize structure of JSON format in test plan)
+
 ## [1.6.6] - 2025-08-22
 
 ### Added
@@ -224,8 +230,6 @@ Describes an **agent-to-object interaction** where the agent grabs, releases, mo
 ### Fixed
 
 - GameObjectConfigManager prefab import & export logic
-
-## [1.5.5] - 2025-06-18
 
 ### Added
 - Support for exporting GameObjects with scripts under the `VRExplorer` namespace only.
