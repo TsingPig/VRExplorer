@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 6133224020162057717}
   - component: {fileID: 8691336054346914301}
   m_Layer: 10
-  m_Name: VRExplorerBox (3)
+  m_Name: VRExplorerBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -22,7 +22,7 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 - 1). The same as VRExplorer Configuration
 - 2). **Test Plan Generation:** LLM + RAG / Manual Setting
 - 3). **Test Plan Import Import**: Tools -> VRExplorer -> Import Test Plan -> Browse ->  Import Test Plan
-- 4). Test Plan Checking: 检查是否在测试的场景中生成 FileIdManager，并且检查ID配置是否正确完整。
+- 4). Test Plan **Checking**: 检查是否在测试的场景中生成 FileIdManager，并且检查ID配置是否正确完整；**同时检查对应的需要测试的物体是否发生变化 （比如已经附加上测试脚本）**
 
 
 
@@ -204,7 +204,7 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 ```json
 {
   "type": "Grab",
-  "source_object_name": "<string>",       // Name of the agent or object initiating the grab
+  "source_object_name": "<string>",       // Name of the source object
   "source_object_fileID": <long>,         // FileID of the source object in the Unity scene file
   "target_position": {                    // Target world position to which the object should be moved
     "x": <float>,
@@ -243,7 +243,8 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 ```json
 {
   "type": "Trigger",
-  "source_object_name": "<string>",        // 触发器所属对象
+  "source_object_name": "<string>",       // Name of the source object
+  "source_object_fileID": <long>,         // FileID of the source object in the Unity scene file
   "method": "<string>",                    // Unity 生命周期或事件方法 (e.g., OnTriggerEnter, Update)
   "condition": "<string>"                  // 触发条件说明（可包含脚本ID、GUID、序列化配置、调用预期行为）
 }

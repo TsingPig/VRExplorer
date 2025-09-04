@@ -17,4 +17,12 @@ namespace VRExplorer.JSON
         [JsonProperty("target_object_fileID")] public string? objectB;
         [JsonProperty("target_position")] public Vector3? targetPosition;
     }
+
+    public class TriggerActionUnit: ActionUnit
+    {
+        [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
+        [JsonProperty("triggerred_events")] public List<eventUnit> triggerredEvents;
+    }
+
+
 }

@@ -137,51 +137,82 @@ namespace VRExplorer
                             AssetDatabase.SaveAssets();
                         }
                     }
+                    else if(action.type == "Trigger")
+                    {
+
+                        TriggerActionUnit triggerAction = action as TriggerActionUnit;
+                        if(triggerAction == null) continue;
+
+                        XRTriggerable triggerable = objA.GetComponent<XRTriggerable>() ?? objA.AddComponent<XRTriggerable>();
+
+                        FileIdResolver.BindEventList(triggerAction.triggerringEvents, triggerable.triggerringEvents);
+                        FileIdResolver.BindEventList(triggerAction.triggerredEvents, triggerable.triggerredEvents);
+
+                        if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                        {
+                            EditorUtility.SetDirty(objA);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
                 }
             }
         }
 
         public static void RemoveTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
         {
-            // 移除临时物体
+            // 移除临时目标物体
             var tempTargets = GameObject.FindGameObjectsWithTag(Str.TempTargetTag);
             foreach(var t in tempTargets)
             {
                 DestroyImmediate(t);
             }
 
-            // 移除场景的FileIdManager
+            // 移除场景的 FileIdManager
             FileIdManagerMono manager = FindObjectOfType<FileIdManagerMono>();
-            DestroyImmediate(manager.gameObject);
+            if(manager != null)
+                DestroyImmediate(manager.gameObject);
 
             TaskList tasklist = GetTaskListFromJson(filePath);
+            if(tasklist == null) return;
+
             foreach(var taskUnit in tasklist.taskUnits)
             {
                 foreach(var action in taskUnit.actionUnits)
                 {
+                    GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
+                    if(objA == null) continue;
+
                     if(action.type == "Grab")
                     {
-                        GameObject objA = FileIdResolver.FindGameObject(action.objectA, useFileID);
-                        if(objA != null)
+                        XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
+                        if(grabbable != null)
                         {
-                            // 直接移除XRGrabbable组件
-                            XRGrabbable grabbable = objA.GetComponent<XRGrabbable>();
-                            Debug.Log(objA.name);
-                            if(grabbable != null)
-                            {
-                                UnityEngine.Object.DestroyImmediate(grabbable, true);
-                                Debug.Log($"Removed XRGrabbable component from {objA.name}");
-
-                                if(PrefabUtility.IsPartOfPrefabAsset(objA))
-                                {
-                                    EditorUtility.SetDirty(objA);
-                                    AssetDatabase.SaveAssets();
-                                }
-                            }
+                            UnityEngine.Object.DestroyImmediate(grabbable, true);
+                            Debug.Log($"Removed XRGrabbable from {objA.name}");
                         }
                     }
-                    // 可以添加其他action类型的移除逻辑
+                    else if(action.type == "Trigger")
+                    {
+                        XRTriggerable triggerable = objA.GetComponent<XRTriggerable>();
+                        if(triggerable != null)
+                        {
+                            // 清空事件列表
+                            triggerable.triggerringEvents.Clear();
+                            triggerable.triggerredEvents.Clear();
+
+                            UnityEngine.Object.DestroyImmediate(triggerable, true);
+                            Debug.Log($"Removed XRTriggerable from {objA.name}");
+
+                        }
+                    }
+
+                    if(PrefabUtility.IsPartOfPrefabAsset(objA))
+                    {
+                        EditorUtility.SetDirty(objA);
+                        AssetDatabase.SaveAssets();
+                    }
                 }
+
             }
         }
 

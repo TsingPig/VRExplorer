@@ -12,7 +12,7 @@ namespace VRExplorer
     public class TestPlanImporterWindow : EditorWindow
     {
         private string filePath = Str.TestPlanPath;
-        private GameObject selectedObject;  // 用于选择场景中的物体
+        private UnityEngine.Object selectedObject;  // 用于选择场景中的物体
 
         [MenuItem("Tools/VR Explorer/Import Test Plan")]
         public static void ShowWindow()
@@ -25,16 +25,16 @@ namespace VRExplorer
             GUILayout.Label("Test Plan Importer", EditorStyles.boldLabel);
 
             // 物体选择器
-            selectedObject = (GameObject)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(GameObject), true);
+            selectedObject = (UnityEngine.Object)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(UnityEngine.Object), true);
 
-            // 打印GUID按钮
-            if(GUILayout.Button("Print Object GUID") && selectedObject != null)
-            {
-                string guid = FileIdResolver.GetObjectGuid(selectedObject);
-                Debug.Log($"GUID for {selectedObject.name}: {guid}");
-                EditorGUIUtility.systemCopyBuffer = guid;  // 复制到剪贴板
-                ShowNotification(new GUIContent($"GUID copied to clipboard: {guid}"));
-            }
+            //// 打印GUID按钮
+            //if(GUILayout.Button("Print Object GUID") && selectedObject != null)
+            //{
+            //    string guid = FileIdResolver.GetObjectGuid(selectedObject);
+            //    Debug.Log($"GUID for {selectedObject.name}: {guid}");
+            //    EditorGUIUtility.systemCopyBuffer = guid;  // 复制到剪贴板
+            //    ShowNotification(new GUIContent($"GUID copied to clipboard: {guid}"));
+            //}
 
             if(GUILayout.Button("Print Object FileID") && selectedObject != null)
             {

@@ -5434,7 +5434,7 @@ GameObject:
   - component: {fileID: 5316981832136713713}
   - component: {fileID: 1110294159016823260}
   m_Layer: 0
-  m_Name: VREscaper
+  m_Name: VRAgent
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

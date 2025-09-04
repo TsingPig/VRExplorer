@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json.Linq;
-using Unity.Plastic.Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace VRExplorer.JSON
 {
-
     public class ActionUnitConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
@@ -19,11 +18,17 @@ namespace VRExplorer.JSON
             string type = jo["type"]?.ToString();
 
             ActionUnit action;
+
             switch(type)
             {
                 case "Grab":
                 action = new GrabActionUnit();
                 break;
+
+                case "Trigger":
+                action = new TriggerActionUnit();
+                break;
+
                 default:
                 action = new ActionUnit();
                 break;
@@ -38,5 +43,4 @@ namespace VRExplorer.JSON
             serializer.Serialize(writer, value);
         }
     }
-
 }
