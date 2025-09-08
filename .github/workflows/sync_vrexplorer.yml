@@ -28,14 +28,15 @@ jobs:
 
       - name: Prepare and sync folder
         run: |
-          set -euo pipefail  # 严格模式：错误、未定义变量、管道失败时终止
+          set -euo pipefail
 
           # 配置变量
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
+          SYNC_BRANCH="sync-branch"
 
-          # 如果是手动触发且未启用 force_sync，检查是否有实际更改
+          # 手动触发时检查 force_sync
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_sync }}" = "false" ]; then
             echo "::notice::Manual trigger detected, checking folder changes..."
             if git diff --quiet HEAD^ -- "$FOLDER_PATH"; then
@@ -44,20 +45,41 @@ jobs:
             fi
           fi
 
-          # 创建临时目录并复制内容
-          TEMP_DIR="$(mktemp -d)"
-          echo "::group::Copying files to temp directory"
-          cp -rv "$FOLDER_PATH/"* "$TEMP_DIR"
-          echo "::endgroup::"
+          # 生成 subtree 分支，包含 FOLDER_PATH 的历史
+          git subtree split --prefix="$FOLDER_PATH" -b "$SYNC_BRANCH"
 
-          # 同步到新仓库
-          cd "$TEMP_DIR"
-          git init -b main
-          git remote add origin "$NEW_REPO_URL"
-          git add .
-          git commit -m "Sync from $FOLDER_PATH (Source: ${{ github.repository }}@${{ github.sha }})"
-          git push origin main --force
+          # 添加目标仓库 remote
+          git remote remove release || true
+          git remote add release "$NEW_REPO_URL"
+
+          # 拉取目标仓库 main 分支，合并历史
+          git fetch release main || true
+          git checkout -B main release/main || git checkout -B main
+          git merge --allow-unrelated-histories "$SYNC_BRANCH" -m "Merge VRExplorer subtree"
+
+          # 推送合并后的 main 分支
+          git push release main
+
+          # 推送所有标签
+          git push release --tags
+
           echo "::notice::Successfully synced to $NEW_REPO_URL"
 
-          # 清理临时目录
-          rm -rf "$TEMP_DIR"
+
+        # # 创建临时目录并复制内容
+        # TEMP_DIR="$(mktemp -d)"
+        # echo "::group::Copying files to temp directory" # 折叠日志
+        # cp -rv "$FOLDER_PATH/"* "$TEMP_DIR"  # 把子目录内容拷贝进去
+        # echo "::endgroup::" 
+
+        # # 同步到新仓库
+        # cd "$TEMP_DIR"
+        # git init -b main
+        # git remote add origin "$NEW_REPO_URL"
+        # git add .
+        # git commit -m "Sync from $FOLDER_PATH (Source: ${{ github.repository }}@${{ github.sha }})"
+        # git push origin main --force
+        # echo "::notice::Successfully synced to $NEW_REPO_URL"
+
+        # # 清理临时目录
+        # rm -rf "$TEMP_DIR"
