@@ -48,31 +48,24 @@ jobs:
           # 生成 subtree 分支，包含 FOLDER_PATH 的历史
           git subtree split --prefix="$FOLDER_PATH" -b "$SYNC_BRANCH"
 
-          # 添加目标仓库 remote
+          # 添加目标仓库 remote（如果已存在则先移除）
           git remote remove release || true
           git remote add release "$NEW_REPO_URL"
 
-          # 拉取目标仓库 main 分支，合并历史
-          git fetch release main || true
-          git checkout -B main release/main || git checkout -B main
-          git merge --allow-unrelated-histories "$SYNC_BRANCH" -m "Merge VRExplorer subtree"
+          # 强制推送到目标仓库 main 分支（覆盖远程，避免冲突）
+          git push release "$SYNC_BRANCH":main --force
 
-          # 推送合并后的 main 分支
-          git push release main
-
-          # 推送所有标签
-          git push release --tags
+          # 推送所有标签（可选）
+          git push release --tags || true
 
           echo "::notice::Successfully synced to $NEW_REPO_URL"
 
-
-        # # 创建临时目录并复制内容
+        # # 备选方案（不用 subtree，直接复制文件方式）
         # TEMP_DIR="$(mktemp -d)"
         # echo "::group::Copying files to temp directory" # 折叠日志
         # cp -rv "$FOLDER_PATH/"* "$TEMP_DIR"  # 把子目录内容拷贝进去
         # echo "::endgroup::" 
-
-        # # 同步到新仓库
+        #
         # cd "$TEMP_DIR"
         # git init -b main
         # git remote add origin "$NEW_REPO_URL"
@@ -80,6 +73,5 @@ jobs:
         # git commit -m "Sync from $FOLDER_PATH (Source: ${{ github.repository }}@${{ github.sha }})"
         # git push origin main --force
         # echo "::notice::Successfully synced to $NEW_REPO_URL"
-
-        # # 清理临时目录
+        #
         # rm -rf "$TEMP_DIR"

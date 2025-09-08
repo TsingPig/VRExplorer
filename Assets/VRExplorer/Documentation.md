@@ -456,6 +456,17 @@ Transform 的核心用途包括：
 
 # Changelog
 
+## [1.7.3] - 2025-09-08
+
+### Added
+- `sampleScene3` for testing
+
+### Updated
+- Optimized **Test Plan documentation** for clearer usage and structure
+
+### Fixed
+- Test Plan path selection issue
+
 ## [1.7.2] - 2025-09-04
 
 ### Added
