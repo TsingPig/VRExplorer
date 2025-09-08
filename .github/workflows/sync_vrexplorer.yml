@@ -19,17 +19,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0   # 保证完整历史
+          fetch-depth: 0  # 确保获取完整历史记录
 
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Push subtree history
+      - name: Prepare and sync folder
         run: |
-          set -euo pipefail
+          set -euo pipefail  # 严格模式：错误、未定义变量、管道失败时终止
 
+          # 配置变量
           FOLDER_PATH="Assets/VRExplorer"
           NEW_REPO="VRExplorer_Release"
           NEW_REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/$NEW_REPO.git"
@@ -43,13 +44,20 @@ jobs:
             fi
           fi
 
-          # 生成 subtree 分支（只包含 FOLDER_PATH 的历史）
-          git subtree split --prefix="$FOLDER_PATH" -b sync-branch
+          # 创建临时目录并复制内容
+          TEMP_DIR="$(mktemp -d)"
+          echo "::group::Copying files to temp directory"
+          cp -rv "$FOLDER_PATH/"* "$TEMP_DIR"
+          echo "::endgroup::"
 
-          # 推送到子仓库 main 分支（保留历史）
-          git push "$NEW_REPO_URL" sync-branch:main
+          # 同步到新仓库
+          cd "$TEMP_DIR"
+          git init -b main
+          git remote add origin "$NEW_REPO_URL"
+          git add .
+          git commit -m "Sync from $FOLDER_PATH (Source: ${{ github.repository }}@${{ github.sha }})"
+          git push origin main --force
+          echo "::notice::Successfully synced to $NEW_REPO_URL"
 
-          # 推送所有标签（避免丢失 tag）
-          git push "$NEW_REPO_URL" --tags
-
-          echo "::notice::Successfully synced subtree ($FOLDER_PATH) + tags to $NEW_REPO_URL"
+          # 清理临时目录
+          rm -rf "$TEMP_DIR"
