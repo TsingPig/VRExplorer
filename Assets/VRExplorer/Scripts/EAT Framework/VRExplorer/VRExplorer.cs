@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace VRExplorer
@@ -101,7 +100,6 @@ namespace VRExplorer
                 await Task.Delay(TimeSpan.FromSeconds(autonomousEventInterval));
             }
         }
-
 
         /// <summary>
         /// 用于执行 AutonomousEvent 的Task

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.Plastic.Newtonsoft.Json;
-using System;
 using UnityEngine;
 
 namespace VRExplorer.JSON
@@ -8,7 +7,7 @@ namespace VRExplorer.JSON
     [JsonConverter(typeof(ActionUnitConverter))] // ÷ß≥÷JSON∂‡Ã¨
     public class ActionUnit
     {
-        public string type; 
+        public string type;
         [JsonProperty("source_object_fileID")] public string objectA;
     }
 
@@ -18,7 +17,7 @@ namespace VRExplorer.JSON
         [JsonProperty("target_position")] public Vector3? targetPosition;
     }
 
-    public class TriggerActionUnit: ActionUnit
+    public class TriggerActionUnit : ActionUnit
     {
         [JsonProperty("triggerring_time")] public float? trigerringTime;
         [JsonProperty("triggerring_events")] public List<eventUnit> triggerringEvents;
@@ -34,6 +33,4 @@ namespace VRExplorer.JSON
         [JsonProperty("delta_rotation")] public Vector3 deltaRotation;
         [JsonProperty("delta_scale")] public Vector3 deltaScale;
     }
-
-
 }

@@ -11,7 +11,7 @@ namespace VRExplorer
 {
     public class TestPlanImporterWindow : EditorWindow
     {
-        private string filePath = Str.TestPlanPath;
+        public static string filePath = null;
         private UnityEngine.Object selectedObject;  // 用于选择场景中的物体
 
         [MenuItem("Tools/VR Explorer/Import Test Plan")]
@@ -66,6 +66,7 @@ namespace VRExplorer
             if(GUILayout.Button("Browse", GUILayout.Width(80)))
             {
                 filePath = EditorUtility.OpenFilePanel("Select Test Plan", "Assets", "json");
+                EditorPrefs.SetString("TestPlanPath", filePath);
             }
             GUILayout.EndHorizontal();
 
@@ -73,8 +74,8 @@ namespace VRExplorer
             // 导入按钮
             if(GUILayout.Button("Import Test Plan"))
             {
-                VRAgent.RemoveTestPlan(filePath);
-                VRAgent.ImportTestPlan(filePath);
+                VRAgent.RemoveTestPlan();
+                VRAgent.ImportTestPlan();
             }
 
             if(GUILayout.Button("Remove Test Plan"))
@@ -83,7 +84,7 @@ namespace VRExplorer
                    "This will remove all components added by the test plan. Continue?",
                    "Yes", "No"))
                 {
-                    VRAgent.RemoveTestPlan(filePath);
+                    VRAgent.RemoveTestPlan();
                 }
             }
         }

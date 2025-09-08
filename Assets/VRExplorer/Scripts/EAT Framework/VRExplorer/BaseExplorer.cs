@@ -164,7 +164,6 @@ namespace VRExplorer
                         // 实验结束后 不选择退出，重置所有状态循环实验
                         ResetExploration();
                     }
-
                 }
             }
         }

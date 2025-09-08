@@ -161,6 +161,5 @@ namespace VRExplorer
 
             Debug.Log($"{Str.DebugTag}All Entities Reset");
         }
-
     }
 }

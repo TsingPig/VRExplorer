@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 
@@ -34,6 +35,6 @@ namespace VRExplorer
             }
         }
     }
-#endif
 
+#endif
 }

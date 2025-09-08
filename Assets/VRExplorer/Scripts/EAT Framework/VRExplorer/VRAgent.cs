@@ -1,14 +1,12 @@
 using System;
-using Unity.Plastic.Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
-using VRExplorer.Mono;
 using VRExplorer.JSON;
-using BNG;
-using Microsoft.SqlServer.Server;
+using VRExplorer.Mono;
 
 namespace VRExplorer
 {
@@ -33,8 +31,9 @@ namespace VRExplorer
             return manager;
         }
 
-        private static TaskList GetTaskListFromJson(string filePath = Str.TestPlanPath)
+        private static TaskList GetTaskListFromJson()
         {
+            string filePath = EditorPrefs.GetString("TestPlanPath", Str.TestPlanPath);
             if(!File.Exists(filePath))
             {
                 Debug.LogError($"Test plan file not found at: {filePath}");
@@ -59,9 +58,9 @@ namespace VRExplorer
             return null;
         }
 
-        public static void ImportTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
+        public static void ImportTestPlan(bool useFileID = true)
         {
-            TaskList tasklist = GetTaskListFromJson(filePath);
+            TaskList tasklist = GetTaskListFromJson();
 
             // 获取场景的FileIdManager
             FileIdManagerMono manager = GetOrCreateManager();
@@ -75,7 +74,6 @@ namespace VRExplorer
 
                     if(objA != null)
                         manager.Add(action.objectA, objA);
-
 
                     if(action.type == "Grab")
                     {
@@ -140,7 +138,6 @@ namespace VRExplorer
                     }
                     else if(action.type == "Trigger")
                     {
-
                         TriggerActionUnit triggerAction = action as TriggerActionUnit;
                         if(triggerAction == null) continue;
 
@@ -182,12 +179,11 @@ namespace VRExplorer
                             AssetDatabase.SaveAssets();
                         }
                     }
-
                 }
             }
         }
 
-        public static void RemoveTestPlan(string filePath = Str.TestPlanPath, bool useFileID = true)
+        public static void RemoveTestPlan(bool useFileID = true)
         {
             // 移除临时目标物体
             var tempTargets = GameObject.FindGameObjectsWithTag(Str.TempTargetTag);
@@ -201,7 +197,7 @@ namespace VRExplorer
             if(manager != null)
                 DestroyImmediate(manager.gameObject);
 
-            TaskList tasklist = GetTaskListFromJson(filePath);
+            TaskList tasklist = GetTaskListFromJson();
             if(tasklist == null) return;
 
             foreach(var taskUnit in tasklist.taskUnits)
@@ -231,7 +227,6 @@ namespace VRExplorer
 
                             UnityEngine.Object.DestroyImmediate(triggerable, true);
                             Debug.Log($"Removed XRTriggerable from {objA.name}");
-
                         }
                     }
                     else if(action.type == "Transform")
@@ -250,14 +245,12 @@ namespace VRExplorer
                         }
                     }
 
-
                     if(PrefabUtility.IsPartOfPrefabAsset(objA))
                     {
                         EditorUtility.SetDirty(objA);
                         AssetDatabase.SaveAssets();
                     }
                 }
-
             }
         }
 
@@ -293,7 +286,4 @@ namespace VRExplorer
         {
         }
     }
-
-
-
 }

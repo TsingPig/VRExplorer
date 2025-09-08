@@ -7,10 +7,12 @@ namespace VRExplorer
     {
         // ´æ GameObject
         public List<string> fileIds = new List<string>();
+
         public List<GameObject> objects = new List<GameObject>();
 
         // ´æ MonoBehaviour
         public List<string> scriptFileIds = new List<string>();
+
         public List<MonoBehaviour> scripts = new List<MonoBehaviour>();
 
         public void Clear()

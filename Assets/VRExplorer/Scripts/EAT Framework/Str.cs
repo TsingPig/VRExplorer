@@ -13,6 +13,6 @@
 
         public const string DebugTag = "VRExplorer Console: ";
         public const string TempTargetTag = "TempTargetTag";
-        public const string TestPlanPath = "Assets/TestPlan_SampleScene2.json";
+        public const string TestPlanPath = "Assets/TestPlan.json";
     }
 }

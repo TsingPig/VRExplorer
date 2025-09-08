@@ -1,9 +1,7 @@
-using BNG;
-using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using VRExplorer;
 
-public class VRExplorerBox : MonoBehaviour, ITriggerableEntity
+public class Box : MonoBehaviour, ITriggerableEntity
 {
     public float TriggeringTime => 0.5f;
 
