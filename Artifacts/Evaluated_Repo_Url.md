@@ -14,6 +14,10 @@ VR-Room: [MdAsimKhan/VR-Room: My first VR project made with Unity XR Interaction
 
 VR-Basics: [Ldragon27/VR-Basics: Part 1 of 3 in Unity's VR Development Corse (github.com)](https://github.com/Ldragon27/VR-Basics)
 
+VRChess: [gromperen/VRChess: VR Chess Game made in Unity using Unity XR Toolkit](https://github.com/gromperen/VRChess)
+
+Parkinson-App-Virtual-Reality: [Carolina-Riddick/Parkinson-App-Virtual-Reality: Virtual Reality environment aimed at enhancing and training motor skills in individuals with Parkinson's disease](https://github.com/Carolina-Riddick/Parkinson-App-Virtual-Reality)
+
 ## Tested & Evaluated Projects' Url
 
 > Note: The forked repository contain our implementation of interfaces. If you want to reproduce the results of our experiments, it's better to use this forked repository
@@ -29,6 +33,10 @@ VR-Adventure: [Anonymized Repository - Anonymous GitHub (4open.science)](https:/
 VR-Room: [[Anonymized Repository - Anonymous GitHub (4open.science)]](https://anonymous.4open.science/r/VR-Room-748B/)
 
 VR-Basics: [Anonymized Repository - Anonymous GitHub (4open.science)](https://anonymous.4open.science/r/VR-Basics-0854/)
+
+VRChess: [Anonymized Repository - Anonymous GitHub](https://anonymous.4open.science/r/VRChess-3650)
+
+Parkinson-App-Virtual-Reality: [Anonymized Repository - Anonymous GitHub](https://anonymous.4open.science/r/Parkinson-App-Virtual-Reality-4A89/README.md)
 
 # Group1 Url
 
