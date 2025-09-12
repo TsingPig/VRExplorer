@@ -7,7 +7,7 @@ namespace VRExplorer.Mono
     {
         public string Name => "Base";
 
-        public bool useGravity = true;
+        //public bool useGravity = true;
         protected XRBaseInteractable _interactable;
         protected XRBaseInteractor _interactor;
 
@@ -19,11 +19,11 @@ namespace VRExplorer.Mono
         protected void Start()
         {
             _interactable = transform.GetComponent<XRBaseInteractable>();
-            if(_interactable == null)
-            {
-                _interactable = gameObject.AddComponent<XRGrabInteractable>();
-                transform.GetComponent<Rigidbody>().useGravity = useGravity;
-            }
+            //if(_interactable == null)
+            //{
+            //    _interactable = gameObject.AddComponent<XRGrabInteractable>();
+            //    transform.GetComponent<Rigidbody>().useGravity = useGravity;
+            //}
             if(_interactor == null) _interactor = gameObject.AddComponent<XRDirectInteractor>();
         }
     }

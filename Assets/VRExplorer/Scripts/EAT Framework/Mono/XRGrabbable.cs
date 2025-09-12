@@ -59,11 +59,14 @@ namespace VRExplorer.Mono
             var e = new SelectEnterEventArgs() { interactorObject = interactor };
             var h = new HoverEnterEventArgs() { interactorObject = interactor };
             var a = new ActivateEventArgs() { interactorObject = interactor };
-            _interactable.selectEntered.Invoke(e);
-            _interactable.hoverEntered.Invoke(h);
-            _interactable.firstSelectEntered.Invoke(e);
-            _interactable.firstHoverEntered.Invoke(h);
-            _interactable.activated.Invoke(a);
+            if(_interactable)
+            {
+                _interactable.selectEntered.Invoke(e);
+                _interactable.hoverEntered.Invoke(h);
+                _interactable.firstSelectEntered.Invoke(e);
+                _interactable.firstHoverEntered.Invoke(h);
+                _interactable.activated.Invoke(a);
+            }
         }
 
         public void OnReleased()
