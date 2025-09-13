@@ -27,14 +27,14 @@ namespace VRExplorer
             // 物体选择器
             selectedObject = (UnityEngine.Object)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(UnityEngine.Object), true);
 
-            //// 打印GUID按钮
-            //if(GUILayout.Button("Print Object GUID") && selectedObject != null)
-            //{
-            //    string guid = FileIdResolver.GetObjectGuid(selectedObject);
-            //    Debug.Log($"GUID for {selectedObject.name}: {guid}");
-            //    EditorGUIUtility.systemCopyBuffer = guid;  // 复制到剪贴板
-            //    ShowNotification(new GUIContent($"GUID copied to clipboard: {guid}"));
-            //}
+            // 打印GUID按钮
+            if(GUILayout.Button("Print Object GUID") && selectedObject != null)
+            {
+                string guid = FileIdResolver.GetObjectGuid(selectedObject as GameObject);
+                Debug.Log($"GUID for {selectedObject.name}: {guid}");
+                EditorGUIUtility.systemCopyBuffer = guid;  // 复制到剪贴板
+                ShowNotification(new GUIContent($"GUID copied to clipboard: {guid}"));
+            }
 
             if(GUILayout.Button("Print Object FileID") && selectedObject != null)
             {

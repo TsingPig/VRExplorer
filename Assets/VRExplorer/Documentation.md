@@ -456,16 +456,19 @@ Transform 的核心用途包括：
 
 # Changelog
 
-## [1.7.3] - 2025-09-08
+## [1.7.4] - 2025-09-12
 
 ### Added
 - `sampleScene3` for testing
 
 ### Updated
 - Optimized **Test Plan documentation** for clearer usage and structure
+- Optimize XRTriggerable by inheriting from XRTransformable
+- Adding Check if-else in XRGrabbable OnGrabbed(); 
 
 ### Fixed
-- Test Plan path selection issue
+- Test Plan path selection issue;
+- Remove add XRGrabinteractable in XRBase Start();
 
 ## [1.7.2] - 2025-09-04
 
