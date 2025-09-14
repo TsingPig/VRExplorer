@@ -26,21 +26,21 @@ namespace VRExplorer
         public void Add(string fileId, GameObject go)
         {
             if(string.IsNullOrEmpty(fileId) || go == null) return;
-            if(!fileIds.Contains(fileId))
-            {
-                fileIds.Add(fileId);
-                objects.Add(go);
-            }
+            //if(!fileIds.Contains(fileId))
+            //{
+            fileIds.Add(fileId);
+            objects.Add(go);
+            //}
         }
 
         public void AddMono(string scriptFileId, MonoBehaviour mono)
         {
             if(string.IsNullOrEmpty(scriptFileId) || mono == null) return;
-            if(!scriptFileIds.Contains(scriptFileId))
-            {
-                scriptFileIds.Add(scriptFileId);
-                scripts.Add(mono);
-            }
+            //if(!scriptFileIds.Contains(scriptFileId))
+            //{
+            scriptFileIds.Add(scriptFileId);
+            scripts.Add(mono);
+            //}
         }
 
         public GameObject GetObject(string fileId)

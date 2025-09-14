@@ -42758,7 +42758,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8080720548095950257}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!136 &4267808211186112318
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -42807,17 +42807,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 957ff6b7ed039c24cbc257fae82183e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reportCoverageDuration: 5
+  reportCoverageDuration: 15
   exitAfterTesting: 1
   leftHandController: {fileID: 1026356573675553863}
   moveSpeed: 6
-  explorationEventFrequency: 0
   randomInitPos: 0
   drag: 1
-  explorationEvents: []
   _areaDiameter: 7.5
   _curTask: []
   _nextMono: {fileID: 0}
+  autonomousEventFrequency: 0
+  autonomousEventInterval: 0.75
+  autonomousEvents: []
 --- !u!65 &3928622045715239325
 BoxCollider:
   m_ObjectHideFlags: 0

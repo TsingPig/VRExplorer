@@ -13,7 +13,7 @@ namespace VRExplorer
     public class VRAgent : BaseExplorer
     {
         private int _index = 0;
-        private List<MonoBehaviour> _monos = new List<MonoBehaviour>();
+        [SerializeField] private List<MonoBehaviour> _monos = new List<MonoBehaviour>();
 
         public bool useFileID = true;
 
@@ -31,9 +31,41 @@ namespace VRExplorer
             return manager;
         }
 
+        private new void Start()
+        {
+            base.Start();
+            var taskList = GetTaskListFromJson();  // 初始化_taskList
+
+            foreach(var taskUnit in taskList.taskUnits)
+            {
+                foreach(var action in taskUnit.actionUnits)
+                {
+                    GameObject objA = FindObjectOfType<FileIdManagerMono>().GetObject(action.objectA);
+                    _monos.Add(objA.GetComponent<MonoBehaviour>());
+                }
+            }
+        }
+
+        protected override void GetNextMono(out MonoBehaviour nextMono)
+        {
+            nextMono = _monos[_index++];
+        }
+
+        protected override async Task SceneExplore()
+        {
+            if(!TestFinished)
+            {
+                await TaskExecutation();
+            }
+        }
+
+        protected override void ResetExploration()
+        {
+        }
+
         private static TaskList GetTaskListFromJson()
         {
-            string filePath = EditorPrefs.GetString("TestPlanPath", Str.TestPlanPath);
+            string filePath = PlayerPrefs.GetString("TestPlanPath", Str.TestPlanPath);
             if(!File.Exists(filePath))
             {
                 Debug.LogError($"Test plan file not found at: {filePath}");
@@ -252,38 +284,6 @@ namespace VRExplorer
                     }
                 }
             }
-        }
-
-        private new void Start()
-        {
-            base.Start();
-            var taskList = GetTaskListFromJson();  // 初始化_taskList
-
-            foreach(var taskUnit in taskList.taskUnits)
-            {
-                foreach(var action in taskUnit.actionUnits)
-                {
-                    GameObject objA = FindObjectOfType<FileIdManagerMono>().GetObject(action.objectA);
-                    _monos.Add(objA.GetComponent<MonoBehaviour>());
-                }
-            }
-        }
-
-        protected override void GetNextMono(out MonoBehaviour nextMono)
-        {
-            nextMono = _monos[_index++];
-        }
-
-        protected override async Task SceneExplore()
-        {
-            if(!TestFinished)
-            {
-                await TaskExecutation();
-            }
-        }
-
-        protected override void ResetExploration()
-        {
         }
     }
 }

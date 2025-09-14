@@ -66,7 +66,7 @@ namespace VRExplorer
             if(GUILayout.Button("Browse", GUILayout.Width(80)))
             {
                 filePath = EditorUtility.OpenFilePanel("Select Test Plan", "Assets", "json");
-                EditorPrefs.SetString("TestPlanPath", filePath);
+                PlayerPrefs.SetString("TestPlanPath", filePath);
             }
             GUILayout.EndHorizontal();
 

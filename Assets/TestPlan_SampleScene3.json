@@ -17,6 +17,22 @@
               ]
             }
           ]
+        },
+        {
+          "type": "Trigger",
+          "triggerring_time": 1,
+          "source_object_fileID": 1448458900,
+          "triggerring_events": [
+            {
+              "methodCallUnits": [
+                {
+                  "script_fileID": 1448458903,
+                  "method_name": "Fire",
+                  "parameter_fileID": []
+                }
+              ]
+            }
+          ]
         }
       ]
     }
