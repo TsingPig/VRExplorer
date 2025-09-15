@@ -13013,6 +13013,7 @@ GameObject:
   - component: {fileID: 1875767444}
   - component: {fileID: 1875767449}
   - component: {fileID: 1875767450}
+  - component: {fileID: 1875767451}
   m_Layer: 10
   m_Name: VRExplorerBox (5)
   m_TagString: Untagged
@@ -13228,6 +13229,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 863ad73ce86b912429a5644514e806f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1875767451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875767441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usePhysicsOnRelease: 0
+  GrabPhysics: 1
+  GrabMechanic: 0
+  destination: {fileID: 64330975}
 --- !u!1 &1924945598
 GameObject:
   m_ObjectHideFlags: 0
@@ -14662,6 +14679,28 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2076594680}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2076594682 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8691336054346914290, guid: 9b375a9a652b05a40aa62f86ba5bfa42,
+    type: 3}
+  m_PrefabInstance: {fileID: 2076594680}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2076594683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076594682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 005b36b8fc16f6649ac98d1464b1c1f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usePhysicsOnRelease: 0
+  GrabPhysics: 1
+  GrabMechanic: 0
+  destination: {fileID: 2088243954}
 --- !u!1 &2079483090
 GameObject:
   m_ObjectHideFlags: 0

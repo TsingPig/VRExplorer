@@ -71,7 +71,7 @@ namespace VRExplorer.Mono
 
         public void OnReleased()
         {
-            if(!usePhysicsOnRelease)
+            if(!usePhysicsOnRelease && Grabbable.gameObject.GetComponent<Rigidbody>())
             {
                 Grabbable.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
             }
