@@ -122,60 +122,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: e5d27ec5484c2074b9b5bf8023b3846b, type: 2}
---- !u!1 &54302890
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 54302892}
-  - component: {fileID: 54302891}
-  m_Layer: 0
-  m_Name: FileIdManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &54302891
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 54302890}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd69f65df1beda44c909e73ec22b9839, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fileIds:
-  - 1448458900
-  - 1760679936
-  objects:
-  - {fileID: 1448458901}
-  - {fileID: 1953890318}
-  scriptFileIds:
-  - 1448458903
-  scripts:
-  - {fileID: 1448458903}
---- !u!4 &54302892
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 54302890}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &389042350
 GameObject:
   m_ObjectHideFlags: 0
@@ -447,38 +393,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
---- !u!114 &1448458907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1448458901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea063aa6194c2234cac095d8da6e035e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useGravity: 1
-  triggerringEvents:
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1448458903}
-        m_TargetAssemblyTypeName: Gun, Test
-        m_MethodName: Fire
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  triggerredEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-  triggeringTime: 1.5
 --- !u!1 &1606089369
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,26 +763,3 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7536e93f5e86cf542ad33bdf02ea7b09, type: 3}
---- !u!1 &1953890318 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8691336054346914290, guid: 9b375a9a652b05a40aa62f86ba5bfa42,
-    type: 3}
-  m_PrefabInstance: {fileID: 1760679936}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1953890324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1953890318}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3b05e8f39c90dc4fad20aaf0100ad81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useGravity: 1
-  triggerringTime: 3
-  deltaRotation: {x: 0, y: 0, z: 0}
-  deltaScale: {x: 1.5, y: 1.5, z: 1.5}
-  deltaPosition: {x: 0, y: 0, z: 0}

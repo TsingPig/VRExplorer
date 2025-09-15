@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace VRExplorer
 {
@@ -10,6 +12,7 @@ namespace VRExplorer
     {
         [SerializeField] private string _name = "BaseAction";
         protected Action _callback = null;
+
 
         public BaseAction(Action callback = null)
         {
@@ -24,5 +27,21 @@ namespace VRExplorer
             await Task.Yield();
             _callback?.Invoke();
         }
+
+        protected void SafeInvokeEvents(IEnumerable<UnityEvent> events)
+        {
+            foreach(var unityEvent in events)
+            {
+                try
+                {
+                    unityEvent?.Invoke();
+                }
+                catch(Exception ex)
+                {
+                    Debug.LogError(ex);
+                }
+            }
+        }
+
     }
 }

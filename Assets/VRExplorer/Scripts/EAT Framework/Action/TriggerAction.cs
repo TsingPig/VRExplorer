@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace VRExplorer
 {
@@ -17,7 +20,6 @@ namespace VRExplorer
     {
         protected float _triggerringTime = 0f;
         protected ITriggerableEntity _triggerableEntity;
-
         public TriggerAction(float triggerringTime, ITriggerableEntity triggerableEntity)
         {
             Name = "TriggerAction";

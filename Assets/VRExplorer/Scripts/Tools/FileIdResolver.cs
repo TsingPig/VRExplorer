@@ -24,7 +24,7 @@ namespace VRExplorer
         /// </summary>
         public static UnityEvent CreateUnityEvent(eventUnit e, bool useFileID = true)
         {
-            var manager = UnityEngine.Object.FindAnyObjectByType<FileIdManagerMono>();
+            var manager = UnityEngine.Object.FindAnyObjectByType<FileIdManager>();
             UnityEvent evt = new UnityEvent();
             if(e.methodCallUnits == null) return evt;
 
@@ -34,24 +34,13 @@ namespace VRExplorer
                     continue;
 
                 MonoBehaviour mono = FindMonoByFileID(methodCallUnit.script);
-                if(mono == null)
-                {
-                    Debug.LogError($"{methodCallUnit}'s script is null");
-                    continue;
-                }
-
-                manager.AddMono(methodCallUnit.script, mono);
-
                 MethodInfo method = mono.GetType().GetMethod(methodCallUnit.methodName,
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-
                 if(method == null)
                 {
                     Debug.LogWarning($"Method {methodCallUnit.methodName} not found on {mono.name}");
                     continue;
                 }
-
 
                 // 方法无参数
                 if(method.GetParameters().Length == 0)
@@ -88,6 +77,7 @@ namespace VRExplorer
                 targetList.Add(CreateUnityEvent(e, useFileID));
             }
         }
+
 
         public static long GetObjectFileID(UnityEngine.Object obj)
         {

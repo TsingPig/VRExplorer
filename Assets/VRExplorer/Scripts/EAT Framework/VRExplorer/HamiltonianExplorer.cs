@@ -7,6 +7,11 @@ namespace VRExplorer
     {
         protected override bool TestFinished => throw new System.NotImplementedException();
 
+        protected override Task RepeatSceneExplore()
+        {
+            throw new System.NotImplementedException();
+        }
+
         //private float[,] distanceMatrix;
         //private List<int> hamiltonianPath;
         //private int curGrabbableIndex = 0;
@@ -122,10 +127,6 @@ namespace VRExplorer
         //    mono = _grabbables[hamiltonianPath[curGrabbableIndex]].GetComponent<MonoBehaviour>();
         //    curGrabbableIndex += 1;
         //}
-        protected override void GetNextMono(out MonoBehaviour mono)
-        {
-            throw new System.NotImplementedException();
-        }
 
         protected override void ResetExploration()
         {
@@ -133,6 +134,11 @@ namespace VRExplorer
         }
 
         protected override Task SceneExplore()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override Task TaskExecutation()
         {
             throw new System.NotImplementedException();
         }
