@@ -456,6 +456,12 @@ Transform 的核心用途包括：
 
 # Changelog
 
+## [1.8.0] - 2025-09-15
+
+### Updated 
+
+- **Restructured VRAgent** design to remove dependency on static Mono layer script bindings
+
 ## [1.7.4] - 2025-09-12
 
 ### Added
@@ -465,6 +471,7 @@ Transform 的核心用途包括：
 - Optimized **Test Plan documentation** for clearer usage and structure
 - Optimize XRTriggerable by inheriting from XRTransformable
 - Adding Check if-else in XRGrabbable OnGrabbed(); 
+- Replace EditorPrefabs with PlayPrefabs for stroing TestPlanPath
 
 ### Fixed
 - Test Plan path selection issue;

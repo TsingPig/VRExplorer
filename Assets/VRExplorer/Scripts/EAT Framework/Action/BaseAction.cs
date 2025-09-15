@@ -13,7 +13,6 @@ namespace VRExplorer
         [SerializeField] private string _name = "BaseAction";
         protected Action _callback = null;
 
-
         public BaseAction(Action callback = null)
         {
             _callback = callback;
@@ -42,6 +41,5 @@ namespace VRExplorer
                 }
             }
         }
-
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TsingPigSDK;
 using UnityEngine;
 using VRExplorer.JSON;
 
@@ -44,6 +43,7 @@ namespace VRExplorer
                 scripts.Add(mono);
             }
         }
+
         public void AddMonos(IEnumerable<eventUnit> eventUnits)
         {
             if(eventUnits == null) return;
@@ -64,7 +64,6 @@ namespace VRExplorer
                 }
             }
         }
-
 
         public GameObject GetObject(string fileId)
         {

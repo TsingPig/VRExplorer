@@ -1,12 +1,8 @@
 using BNG;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using TsingPigSDK;
 using UnityEngine;
 using UnityEngine.AI;
-using Random = UnityEngine.Random;
 
 namespace VRExplorer
 {
@@ -40,6 +36,7 @@ namespace VRExplorer
         [SerializeField] protected List<BaseAction> _curTask = new List<BaseAction>();
 
         #region 场景信息预处理
+
         /// <summary>
         /// 通过获取NavMesh的所有三角形网格顶点坐标，近似每个Mesh的几何中心、场景集合中心
         /// </summary>
@@ -78,7 +75,8 @@ namespace VRExplorer
         /// </summary>
         /// <returns></returns>
         protected abstract Task RepeatSceneExplore();
-        #endregion
+
+        #endregion 场景信息预处理
 
         #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
 
@@ -199,7 +197,8 @@ namespace VRExplorer
             };
             return task;
         }
-        #endregion
+
+        #endregion 任务预定义
 
         protected void Awake()
         {

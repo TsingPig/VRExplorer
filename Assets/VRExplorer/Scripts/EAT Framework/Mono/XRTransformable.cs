@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace VRExplorer.Mono
 {
@@ -17,6 +16,5 @@ namespace VRExplorer.Mono
         public Vector3 DeltaRotation => deltaRotation;
 
         public Vector3 DeltaScale => deltaScale;
-
     }
 }

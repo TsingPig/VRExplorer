@@ -9,6 +9,7 @@ namespace VRExplorer.Mono
 
         //public bool useGravity = true;
         protected XRBaseInteractable _interactable;
+
         protected XRBaseInteractor _interactor;
 
         private void Awake()

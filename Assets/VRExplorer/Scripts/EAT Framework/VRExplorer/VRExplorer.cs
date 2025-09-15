@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TsingPigSDK;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
@@ -72,7 +71,6 @@ namespace VRExplorer
             }
         }
 
-
         /// <summary>
         /// 重复执行场景探索。
         /// 初始时记录场景信息，当结束运行时自动结束异步任务。
@@ -105,9 +103,8 @@ namespace VRExplorer
                 }
             }
         }
+
         #endregion 场景信息预处理（Scene Information Preprocessing)
-
-
 
         protected UnityEvent _nextAutonomousEvent
         {
@@ -245,9 +242,6 @@ namespace VRExplorer
         }
 
         #region 任务预定义（Task Pre-defined）
-
-
-
 
         /// <summary>
         /// Task to approach the gun and fire

@@ -1,9 +1,7 @@
-using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using TsingPigSDK;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
@@ -38,7 +36,6 @@ namespace VRExplorer
         {
             base.Start();
             _taskUnits = GetTaskListFromJson().taskUnits;  // ≥ı ºªØ_taskList
-
             //foreach(var taskUnit in taskList.taskUnits)
             //{
             //    foreach(var action in taskUnit.actionUnits)
@@ -139,7 +136,6 @@ namespace VRExplorer
 
                     if(action.type == "Grab")
                     {
-
                         GrabActionUnit grabAction = action as GrabActionUnit;
                         if(grabAction.objectB != null)
                         {
@@ -158,7 +154,6 @@ namespace VRExplorer
                     }
                     else if(action.type == "Transform")
                     {
-
                     }
                 }
             }
@@ -237,6 +232,8 @@ namespace VRExplorer
 
         private List<BaseAction> TaskGenerator(TaskUnit taskUnit)
         {
+            List<BaseAction> task = new List<BaseAction>();
+
             foreach(var action in taskUnit.actionUnits)
             {
                 GameObject objA = GetOrCreateManager().GetObject(action.objectA);
@@ -247,7 +244,6 @@ namespace VRExplorer
                     if(grabAction == null) continue;
                     XRGrabbable grabbable = objA.AddComponent<XRGrabbable>();
                     Debug.Log($"Added XRGrabbable component to {objA.name}");
-
 
                     if(grabAction.objectB != null)
                     {
@@ -279,15 +275,7 @@ namespace VRExplorer
                     {
                         Debug.LogError("Lacking of Destination");
                     }
-
-                    //// Mark as dirty and save if it's a prefab
-                    //if(PrefabUtility.IsPartOfPrefabAsset(objA))
-                    //{
-                    //    EditorUtility.SetDirty(objA);
-                    //    AssetDatabase.SaveAssets();
-                    //}
-
-                    return GrabTask(grabbable);
+                    task.AddRange(GrabTask(grabbable));
                 }
                 else if(action.type == "Trigger")
                 {
@@ -300,12 +288,7 @@ namespace VRExplorer
                     FileIdResolver.BindEventList(triggerAction.triggerringEvents, triggerable.triggerringEvents);
                     FileIdResolver.BindEventList(triggerAction.triggerredEvents, triggerable.triggerredEvents);
 
-                    return TriggerTask(triggerable);
-                    //if(PrefabUtility.IsPartOfPrefabAsset(objA))
-                    //{
-                    //    EditorUtility.SetDirty(objA);
-                    //    AssetDatabase.SaveAssets();
-                    //}
+                    task.AddRange(TriggerTask(triggerable));
                 }
                 else if(action.type == "Transform")
                 {
@@ -323,16 +306,11 @@ namespace VRExplorer
                     if(transformAction.trigerringTime != null)
                         transformable.triggerringTime = (float)transformAction.trigerringTime;
 
-                    return TransformTask(transformable);
-                    //if(PrefabUtility.IsPartOfPrefabAsset(objA))
-                    //{
-                    //    EditorUtility.SetDirty(objA);
-                    //    AssetDatabase.SaveAssets();
-                    //}
+                    task.AddRange(TransformTask(transformable));
                 }
             }
-            Debug.LogError($"{taskUnit} is null");
-            return null;
+            if(task.Count == 0) Debug.LogError($"{taskUnit} is null");
+            return task;
         }
 
         protected override async Task TaskExecutation()
