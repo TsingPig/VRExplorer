@@ -5432,9 +5432,9 @@ GameObject:
   - component: {fileID: 4933340264323916626}
   - component: {fileID: 8768397333688951990}
   - component: {fileID: 5316981832136713713}
-  - component: {fileID: 1110294159016823260}
+  - component: {fileID: 6214257061678146550}
   m_Layer: 0
-  m_Name: VRAgent
+  m_Name: XRAgent
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5564,7 +5564,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.5, y: 3, z: 2.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1110294159016823260
+--- !u!114 &6214257061678146550
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5573,10 +5573,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1110294159016823261}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e587369f96d5cc45a43e037fd32bb16, type: 3}
+  m_Script: {fileID: 11500000, guid: 89eebbb6ad583cb4f9824e6b99d0fb96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reportCoverageDuration: 15
+  reportCoverageDuration: 50
   exitAfterTesting: 1
   leftHandController: {fileID: 8174785374544425003}
   moveSpeed: 6
@@ -5584,7 +5584,8 @@ MonoBehaviour:
   drag: 0
   _areaDiameter: 7.5
   _curTask: []
-  _nextMono: {fileID: 0}
+  objA: {fileID: 0}
+  objB: {fileID: 0}
   useFileID: 1
 --- !u!1 &1110294159746324248
 GameObject:

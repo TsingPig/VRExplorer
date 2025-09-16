@@ -19,8 +19,16 @@ namespace VRExplorer
         [Range(0f, 3.0f)] public float autonomousEventInterval = 0.75f;
 
         public List<UnityEvent> autonomousEvents = new List<UnityEvent>();
-
-        protected override bool TestFinished => (_autonomousEventsExecuted >= autonomousEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value);
+        protected UnityEvent _nextAutonomousEvent
+        {
+            get
+            {
+                var e = autonomousEvents[_autonomousEventIndex];
+                _autonomousEventIndex = (_autonomousEventIndex + 1) % autonomousEvents.Count;
+                _autonomousEventsExecuted++;
+                return e;
+            }
+        }
 
         #region 场景信息预处理（Scene Information Preprocessing)
 
@@ -71,6 +79,10 @@ namespace VRExplorer
             }
         }
 
+        #endregion 场景信息预处理（Scene Information Preprocessing)
+
+        #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
+
         /// <summary>
         /// 重复执行场景探索。
         /// 初始时记录场景信息，当结束运行时自动结束异步任务。
@@ -104,19 +116,6 @@ namespace VRExplorer
             }
         }
 
-        #endregion 场景信息预处理（Scene Information Preprocessing)
-
-        protected UnityEvent _nextAutonomousEvent
-        {
-            get
-            {
-                var e = autonomousEvents[_autonomousEventIndex];
-                _autonomousEventIndex = (_autonomousEventIndex + 1) % autonomousEvents.Count;
-                _autonomousEventsExecuted++;
-                return e;
-            }
-        }
-
         /// <summary>
         /// 场景探索。
         /// 基于条件分支实现了PFSM
@@ -147,6 +146,37 @@ namespace VRExplorer
                 await TaskExecutation();
             }
         }
+
+        protected override async Task TaskExecutation()
+        {
+            try
+            {
+                GetNextMono(out _nextMono);
+                _curTask = TaskGenerator(_nextMono);
+                Debug.Log(new RichText()
+                    .Add("Mono of Task: ", bold: true)
+                    .Add(_nextMono.name, bold: true, color: Color.yellow));
+                foreach(var action in _curTask)
+                {
+                    await action.Execute();
+                }
+                EntityManager.Instance.UpdateMonoState(_nextMono, true);
+            }
+            catch(Exception except)
+            {
+                Debug.LogError(except.ToString());
+            }
+        }
+       
+        protected override void ResetExploration()
+        {
+            EntityManager.Instance.ResetAllEntites();
+            ResetMonoPos();
+            _autonomousEventIndex = 0;
+            _autonomousEventsExecuted = 0;
+        }
+
+        protected override bool TestFinished => (_autonomousEventsExecuted >= autonomousEvents.Count) && EntityManager.Instance.monoState.Values.All(value => value);
 
         /// <summary>
         /// 任务生成器，通过输入Mono信息，解析Entity标识符名，返回对应的任务模型
@@ -182,13 +212,7 @@ namespace VRExplorer
                 .FirstOrDefault();
         }
 
-        protected override void ResetExploration()
-        {
-            EntityManager.Instance.ResetAllEntites();
-            ResetMonoPos();
-            _autonomousEventIndex = 0;
-            _autonomousEventsExecuted = 0;
-        }
+
 
         /// <summary>
         /// Autonomous Event (如释放技能等无交互对象的事件)的调用
@@ -207,6 +231,10 @@ namespace VRExplorer
             }
         }
 
+        #endregion
+
+        #region 任务预定义（Task Pre-defined）
+
         /// <summary>
         /// 用于执行 AutonomousEvent 的Task
         /// </summary>
@@ -219,29 +247,6 @@ namespace VRExplorer
            };
             return task;
         }
-
-        protected override async Task TaskExecutation()
-        {
-            try
-            {
-                GetNextMono(out _nextMono);
-                _curTask = TaskGenerator(_nextMono);
-                Debug.Log(new RichText()
-                    .Add("Mono of Task: ", bold: true)
-                    .Add(_nextMono.name, bold: true, color: Color.yellow));
-                foreach(var action in _curTask)
-                {
-                    await action.Execute();
-                }
-                EntityManager.Instance.UpdateMonoState(_nextMono, true);
-            }
-            catch(Exception except)
-            {
-                Debug.LogError(except.ToString());
-            }
-        }
-
-        #region 任务预定义（Task Pre-defined）
 
         /// <summary>
         /// Task to approach the gun and fire

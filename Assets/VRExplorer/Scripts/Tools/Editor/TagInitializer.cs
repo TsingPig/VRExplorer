@@ -5,12 +5,17 @@ using UnityEngine;
 
 namespace VRExplorer
 {
+    /// <summary>
+    /// TagInitializer 是一个 Editor 脚本，在 Unity 编辑器加载时自动执行。
+    /// 它用于检查并在项目中添加所需的自定义 Tag，确保在运行时相关功能不会因为缺少 Tag 而报错。
+    /// 例如，VRExplorer 中的临时目标对象会使用 <see cref="Str.Tags.TempTargetTag"/>。
+    /// </summary>
     [InitializeOnLoad]
     public static class TagInitializer
     {
         static TagInitializer()
         {
-            AddTagIfNotExists(Str.TempTargetTag);
+            AddTagIfNotExists(Str.Tags.TempTargetTag);
         }
 
         private static void AddTagIfNotExists(string tag)

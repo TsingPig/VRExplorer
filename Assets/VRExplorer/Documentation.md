@@ -456,35 +456,43 @@ Transform 的核心用途包括：
 
 # Changelog
 
-## [1.8.0] - 2025-09-15
+## [1.8.1] - 2025-09-16
 
 ### Updated 
 
 - **Restructured VRAgent** design to remove dependency on static Mono layer script bindings
+- Optimize codes and files structure
+
+### Feature
+
+- MoveAction Path Checking; 
+
+### Fixed
+
+- Grab target ObjectB catching bugs
+- Task Action Execution Broken bug
+
+### Updated
+
+-  rename VRAgent to XRAgent; Colorful Task Debug
+
+
 
 ## [1.7.4] - 2025-09-12
 
 ### Added
+
+- JSON scripts (ActionUnitConverter, ActionDef, TaskDef for optimize structure of JSON format in test plan)
+- TagInitializer for tag the object that instantiated for temporary usage
+- TriggerActionUnit for Test Plan
 - `sampleScene3` for testing
 
 ### Updated
+
 - Optimized **Test Plan documentation** for clearer usage and structure
 - Optimize XRTriggerable by inheriting from XRTransformable
 - Adding Check if-else in XRGrabbable OnGrabbed(); 
 - Replace EditorPrefabs with PlayPrefabs for stroing TestPlanPath
-
-### Fixed
-- Test Plan path selection issue;
-- Remove add XRGrabinteractable in XRBase Start();
-
-## [1.7.2] - 2025-09-04
-
-### Added
-
-- JSON scripts (ActionUnitConverter, ActionDef, TaskDef for optimize structure of JSON format in test plan)
-
-- TagInitializer for tag the object that instantiated for temporary usage
-- TriggerActionUnit for Test Plan
 
 ### Feature
 
@@ -496,6 +504,8 @@ Transform 的核心用途包括：
 
 - prefab can't be identified when it is on the top-level of the scene
 - XRTriggerable: Triggered Events Execution problem
+- Test Plan path selection issue;
+- Remove add XRGrabinteractable in XRBase Start();
 
 ## [1.6.6] - 2025-08-22
 

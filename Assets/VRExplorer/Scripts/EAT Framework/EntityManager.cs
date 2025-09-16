@@ -54,9 +54,6 @@ namespace VRExplorer
         /// </summary>
         public void RegisterAllEntities()
         {
-            //var entityTypes = Assembly.Load("Test")
-            //    .GetTypes()
-            //    .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
             var entityTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(t => typeof(IBaseEntity).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
@@ -88,7 +85,7 @@ namespace VRExplorer
 
             if(!entityStates.ContainsKey(entity))
             {
-                Debug.Log($"{Str.DebugTag}Entity'{entity.Name}' Registered");
+                Debug.Log($"{Str.Tags.Logs}Entity'{entity.Name}' Registered");
                 entityStates[entity] = new HashSet<Enum>();
 
                 var interfaces = entity.GetType().GetInterfaces();
@@ -159,7 +156,7 @@ namespace VRExplorer
                 monoState[mono] = false;
             }
 
-            Debug.Log($"{Str.DebugTag}All Entities Reset");
+            Debug.Log($"{Str.Tags.Logs}All Entities Reset");
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,6 +25,7 @@ namespace VRExplorer
         public override async Task Execute()
         {
             await base.Execute();
+            NavMeshPath path = new NavMeshPath();
 
             _agent.SetDestination(_destination);
             _agent.speed = _speed;
@@ -31,6 +33,12 @@ namespace VRExplorer
                    (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
             {
                 await Task.Yield();
+            }
+
+            if(!NavMesh.CalculatePath(_agent.transform.position, _destination, NavMesh.AllAreas, path) ||
+                path.status != NavMeshPathStatus.PathComplete)
+            {
+                Debug.LogWarning($"{Str.Tags.HeuristicBugTag}Destination: {_destination} is not reachable on the NavMesh.");
             }
         }
     }

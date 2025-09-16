@@ -40,7 +40,6 @@ namespace VRExplorer
 
         private void Release()
         {
-            Debug.Log("Release");
             _handController.grabber.TryRelease();
             _grabbableEntity.OnReleased();
         }

@@ -1,18 +1,23 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using UnityEditor.SceneManagement;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-
+using Object = UnityEngine.Object;
 namespace VRExplorer
 {
+    /// <summary>
+    /// TestPlanImporterWindow 是一个 Unity 编辑器窗口，
+    /// 用于导入和管理 VRExplorer 的 Test Plan JSON 文件。
+    /// 功能包括：
+    /// 1. 选择场景对象并打印 GUID 或 FileID
+    /// 2. 选择 Test Plan 文件路径
+    /// 3. 导入或移除 Test Plan 对象及其组件
+    /// </summary>
     public class TestPlanImporterWindow : EditorWindow
     {
         public static string filePath = null;
-        private UnityEngine.Object selectedObject;  // 用于选择场景中的物体
+
+        private Object selectedObject;  // 用于选择场景中的物体
 
         [MenuItem("Tools/VR Explorer/Import Test Plan")]
         public static void ShowWindow()
@@ -25,7 +30,7 @@ namespace VRExplorer
             GUILayout.Label("Test Plan Importer", EditorStyles.boldLabel);
 
             // 物体选择器
-            selectedObject = (UnityEngine.Object)EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(UnityEngine.Object), true);
+            selectedObject = EditorGUILayout.ObjectField("Select Object", selectedObject, typeof(UnityEngine.Object), true);
 
             // 打印GUID按钮
             if(GUILayout.Button("Print Object GUID") && selectedObject != null)
@@ -74,8 +79,8 @@ namespace VRExplorer
             // 导入按钮
             if(GUILayout.Button("Import Test Plan"))
             {
-                VRAgent.RemoveTestPlan();
-                VRAgent.ImportTestPlan();
+                XRAgent.RemoveTestPlan();
+                XRAgent.ImportTestPlan();
             }
 
             if(GUILayout.Button("Remove Test Plan"))
@@ -84,7 +89,7 @@ namespace VRExplorer
                    "This will remove all components added by the test plan. Continue?",
                    "Yes", "No"))
                 {
-                    VRAgent.RemoveTestPlan();
+                    XRAgent.RemoveTestPlan();
                 }
             }
         }

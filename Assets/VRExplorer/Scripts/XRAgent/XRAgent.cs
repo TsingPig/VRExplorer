@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using TsingPigSDK;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
@@ -10,15 +11,16 @@ using VRExplorer.Mono;
 
 namespace VRExplorer
 {
-    public class VRAgent : BaseExplorer
+    public class XRAgent : BaseExplorer
     {
         private int _index = 0;
-        private FileIdManager _fileIdManager;
+        private List<TaskUnit> _taskUnits = new List<TaskUnit>();
 
-        [SerializeField] private List<TaskUnit> _taskUnits = new List<TaskUnit>();
+        [Header("Show for Debug")]
+        [SerializeField] private GameObject objA;
+        [SerializeField] private GameObject objB;
+
         public bool useFileID = true;
-
-        protected override bool TestFinished => _index >= _taskUnits.Count;
 
         private static FileIdManager GetOrCreateManager()
         {
@@ -32,21 +34,9 @@ namespace VRExplorer
             return manager;
         }
 
-        private new void Start()
-        {
-            base.Start();
-            _taskUnits = GetTaskListFromJson().taskUnits;  // 初始化_taskList
-            //foreach(var taskUnit in taskList.taskUnits)
-            //{
-            //    foreach(var action in taskUnit.actionUnits)
-            //    {
-            //        GameObject objA = FindObjectOfType<FileIdManagerMono>().GetObject(action.objectA);
-            //        _monos.Add(objA.GetComponent<MonoBehaviour>());
-            //    }
-            //}
-        }
-
         protected TaskUnit NextTask => _taskUnits[_index++];
+
+        #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
 
         /// <summary>
         /// 重复执行场景探索。
@@ -89,9 +79,30 @@ namespace VRExplorer
             }
         }
 
+        protected override async Task TaskExecutation()
+        {
+            _curTask = TaskGenerator(NextTask);
+
+            foreach(var action in _curTask)
+            {
+                try
+                {
+                    await action.Execute();
+                }
+                catch(Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+            }
+
+        }
+
         protected override void ResetExploration()
         {
         }
+        protected override bool TestFinished => _index >= _taskUnits.Count;
+
+        #endregion
 
         private static TaskList GetTaskListFromJson()
         {
@@ -162,7 +173,7 @@ namespace VRExplorer
         public static void RemoveTestPlan(bool useFileID = true)
         {
             // 移除临时目标物体
-            var tempTargets = GameObject.FindGameObjectsWithTag(Str.TempTargetTag);
+            var tempTargets = GameObject.FindGameObjectsWithTag(Str.Tags.TempTargetTag);
             foreach(var t in tempTargets)
             {
                 DestroyImmediate(t);
@@ -234,9 +245,44 @@ namespace VRExplorer
         {
             List<BaseAction> task = new List<BaseAction>();
 
-            foreach(var action in taskUnit.actionUnits)
+            for(int actionIndex = 0; actionIndex < taskUnit.actionUnits.Count; actionIndex++)
             {
-                GameObject objA = GetOrCreateManager().GetObject(action.objectA);
+                var action = taskUnit.actionUnits[actionIndex];
+                var debugText = new RichText()
+                    .Add($"[Task {_index}][Action {actionIndex}] ", color: Color.yellow)
+                    .Add("Type: ", color: Color.yellow)
+                    .Add(action.type ?? "Unknown", color: Color.cyan)
+                    .Add(" | Source: ", color: Color.white)
+                    .Add(action.objectA ?? "null", color: Color.green);
+
+                switch(action)
+                {
+                    case GrabActionUnit grab:
+                    string targetInfo = grab.objectB ?? (grab.targetPosition?.ToString() ?? "null");
+                    debugText.Add(" | Target: ", color: Color.white)
+                             .Add(targetInfo, color: Color.cyan);
+                    break;
+                    case TransformActionUnit transform:
+                    debugText.Add(" | ΔPos: ", color: Color.white)
+                             .Add(transform.deltaPosition.ToString(), color: Color.cyan)
+                             .Add(" | ΔRot: ", color: Color.white)
+                             .Add(transform.deltaRotation.ToString(), color: Color.cyan)
+                             .Add(" | ΔScale: ", color: Color.white)
+                             .Add(transform.deltaScale.ToString(), color: Color.cyan);
+                    break;
+                    case TriggerActionUnit trigger:
+                    int triggingCount = trigger.triggerringEvents?.Count ?? 0;
+                    int trigredCount = trigger.triggerredEvents?.Count ?? 0;
+                    debugText.Add(" | TriggerringEvents: ", color: Color.white)
+                             .Add(triggingCount.ToString(), color: Color.magenta)
+                             .Add(" | TriggerredEvents: ", color: Color.white)
+                             .Add(trigredCount.ToString(), color: Color.magenta);
+                    break;
+                }
+                Debug.Log(debugText);
+
+
+                objA = GetOrCreateManager().GetObject(action.objectA);
 
                 if(action.type == "Grab")
                 {
@@ -247,7 +293,7 @@ namespace VRExplorer
 
                     if(grabAction.objectB != null)
                     {
-                        GameObject objB = FileIdResolver.FindGameObject(grabAction.objectB, useFileID);
+                        objB = GetOrCreateManager().GetObject(grabAction.objectB);
                         grabbable.destination = objB.transform;
                     }
                     else if(grabAction.targetPosition != null)// 使用 Vector3作为 target
@@ -257,11 +303,9 @@ namespace VRExplorer
                         GameObject targetObj = GameObject.Find($"{objA.name}_TargetPosition");
                         if(targetObj == null)
                         {
-                            targetObj = new GameObject($"{objA.name}_TargetPosition_{Str.TempTargetTag}");
+                            targetObj = new GameObject($"{objA.name}_TargetPosition_{Str.Tags.TempTargetTag}");
                             targetObj.transform.position = targetPos;
-
-                            // 给临时目标加标记，方便后续删除
-                            targetObj.tag = Str.TempTargetTag;
+                            targetObj.tag = Str.Tags.TempTargetTag;  // 给临时目标加标记，方便后续删除
                         }
                         else
                         {
@@ -313,21 +357,10 @@ namespace VRExplorer
             return task;
         }
 
-        protected override async Task TaskExecutation()
+        private new void Start()
         {
-            try
-            {
-                _curTask = TaskGenerator(NextTask);
-
-                foreach(var action in _curTask)
-                {
-                    await action.Execute();
-                }
-            }
-            catch(Exception except)
-            {
-                Debug.LogError(except.ToString());
-            }
+            base.Start();
+            _taskUnits = GetTaskListFromJson().taskUnits;  // 初始化_taskList
         }
     }
 }

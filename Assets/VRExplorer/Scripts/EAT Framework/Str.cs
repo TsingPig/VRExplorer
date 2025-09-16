@@ -11,8 +11,13 @@
 
         #endregion Customized
 
-        public const string DebugTag = "VRExplorer Console: ";
-        public const string TempTargetTag = "TempTargetTag";
         public const string TestPlanPath = "Assets/TestPlan.json";
+
+        public static class Tags
+        {
+            public const string TempTargetTag = "TempTargetTag";
+            public const string Logs = "VRAgent Logs: ";
+            public const string HeuristicBugTag = "Heuristic Bug Logs: ";
+        }
     }
 }

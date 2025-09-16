@@ -38,7 +38,7 @@ namespace VRExplorer
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if(method == null)
                 {
-                    Debug.LogWarning($"Method {methodCallUnit.methodName} not found on {mono.name}");
+                    Debug.LogWarning($"{Str.Tags.Logs}Method {methodCallUnit.methodName} not found on {mono.name}");
                     continue;
                 }
 

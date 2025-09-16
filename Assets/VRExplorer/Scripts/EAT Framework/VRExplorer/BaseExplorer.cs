@@ -69,42 +69,7 @@ namespace VRExplorer
             radius = Vector3.Distance(min, max) / 2;
         }
 
-        /// <summary>
-        /// 重复执行场景探索。
-        /// 初始时记录场景信息，当结束运行时自动结束异步任务。
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Task RepeatSceneExplore();
-
         #endregion 场景信息预处理
-
-        #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
-
-        private void OnApplicationQuit()
-        {
-            _applicationQuitting = true;
-        }
-
-        /// <summary>
-        /// 测试结束的标记
-        /// </summary>
-        protected abstract bool TestFinished { get; }
-
-        protected abstract Task TaskExecutation();
-
-        /// <summary>
-        /// 场景探索。
-        /// 基于条件分支实现了PFSM
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Task SceneExplore();
-
-        /// <summary>
-        /// 重新开始试验
-        /// </summary>
-        protected abstract void ResetExploration();
-
-        #endregion 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
 
         #region 任务预定义
 
@@ -200,23 +165,57 @@ namespace VRExplorer
 
         #endregion 任务预定义
 
+        #region 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
+
+        /// <summary>
+        /// 执行场景探索。
+        /// 初始时记录场景信息，当结束运行时自动结束异步任务。
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Task RepeatSceneExplore();
+
+        /// <summary>
+        /// 场景探索
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Task SceneExplore();
+
+        /// <summary>
+        /// 任务执行
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Task TaskExecutation();
+
+        /// <summary>
+        /// 测试结束的标记
+        /// </summary>
+        protected abstract bool TestFinished { get; }
+
+        /// <summary>
+        /// 重新开始试验
+        /// </summary>
+        protected abstract void ResetExploration();
+
+        #endregion 基于行为执行的场景探索（Scene Exploration with Behaviour Executation）
+
         protected void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
 
             EntityManager.Instance.vrexplorerMono = this;
             ExperimentManager.Instance.reportCoverageDuration = reportCoverageDuration;
-            ExperimentManager.Instance.ExperimentFinishEvent += () =>
-            {
-                //ResetMonoPos();
-            };
         }
 
         protected void Start()
         {
             _triangulation = NavMesh.CalculateTriangulation();
             ParseNavMesh(out _sceneCenter, out _areaDiameter, out _meshCenters);
-            Invoke("RepeatSceneExplore", 2f);
+            Invoke("RepeatSceneExplore", 1f);
+        }
+
+        protected void OnApplicationQuit()
+        {
+            _applicationQuitting = true;
         }
     }
 }
