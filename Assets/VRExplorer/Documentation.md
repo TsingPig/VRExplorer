@@ -317,7 +317,7 @@ Both types of events can invoke public functions from Unity scripts, enabling th
 
 #### Requirement for Action Objects
 
-Objects with a `Rigidbody` or `Collider` that can respond to physics or interaction
+Only **public methods of classes that inherit from `MonoBehaviour`** can be invoked and added in `methodCallUnit`
 
 #### Examples
 
