@@ -1,4 +1,4 @@
-# VRExplorer Guidance
+# VRExplorer Guideline
 
  A Model-based Approach for Automated Virtual Reality Scene Exploration and Testing ([TsingPig/VRExplorer_Release (github.com)](https://github.com/TsingPig/VRExplorer_Release))
 
@@ -11,30 +11,30 @@
 - Add the VRExplorer agent prefab to the Package/Prefab Folder for the under-test scenes.
 - Attach predefined scripts in Package/Scripts/EAT Framework/Mono Folder, or select and implement interfaces. 
 
+***
 
-
-# VRAgent Guidance
+# VRAgent Guideline
 
 LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction / Dataset Analysis.
 
-## Configuration
+Configuration
 
-- 1). The same as VRExplorer Configuration
+- 1). Same as **VRExplorer Configuration**
 - 2). **Test Plan Generation:** LLM + RAG / Manual Setting
-- 3). **Test Plan Import Import**: Tools -> VRExplorer -> Import Test Plan -> Browse ->  Import Test Plan
-- 4). Test Plan **Checking**: 检查是否在测试的场景中生成 FileIdManager，并且检查ID配置是否正确完整；**同时检查对应的需要测试的物体是否发生变化 （比如已经附加上测试脚本）**
+- 3). **Test Plan Import:** Tools → VRExplorer → Import Test Plan → Browse → Import Test Plan
+- 4). **Test Plan Checking:** Verify that a **FileIdManager** is generated in the testing scene and that the ID configuration is correct and complete. Also check whether the target objects to be tested have changed (e.g., whether the testing scripts have been attached).
 
+***
 
-
-# Test Plan Format
+# Test Plan Format Guideline
 
 ## Top-Level Structure
 
-- 一个测试计划 (Test Plan) 即等于一个 TaskList类对象，即一个**“任务列表”**。
-- 一个任务列表，包含一个或者多个 taskUnit，即**“任务单元”**。
-- 一个任务单元，包含一个或者多个 actionUnit，即**“动作单元”**，这是执行某个动作的最小单元，比如抓取、触发。
-- Note:
-    - Json格式中允许出现格式规范中的额外字段，但是不允许缺少必要字段。
+- A **Test Plan** corresponds to a `TaskList` class object, i.e., a **“task list.”**
+- A **task list** contains one or more `taskUnit`, i.e., **“taskUnits.”**
+- A **taskUnit** contains one or more `actionUnit`, i.e., **“actionUnits.”** This is the smallest unit of action execution, such as grabbing or triggering.
+- **Note:**
+    - In the JSON format, additional fields beyond the specification are allowed, but required fields must not be omitted.
 
 **JSON format structure**
 
@@ -63,38 +63,42 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
 
 ```
 
+***
+
 ## Event System
 
-在某些交互中，可能需要触发或调用物体脚本上捆绑的公共函数。这类交互对应的动作单元需要包含一个或多个 **事件列表（events）**。事件列表在 Unity 中对应 `List<UnityEvent>`，而每一个事件单元对应 Unity 中的 `UnityEvent`，它是一种支持序列化、可视化（Inspector 窗口中可见）的封装委托（Delegate），用于按顺序调用绑定的函数。每个事件单元包含多个回调函数单元对应 UnityEvent 的一条 Listener，即实际调用的函数。总结如下：
+In some interactions, it may be necessary to trigger or invoke **public** functions bound to object scripts. The corresponding action unit for such interactions must include one or more **event lists**.
+ An event list in Unity corresponds to `List<UnityEvent>`. Each **event unit** corresponds to a single `UnityEvent`, which is a serializable and inspector-visible wrapper of a delegate, used to invoke bound functions in sequence. Each event unit contains multiple **callback function units**, each corresponding to a single UnityEvent listener, i.e., the actual function being invoked.
 
-- 每一个事件列表包含1个或者多个的 eventUnit，即**“事件单元”**。对应`UnityEvent`
-- 每一个事件单元，包含1个或者多个methodCallUnit，即**“回调函数单元”**，它是对应执行到具体函数的最小单元，对应一条Listener
-- 一个事件列表内的多个事件单元宏观上顺序执行；同一个事件单元 里面的多个 回调函数单元在帧内部顺序执行，在宏观上并发；
+Summary:
+
+- Each **event list** contains one or more `eventUnit` (i.e., **“events”**), corresponding to `UnityEvent`.
+- Each **event unit** contains one or more callback function units (i.e., **“methodCallUnit”**), which are the smallest units that execute concrete functions, corresponding to a single UnityEvent listener.
+- Multiple event units in an event list execute sequentially at a macro level; within the same event unit, multiple callback function units execute sequentially within the same frame but are **concurrent at the macro level**.
 
 ``` json
-"events": [                 // 列表
-    // 0个或者若干个事件单元
+"events": [                 // List
+    // Zero or more event units
     {
-      "methodCallUnits": [                // 一个事件单元，包含0个或者多个methodCallUnit
+      "methodCallUnits": [  // One eventUnit, containing zero or more methodCallUnits
         {
-          "script_fileID": <long>,     // 目标脚本的 FileID
-          "method_name": "<string>",     // 要调用的方法名
-          "parameter_fileID": []         // 方法参数的 FileID 列表
+          "script_fileID": <long>,       // FileID of the target script
+          "method_name": "<string>",     // Name of the method to invoke
+          "parameter_fileID": []         // List of FileIDs for method parameters
         }
       ]
     }
-  ]
+]
+
 ```
 
+**Description of `methodCallUnit` fields**
 
-
-**methodCallUnit 字段说明**
-
-| 字段名                           | 类型   | 必填情况                         | 说明                                           |
-| -------------------------------- | ------ | -------------------------------- | ---------------------------------------------- |
-| methodCallUnits.script_fileID    | long   | 必填                             | 目标脚本的 FileID                              |
-| methodCallUnits.method_name      | string | 必填                             | 要调用的方法名                                 |
-| methodCallUnits.parameter_fileID | array  | 必填（截至 v1.7.2 版本必须为空） | 方法参数的 FileID 列表，当前版本不支持参数操作 |
+| Field Name                       | Type   | Requirement                                    | Description                                                  |
+| -------------------------------- | ------ | ---------------------------------------------- | ------------------------------------------------------------ |
+| methodCallUnits.script_fileID    | long   | Required                                       | FileID of the target script                                  |
+| methodCallUnits.method_name      | string | Required                                       | Name of the method to invoke (**function identifier only;** must not include return type, parameters, or qualifiers). |
+| methodCallUnits.parameter_fileID | array  | Required in future (**But must be empty now**) | List of FileIDs for method parameters; parameters not supported in current version |
 
 **Example:**
 
@@ -104,31 +108,50 @@ LLM + VRExplorer to solve the problem that manual efforts in Model Abstraction /
     "methodCallUnits": [
       {
         "script_fileID": 124958031,     
-        "method_name": "OpenTheDoor",     
-        "parameter_fileID": []         
+        "method_name": "OpenTheDoor",     // A wrong format is "OpenTheDoor()" or "OpenTheDoor(...)"
+        "parameter_fileID": []         // must be empty right now
       }
     ]
   }
 ]
 ```
 
+***
+
 ## Interaction Definition
 
 ### Grab
 
-Grab 动作分为两类：**Grab1: 对象到对象（Grab Object to Object）、Grab2: 对象到位置（Grab Object to Position）**。在 JSON 中，这两种 Grab 动作共享部分字段，例如 `type` 和 `source_object_fileID` 总是必填，而 `source_object_name` 可选。两者的区别在于目标字段：对象到对象需要指定目标对象的名称和 FileID，而对象到位置则需要指定目标的空间坐标 `target_position`。通过统一表格展示字段的必填情况，使用者可以清晰了解在不同 Grab 类型下哪些字段必须提供，哪些可以省略，从而正确构建任务或动作 JSON 数据。
+#### Action Definition
 
-| 字段名               | 类型   | 必填情况                | 说明                                                        |
-| -------------------- | ------ | ----------------------- | ----------------------------------------------------------- |
-| type                 | string | 必填                    | 固定为 "Grab"                                               |
-| source_object_name   | string | 非必填                  | 发起抓取对象名称，可选填写                                  |
-| source_object_fileID | long   | 必填                    | 发起抓取对象的 Unity FileID                                 |
-| target_object_name   | string | Grab1 必填/Grab2 非必填 | 被抓取对象名称，仅在 Grab 对象到对象时使用                  |
-| target_object_fileID | long   | Grab1 必填/Grab2 非必填 | 被抓取对象的 Unity FileID，仅在 Grab 对象到对象时使用       |
-| target_position      | object | Grab2 必填/Grab1 非必填 | 目标位置，仅在 Grab 对象到位置时使用，包含 x, y, z 三个字段 |
-| target_position.x    | float  | Grab2 必填              | 目标位置 X 坐标，仅在 Grab 对象到位置时使用                 |
-| target_position.y    | float  | Grab2 必填              | 目标位置 Y 坐标，仅在 Grab 对象到位置时使用                 |
-| target_position.z    | float  | Grab2 必填              | 目标位置 Z 坐标，仅在 Grab 对象到位置时使用                 |
+The **Grab** action is divided into two types:
+
+- **Grab1: Object-to-Object** (Grab Object to Object)
+- **Grab2: Object-to-Position** (Grab Object to Position)
+
+In JSON, these two types share some common fields. For example, `type` and `source_object_fileID` are always required, while `source_object_name` is optional.
+ The difference lies in the target fields:
+
+- **Object-to-Object (Grab1)** requires specifying the target object's name and FileID.
+- **Object-to-Position (Grab2)** requires specifying the spatial coordinates in `target_position`.
+
+By presenting all fields in a unified table with their requirements, users can clearly understand which fields are mandatory or optional under different Grab types, ensuring the correct construction of task or action JSON data.
+
+| Field Name           | Type   | Requirement       | Description                                                  |
+| -------------------- | ------ | ----------------- | ------------------------------------------------------------ |
+| type                 | string | **Required**      | Always fixed as `"Grab"`                                     |
+| source_object_name   | string | Optional          | Name of the source object initiating the grab (optional)     |
+| source_object_fileID | long   | **Required**      | Unity FileID of the source object initiating the grab        |
+| target_object_name   | string | Required in Grab1 | Name of the target object, used only in Object-to-Object (Grab1) |
+| target_object_fileID | long   | Required in Grab1 | Unity FileID of the target object, used only in Object-to-Object (Grab1) |
+| target_position      | object | Required in Grab2 | Target **World Position**, used only in Object-to-Position (Grab2); contains x, y, z |
+| target_position.x    | float  | Required in Grab2 | Target X coordinate, used only in Object-to-Position (Grab2) |
+| target_position.y    | float  | Required in Grab2 | Target Y coordinate, used only in Object-to-Position (Grab2) |
+| target_position.z    | float  | Required in Grab2 | Target Z coordinate, used only in Object-to-Position (Grab2) |
+
+#### Requirement for Action Objects
+
+The **source object** must contain a **`Rigidbody` component** in Unity. Without it, the action cannot be executed correctly. (For Grab1 type, target object does not need to meet this condition)
 
 #### Grab1 — Grab Object to Object
 
@@ -171,16 +194,12 @@ Grab 动作分为两类：**Grab1: 对象到对象（Grab Object to Object）、
 }
 ```
 
-> **Notes**:
->
-> - 其中 source_object_name 和 target_object_name为非必要字段
-> - Typically used when the agent directly manipulates a specific object.
-
 ------
 
 **Grab1_Example2**
 
-下面这种写法包含一个任务，这个任务包含两个 Grab动作。当然也可以写成另一种形式（包含两个任务，每一个任务包含一个动作）。
+The following example defines **one task** that contains **two Grab actions**.
+ Alternatively, it can also be written in another form: **two tasks**, each containing **one Grab action**.
 
 ```json
 {
@@ -203,7 +222,8 @@ Grab 动作分为两类：**Grab1: 对象到对象（Grab Object to Object）、
 }
 ```
 
-另一种格式 （实际上这两种写法等效，只不过在 JSON 组织的逻辑上可读性不一样。更建议写成后者。
+Another format (functionally equivalent, but with a different JSON organization for better readability).
+ The latter form is **recommended**.
 
 ```json
 {
@@ -245,61 +265,72 @@ Grab 动作分为两类：**Grab1: 对象到对象（Grab Object to Object）、
 }
 ```
 
-
-
-
+***
 
 ###  Trigger
 
-Trigger 描述 **交互动作中的触发过程**，主要用于模拟玩家在 VR 场景中对物体的交互，例如点击按钮、拉动拉杆或触发某个状态变化。
+#### Action Definition
 
-Trigger 动作基于框架的事件系统，支持 **触发过程事件（triggerring_events）** 和 **完成后事件（triggerred_events）**，两类事件均可调用 Unity 脚本中的公共函数。通过这种方式能够组合实现对复杂函数逻辑的调用。
+A **Trigger** describes the **triggering process of an interactive action**, mainly used to simulate how a player interacts with objects in a VR scene — for example, pressing a button, pulling a lever, or causing a state change.
+
+The Trigger action is based on the framework’s **event system** and supports two types of events:
+
+- **Triggering events (`triggerring_events`)**: events executed during the trigger process
+- **Triggered events (`triggerred_events`)**: events executed after the trigger is completed
+
+Both types of events can invoke public functions from Unity scripts, enabling the composition of more complex function logic.
 
 ```json
 {
   "type": "Trigger",
-  "source_object_name": "<string>",       // 触发事件的源对象名称
-  "triggerring_time": <float>, 			  // 触发的持续时间
-  "source_object_fileID": <long>,         // Unity 场景文件中源对象的 FileID
-  "condition": "<string>",                // 触发条件说明（可包含脚本ID、GUID、序列化配置、调用预期行为）
-  "triggerring_events": [                 // Trigger过程中的事件列表
-    // 0个或者若干个事件单元
+  "source_object_name": "<string>",       // Name of the source object triggering the event
+  "triggerring_time": <float>,            // Duration of the triggering process (seconds)
+  "source_object_fileID": <long>,         // FileID of the source object in the Unity scene
+  "condition": "<string>",                // Condition for triggering (may include script ID, GUID, serialized config, or expected behavior)
+  "triggerring_events": [                 // List of events during the trigger process
+    // Zero or more event units
     {
-      "methodCallUnits": [                // 一个事件单元，包含0个或者多个methodCallUnit
+      "methodCallUnits": [                // One event unit, containing zero or more methodCallUnits
         {
-          "script_fileID": <long>,     // 目标脚本的 FileID
-          "method_name": "<string>",     // 要调用的方法名
-          "parameter_fileID": []         // 方法参数的 FileID 列表
+          "script_fileID": <long>,        // FileID of the target script
+          "method_name": "<string>",      // Name of the method to invoke (identifier only, no return type or parameters)
+          "parameter_fileID": []          // List of FileIDs for method parameters
         }
       ]
     }
   ],
-  "triggerred_events": [                  //  Trigger完成后的事件列表
-    	// 0个或者若干个事件单元
+  "triggerred_events": [                  // List of events after the trigger completes
+    // Zero or more event units
   ]
 }
-
 ```
 
-| 字段名               | 类型   | 必填情况 | 说明                                           |
-| -------------------- | ------ | -------- | ---------------------------------------------- |
-| type                 | string | 必填     | 固定为 `"Trigger"`                             |
-| source_object_name   | string | 非必填   | 源对象名称                                     |
-| source_object_fileID | long   | 必填     | Unity 场景文件中源对象的 FileID                |
-| condition            | string | 非必填   | 触发条件说明                                   |
-| triggerring_time     | float  | 必填     | 触发过程持续时间（秒）                         |
-| triggerring_events   | array  | 非必填   | 触发过程中的事件列表，序列化为 UnityEvent 列表 |
-| triggerred_events    | array  | 非必填   | 触发完成后的事件列表，序列化为 UnityEvent 列表 |
+| Field Name           | Type   | Requirement  | Description                                                  |
+| -------------------- | ------ | ------------ | ------------------------------------------------------------ |
+| type                 | string | **Required** | Always fixed as `"Trigger"`                                  |
+| source_object_name   | string | Optional     | Name of the source object                                    |
+| source_object_fileID | long   | **Required** | FileID of the source object in the Unity scene               |
+| condition            | string | Optional     | Description of the triggering condition                      |
+| triggerring_time     | float  | **Required** | Duration of the triggering process (in seconds)              |
+| triggerring_events   | array  | Optional     | Event list during the trigger process, serialized as UnityEvents |
+| triggerred_events    | array  | Optional     | Event list after the trigger completes, serialized as UnityEvents |
+
+#### Requirement for Action Objects
+
+Objects with a `Rigidbody` or `Collider` that can respond to physics or interaction
 
 #### Examples
 
 **Example1**
 
-下面的例子中包含了一个Trigger任务，其中triggerring_events 包含两个 eventUnit，每个eventUnit包含一个methodCallUnit；triggerred_events包含一个eventUnit，它拥有两个methodCallUnit。
+The following example illustrates a **Trigger** task. In this task:
 
-Triggerring过程中的事件：换弹 -> 开火
+- `triggerring_events` contains two **eventUnits**, each of which contains one **methodCallUnit**.
+- `triggerred_events` contains one **eventUnit**, which includes two **methodCallUnits** executed simultaneously.
 
-Triggerred完成后的事件：换弹 + 换弹（同时）
+**Events during the triggering process:** Reload → Fire
+
+**Events after the trigger is completed:** Reload + Reload (simultaneously)
 
 ```json
 {
@@ -353,77 +384,83 @@ Triggerred完成后的事件：换弹 + 换弹（同时）
 }
 ```
 
-
+***
 
 ### Transform Definition
 
-Transform 描述 **物体的平移、旋转、缩放变换操作**，用于在动作单元中实现物体状态的增量调整（delta）。
+#### Action Definition
 
-- 所有字段均为 **偏移量**，例如让物体 Y 轴缩放 1.1 倍，则 `delta_scale.y` 设置为 0.1，而非绝对值。
-- Transform 动作继承 Trigger 的事件设计，支持 **事件列表（triggerring_events）** 和 **完成后事件列表（triggerred_events）**，可在变换执行过程中或结束后触发物体脚本中的函数。
-- `trigger_time` 指定动作持续时间，实现平滑过渡。
+A **Transform** describes **translation, rotation, and scale operations** on an object, used to implement incremental adjustments (delta) of object states within an action unit.
 
-Transform 的核心用途包括：
+- All fields represent **offsets**. For example, to scale an object along the Y-axis by 1.1×, set `delta_scale.y` to `0.1` rather than the absolute value.
+- Transform actions inherit the **event system design** from Trigger, supporting **triggering events (`triggerring_events`)** and **triggered events (`triggerred_events`)**, which can invoke functions on the object’s Unity scripts during or after the transform.
+- `triggerring_time` specifies the action duration, allowing smooth transitions.
 
-1. **动态调整物体状态**：例如平移、旋转、缩放，实现动画效果或交互反馈。
-2. **触发脚本行为**：通过事件列表调用绑定在 Unity 脚本上的方法，支持复杂动作与交互逻辑。
-3. **增量式控制**：偏移量设计允许动作单元相对于当前状态进行调整，无需知道物体绝对位置、旋转或缩放。
+Core purposes of Transform include:
+
+1. **Dynamic object state adjustment** — e.g., translation, rotation, scaling to achieve animation or interactive feedback.
+2. **Script behavior triggering** — calling methods bound in Unity scripts via event lists, supporting complex action and interaction logic.
+3. **Incremental control** — the offset design allows action units to adjust relative to the current state, without needing absolute position, rotation, or scale.
 
 ```json
 {
   "type": "Transform",
-  "source_object_name": "<string>",        // 目标对象名称
-  "source_object_fileID": <long>,          // Unity 场景中对象的 FileID
-  "target_position": {                     // 位置delta量
+  "source_object_name": "<string>",        // Name of the target object
+  "source_object_fileID": <long>,          // FileID of the target object in the Unity scene
+  "target_position": {                     // Position delta (offset)
     "x": <float>,
     "y": <float>,
     "z": <float>
   },
-  "target_rotation": {                     // 旋转delta量
+  "target_rotation": {                     // Rotation delta (offset)
     "x": <float>,
     "y": <float>,
     "z": <float>
   },
-  "target_scale": {                        // 缩放delta量
+  "target_scale": {                        // Scale delta (offset)
     "x": <float>,
     "y": <float>,
     "z": <float>
   },
-  "triggerring_events": [                 // Trigger过程中的事件列表
-        // 0个或者若干个事件单元
+  "triggerring_events": [                  // List of events during the triggering process
+    // Zero or more event units
+    {
+      "methodCallUnits": [                 // One event unit, containing zero or more methodCallUnits
         {
-          "methodCallUnits": [                // 一个事件单元，包含0个或者多个methodCallUnit
-            {
-              "script_fileID": <long>,     // 目标脚本的 FileID
-              "method_name": "<string>",     // 要调用的方法名
-              "parameter_fileID": []         // 方法参数的 FileID 列表
-            }
-          ]
+          "script_fileID": <long>,        // FileID of the target script
+          "method_name": "<string>",       // Name of the method to invoke
+          "parameter_fileID": []           // List of FileIDs for method parameters
         }
-      ],
-  "triggerred_events": [                  //  Trigger完成后的事件列表
-            // 0个或者若干个事件单元
-      ],
-  "triggerring_time": <float>                  // 动作持续时间
+      ]
+    }
+  ],
+  "triggerred_events": [                   // List of events after the trigger completes
+    // Zero or more event units
+  ],
+  "triggerring_time": <float>              // Duration of the action (in seconds)
 }
 
 ```
 
-| 字段名               | 类型   | 必填情况                                             | 说明                                           |
-| -------------------- | ------ | ---------------------------------------------------- | ---------------------------------------------- |
-| type                 | string | 必填                                                 | 固定为 "Transform"                             |
-| source_object_name   | string | 非必填                                               | 目标对象名称，可选填写                         |
-| source_object_fileID | long   | 必填                                                 | Unity 场景中对象的 FileID                      |
-| delta_position       | object | 必填，不需要时需填0占位，后续同理                    | 位置增量，包含 x, y, z 三个 float 字段         |
-| delta_rotation       | object | 必填                                                 | 旋转增量，包含 x, y, z 三个 float 字段         |
-| delta_scale          | object | 必填                                                 | 缩放增量，包含 x, y, z 三个 float 字段         |
-| triggerring_events   | array  | 非必填触发过程中的事件列表，序列化为 UnityEvent 列表 | 触发过程中的事件列表，序列化为 UnityEvent 列表 |
-| triggerred_events    | array  | 非必填                                               | 触发过程后的事件列表，序列化为 UnityEvent 列表 |
-| triggerring_time     | float  | 必填                                                 | 动作持续时间（秒）                             |
+| Field Name           | Type   | Requirement / Notes                                          | Description                                                  |
+| -------------------- | ------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| type                 | string | **Required**                                                 | Fixed as `"Transform"`                                       |
+| source_object_name   | string | Optional                                                     | Name of the target object                                    |
+| source_object_fileID | long   | **Required**                                                 | FileID of the target object in the Unity scene               |
+| delta_position       | object | Required; use zero values if no movement (same for other delta fields) | Position offset, containing x, y, z float fields             |
+| delta_rotation       | object | **Required**                                                 | Rotation offset, containing x, y, z float fields             |
+| delta_scale          | object | **Required**                                                 | Scale offset, containing x, y, z float fields                |
+| triggerring_events   | array  | Optional; list of events during the transform process, serialized as UnityEvent | Events executed during the transform process, serialized as UnityEvent list |
+| triggerred_events    | array  | Optional                                                     | Events executed after the transform completes, serialized as UnityEvent list |
+| triggerring_time     | float  | **Required**                                                 | Duration of the transform action (in seconds)                |
+
+#### Requirement for Action Objects
+
+The **source object** must contain a **`Collider` component** in Unity, that can respond to physics or interaction.
 
 #### Examples
 
-**Example1:** 能够在3秒内让对应的物体变成原来的 1.5倍大，其delta值为0.5
+**Example1:** The following example scales the target object to **1.5× its original size within 3 seconds**, with a delta value of `0.5`:
 
 ```json
 {

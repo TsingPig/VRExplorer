@@ -100,6 +100,7 @@ namespace VRExplorer
         protected override void ResetExploration()
         {
         }
+
         protected override bool TestFinished => _index >= _taskUnits.Count;
 
         #endregion
