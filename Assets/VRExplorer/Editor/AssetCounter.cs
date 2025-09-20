@@ -3,7 +3,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class AssetCounter : MonoBehaviour
+# if UNITY_EDITOR
+public class AssetCounter 
 {
     [MenuItem("Tools/VR Explorer/Count Project Files %#&c")] // Shift + Ctrl + Alt + C
     public static void CountAllAssets()
@@ -93,3 +94,4 @@ public class AssetCounter : MonoBehaviour
         return allFiles.Count();
     }
 }
+#endif

@@ -1,0 +1,17 @@
+{
+    "name": "VRExplorer.Core",
+    "rootNamespace": "",
+    "references": [
+        "GUID:424c495574460bc488f3401ed7984e87",
+        "GUID:2ae675fa5e1100441be0ade0dd1aa277"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
