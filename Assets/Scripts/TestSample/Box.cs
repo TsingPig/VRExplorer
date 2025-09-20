@@ -1,5 +1,5 @@
 using UnityEngine;
-using VRExplorer;
+using HenryLab;
 
 public class Box : MonoBehaviour, ITriggerableEntity
 {

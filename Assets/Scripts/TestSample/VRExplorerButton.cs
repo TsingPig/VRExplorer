@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.Events;
-using VRExplorer;
+using HenryLab;
 
 public class VRExplorerButton : MonoBehaviour, ITriggerableEntity
 {
