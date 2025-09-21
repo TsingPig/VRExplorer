@@ -1,4 +1,5 @@
 using UnityEngine;
+
 namespace HenryLab
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour, new()

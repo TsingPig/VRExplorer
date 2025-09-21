@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+
 namespace HenryLab
 {
     public class XRBase : MonoBehaviour, IBaseEntity

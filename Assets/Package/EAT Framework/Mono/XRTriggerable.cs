@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
+
 namespace HenryLab
 {
     public class XRTriggerable : XRBase, ITriggerableEntity

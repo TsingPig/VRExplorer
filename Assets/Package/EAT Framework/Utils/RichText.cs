@@ -1,8 +1,8 @@
 using System.Text;
 using UnityEngine;
+
 namespace HenryLab
 {
-
     public class RichText
     {
         private StringBuilder _textBuilder;

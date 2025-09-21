@@ -1,4 +1,5 @@
 using UnityEngine;
+
 namespace HenryLab
 {
     public class XRTransformable : XRTriggerable, ITransformableEntity

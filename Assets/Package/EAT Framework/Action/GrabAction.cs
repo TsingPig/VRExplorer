@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
 namespace HenryLab
 {
     using HandController = BNG.HandController;

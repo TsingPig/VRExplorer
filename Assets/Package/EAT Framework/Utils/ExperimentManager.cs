@@ -3,7 +3,6 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UnityEditor.TestTools.CodeCoverage;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -67,7 +66,7 @@ namespace HenryLab
             Debug.Log(metricInfo);
 
             _csvDataBuilder.AppendLine($"{Time.time - _timeStamp},{TriggeredStateCount},{StateCount},{CoveredInteractableCount},{InteractableCount},{CoveredInteractableCount * 100f / InteractableCount:F2},{TriggeredStateCount * 100f / StateCount:F2}");
-            CodeCoverage.GenerateReportWithoutStopping();
+            // CodeCoverage.GenerateReportWithoutStopping();  Had Removed Code Coverage(revised version) from Framwork
         }
 
         private void OnApplicationQuit()
