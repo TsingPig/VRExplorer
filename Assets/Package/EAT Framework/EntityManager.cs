@@ -84,7 +84,7 @@ namespace HenryLab
 
             if(!entityStates.ContainsKey(entity))
             {
-                Debug.Log($"{Str.Tags.Logs}Entity'{entity.Name}' Registered");
+                Debug.Log($"{Str.Tags.LogsTag}Entity'{entity.Name}' Registered");
                 entityStates[entity] = new HashSet<Enum>();
 
                 var interfaces = entity.GetType().GetInterfaces();
@@ -155,7 +155,7 @@ namespace HenryLab
                 monoState[mono] = false;
             }
 
-            Debug.Log($"{Str.Tags.Logs}All Entities Reset");
+            Debug.Log($"{Str.Tags.LogsTag}All Entities Reset");
         }
     }
 }

@@ -37,7 +37,7 @@ namespace HenryLab
             if(!NavMesh.CalculatePath(_agent.transform.position, _destination, NavMesh.AllAreas, path) ||
                 path.status != NavMeshPathStatus.PathComplete)
             {
-                Debug.LogWarning($"{Str.Tags.HeuristicBugTag}Destination: {_destination} is not reachable on the NavMesh.");
+                Debug.LogWarning($"{Str.Tags.LogsTag}{Str.Tags.HeuristicBugTag}Destination: {_destination} is not reachable on the NavMesh.");
             }
         }
     }

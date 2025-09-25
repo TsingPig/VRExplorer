@@ -1,6 +1,6 @@
 ﻿namespace HenryLab
 {
-    public static class Str
+    public static partial class Str
     {
         #region Customized
 
@@ -16,7 +16,7 @@
         public static class Tags
         {
             public const string TempTargetTag = "TempTargetTag";
-            public const string Logs = "VRAgent Logs: ";
+            public const string LogsTag = "[HenryLab.XR]";
             public const string HeuristicBugTag = "Heuristic Bug Logs: ";
         }
     }
