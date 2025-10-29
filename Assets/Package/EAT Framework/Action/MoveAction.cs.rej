@@ -1,0 +1,37 @@
+diff a/Assets/Package/EAT Framework/Action/MoveAction.cs b/Assets/Package/EAT Framework/Action/MoveAction.cs	(rejected hunks)
+@@ -26,18 +26,27 @@
+             await base.Execute();
+             NavMeshPath path = new NavMeshPath();
+ 
+-            _agent.SetDestination(_destination);
+-            _agent.speed = _speed;
+-            while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh &&
+-                   (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
+-            {
+-                await Task.Yield();
+-            }
+-
++            // �ȼ��·���ɴ���
+             if(!NavMesh.CalculatePath(_agent.transform.position, _destination, NavMesh.AllAreas, path) ||
+                 path.status != NavMeshPathStatus.PathComplete)
+             {
+                 Debug.LogWarning($"{Str.Tags.LogsTag}{Str.Tags.HeuristicBugTag}Destination: {_destination} is not reachable on the NavMesh.");
++                return;
++            }
++
++            // ������Ŀ��
++            if(!_agent.SetDestination(_destination))
++            {
++                Debug.LogWarning($"{Str.Tags.LogsTag} SetDestination failed for {_destination}");
++                return;
++            }
++            _agent.speed = _speed;
++
++            // �ȴ�����
++            while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh &&
++                  (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
++            {
++                await Task.Yield();
+             }
+         }
+     }

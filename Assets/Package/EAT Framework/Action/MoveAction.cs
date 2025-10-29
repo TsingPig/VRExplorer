@@ -25,24 +25,21 @@ namespace HenryLab
         {
             await base.Execute();
             NavMeshPath path = new NavMeshPath();
-
-            if(!NavMesh.CalculatePath(_agent.transform.position, _destination, NavMesh.AllAreas, path) ||
-                path.status != NavMeshPathStatus.PathComplete)
-            {
-                Debug.LogWarning($"{Str.Tags.LogsTag}{Str.Tags.HeuristicBugTag}Destination: {_destination} is not reachable on the NavMesh.");
-                return;
-            }
-
-            if(!_agent.SetDestination(_destination))
-            {
-                Debug.LogWarning($"{Str.Tags.LogsTag} SetDestination failed for {_destination}");
-                return;
-            }
+            _agent.SetDestination(_destination);
             _agent.speed = _speed;
+            while(_agent.pathPending)
+                await Task.Yield();
 
+            float startTime = Time.time;
+            const float maxWaitTime = 30f;
             while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh &&
-                  (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
+                   (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
             {
+                if(Time.time - startTime > maxWaitTime)
+                {
+                    Debug.LogError($"{Str.Tags.LogsTag} Movement timed out.");
+                    break;
+                }
                 await Task.Yield();
             }
         }
