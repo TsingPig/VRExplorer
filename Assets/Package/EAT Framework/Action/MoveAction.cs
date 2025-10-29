@@ -24,7 +24,14 @@ namespace HenryLab
         public override async Task Execute()
         {
             await base.Execute();
+
             NavMeshPath path = new NavMeshPath();
+            if(!NavMesh.CalculatePath(_agent.transform.position, _destination, NavMesh.AllAreas, path) ||
+                path.status != NavMeshPathStatus.PathComplete)
+            {
+                Debug.LogWarning($"{Str.Tags.LogsTag} Destination {_destination} may not be reachable, but will try");
+            }
+
             _agent.SetDestination(_destination);
             _agent.speed = _speed;
             while(_agent.pathPending)
@@ -32,12 +39,13 @@ namespace HenryLab
 
             float startTime = Time.time;
             const float maxWaitTime = 30f;
+
             while(_agent && _agent.isActiveAndEnabled && _agent.isOnNavMesh &&
                    (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance))
             {
                 if(Time.time - startTime > maxWaitTime)
                 {
-                    Debug.LogError($"{Str.Tags.LogsTag} Movement timed out.");
+                    Debug.LogError($"{Str.Tags.LogsTag} Movement of Destination {_destination} timed out");
                     break;
                 }
                 await Task.Yield();
