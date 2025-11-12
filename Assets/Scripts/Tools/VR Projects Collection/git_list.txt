@@ -1,8 +1,4 @@
 https://github.com/EliaFantini/RocketMan-a-VR-videogame-created-with-Unity
-https://github.com/Starvinci/VR-Adventure
-https://github.com/Ldragon27/VR-Basics
-https://github.com/DoctorBlobs/VGuns-Unity-VR
-https://github.com/MdAsimKhan/VR-Room
 https://github.com/Tonheim-Halvorsen-Unity-Development/Edutainment-Escape-Room
 https://github.com/dilmerv/XRToolkitMVP
 https://github.com/TheoCrd/La-volonte-de-fer
@@ -14,7 +10,6 @@ https://github.com/Priyanshu-CODERX/Unity-XR-Interaction-Toolkit-VR-Mechanisms
 https://github.com/LinceWorks/SimpleVR
 https://github.com/dscpesu/EscapeQuest
 https://github.com/maslychm/vr_selection
-https://github.com/PontusAhlin/HorrorGame
 https://github.com/oscardelgado02/AI-NPC-in-VR-Prototype
 https://github.com/chubozeko/The-Art-Inspector
 https://github.com/eisclimber/ExPresS-XR
@@ -32,7 +27,6 @@ https://github.com/williamdsw/classroom-vr
 https://github.com/ShabanDev-47/GAS_VR
 https://github.com/AlfafaWolf/VR-Workshop
 https://github.com/Shounary/LightDiskVR
-https://github.com/GatienVilain/EscapeGameVR
 https://github.com/NeonVhenan/Arcadium
 https://github.com/France30/GOON
 https://github.com/rwthlfi/vr-brush

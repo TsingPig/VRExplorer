@@ -2,14 +2,17 @@ import os
 import subprocess
 
 # 定义存放仓库的目标文件夹路径
-target_directory = "D:\--UnityProject\VR\VRExplorer_projects_dataset"
+target_directory = "E:/Unity/Unity Project"
 
 # 确保目标文件夹存在
 if not os.path.exists(target_directory):
     os.makedirs(target_directory)
 
 # 仓库列表文件路径
-file_path = "git_list.txt"  # 假设你的文件名是 repos_list.txt
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 目标文件是脚本上级目录下的 git_list.txt
+file_path = os.path.join(current_dir, "git_list.txt")
 
 # def clone_repo(repo_url):
 #     try:
