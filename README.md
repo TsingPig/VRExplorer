@@ -1,7 +1,8 @@
 # VRExplorer
 
-VRExplorer: A Model-based Approach for Semi-Automated Testing of Virtual Reality Scenes (ASE '25) [PDF](https://tsingpig.github.io/files/VRExplorer__A_Model_based_Approach_for_Semi-Automated_Testing_of_Virtual_Reality_Scenes.pdf)
-
+VRExplorer: A Model-based Approach for Semi-Automated Testing of Virtual Reality Scenes (ASE '25) 
+[PDF (Homepage Website Ver.)](https://tsingpig.github.io/files/VRExplorer__A_Model_based_Approach_for_Semi-Automated_Testing_of_Virtual_Reality_Scenes.pdf)
+ [PDF (ResearchGate Mirror Ver.)](https://www.researchgate.net/publication/396011250_VRExplorer_A_Model-based_Approach_for_Semi-Automated_Testing_of_Virtual_Reality_Scenes)
 ## Guideline
 
 - Unity → Package Manager → Add package from git URL https://github.com/TsingPig/VRExplorer_Release.git
