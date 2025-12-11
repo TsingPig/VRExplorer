@@ -9,3 +9,15 @@ VRExplorer: A Model-based Approach for Semi-Automated Testing of Virtual Reality
 - Add the VRExplorer agent prefab to the `Package/Prefabs` Folder for the under-test scenes.
 - Adding and Inplement interfaces (`Package/EAT Framework/Entity`)
 - *[Optional]* Attach predefined scripts in `Package/Scripts/EAT Framework/Mono` Folder, or select and implement interfaces. 
+
+## Cite
+```
+@inproceedings{zhu_vrexplorer_ase25,
+  author    = {Zhengyang Zhu and Hong{-}Ning Dai and Hanyang Guo and Zeqin Liao and Zibin Zheng},
+  title     = {VRExplorer: A Model-based Approach for Semi-Automated Testing of Virtual Reality Scenes},
+  booktitle = {Proceedings of the 40th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  year      = {2025},
+  doi       = {10.1109/ASE63991.2025.00047},
+  publisher = {IEEE}
+}
+```
